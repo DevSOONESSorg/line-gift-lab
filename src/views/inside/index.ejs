@@ -1,0 +1,46 @@
+<%- include('../partials/top') %>
+<main class="container wide">
+  <h1>裏側ビュー</h1>
+  <p class="lead">スマホ・LINE社・自社サーバー・管理画面の間で起きたことを、新しい順に表示します（自動で更新）。行をクリックすると詳しい中身が開きます。</p>
+  <div class="inline-form">
+    <label class="check"><input type="checkbox" id="auto" checked> 自動更新</label>
+    <label>絞り込み
+      <select id="filter"><option value="">すべて</option><% Object.keys(SIDES).forEach(function (k) { %><option value="<%= k %>"><%= SIDES[k] %></option><% }) %><option value="ng">NGだけ</option></select></label>
+    <form method="post" action="/inside/clear" onsubmit="return confirm('記録を全部消します')"><button class="small secondary">記録を消す</button></form>
+  </div>
+  <div id="logs">
+    <% logs.forEach(function (l) { %>
+      <details class="log side-<%= l.side %> lv-<%= l.level %>" data-side="<%= l.side %>" data-level="<%= l.level %>" data-id="<%= l.id %>">
+        <summary><span class="time"><%= l.at.slice(11) %></span><span class="side"><%= SIDES[l.side] %></span><span class="lv"><%= { ok: 'OK', ng: 'NG', info: '' }[l.level] %></span><span class="t"><%= l.title %></span></summary>
+        <% if (l.detail) { %><pre><%= l.detail %></pre><% } %>
+      </details>
+    <% }) %>
+  </div>
+</main>
+<script>
+  const SIDES = <%- JSON.stringify(SIDES) %>;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const box = document.getElementById('logs');
+  const filter = document.getElementById('filter');
+  function applyFilter() {
+    const f = filter.value;
+    box.querySelectorAll('.log').forEach((el) => {
+      el.style.display = !f || el.dataset.side === f || (f === 'ng' && el.dataset.level === 'ng') ? '' : 'none';
+    });
+  }
+  filter.addEventListener('change', applyFilter);
+  setInterval(async () => {
+    if (!document.getElementById('auto').checked) return;
+    const first = box.querySelector('.log');
+    const after = first ? first.dataset.id : 0;
+    const rows = await fetch('/inside/logs.json?after=' + after).then((r) => r.json()).catch(() => []);
+    rows.reverse().forEach((l) => {
+      const lv = { ok: 'OK', ng: 'NG', info: '' }[l.level];
+      box.insertAdjacentHTML('afterbegin', `<details class="log side-${l.side} lv-${l.level} new" data-side="${l.side}" data-level="${l.level}" data-id="${l.id}">
+        <summary><span class="time">${l.at.slice(11)}</span><span class="side">${SIDES[l.side]}</span><span class="lv">${lv}</span><span class="t">${esc(l.title)}</span></summary>
+        ${l.detail ? `<pre>${esc(l.detail)}</pre>` : ''}</details>`);
+    });
+    if (rows.length) applyFilter();
+  }, 1500);
+</script>
+<%- include('../partials/bottom') %>

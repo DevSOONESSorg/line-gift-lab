@@ -1,0 +1,17 @@
+<%- include('../partials/admin-start') %>
+<h1>注文管理</h1>
+<table class="table">
+  <thead><tr><th>#</th><th>日時</th><th>店舗</th><th>メニュー</th><th>金額</th><th>送り主</th><th>宛先</th><th>状態</th><th></th></tr></thead>
+  <tbody>
+  <% orders.forEach(function (o) { %>
+    <tr>
+      <td><%= o.id %></td><td><%= o.created_at %></td><td><%= o.store_name %></td><td><%= o.menu_name %></td>
+      <td><%= yen(o.amount) %></td><td><%= o.buyer_name %></td><td><%= o.recipient %></td>
+      <td><% if (o.status === 'received') { %><span class="badge info">受取済み</span><% } else { %><span class="badge warn">リクエスト中</span><% } %></td>
+      <td><a class="button small" href="/admin/orders/<%= o.id %>">詳細</a></td>
+    </tr>
+  <% }) %>
+  <% if (!orders.length) { %><tr><td colspan="9" class="empty">注文はまだありません。</td></tr><% } %>
+  </tbody>
+</table>
+<%- include('../partials/admin-end') %>

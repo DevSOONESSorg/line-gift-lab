@@ -1,0 +1,11 @@
+<%- include('_start') %>
+<h1>アカウント設定</h1>
+<section class="card">
+  <dl class="dl">
+    <dt>アカウント名</dt><dd><%= oa.name %></dd>
+    <dt>ベーシックID</dt><dd><code><%= oa.basic_id %></code> <span class="hint">← 管理画面の「LINE公式アカウントID（@xxx）」に入れる値</span></dd>
+    <dt>業種</dt><dd><%= oa.industry || '—' %></dd>
+    <dt>作成日</dt><dd><%= oa.created_at %></dd>
+  </dl>
+</section>
+<%- include('_end') %>

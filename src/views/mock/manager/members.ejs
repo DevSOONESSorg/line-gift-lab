@@ -1,0 +1,33 @@
+<%- include('_start') %>
+<h1>権限管理</h1>
+<table class="table">
+  <thead><tr><th>メンバー</th><th>メール</th><th>権限</th></tr></thead>
+  <tbody>
+  <% members.forEach(function (m) { %><tr><td><%= m.name %></td><td><%= m.email %></td><td><%= ROLE_LABELS[m.role] %></td></tr><% }) %>
+  </tbody>
+</table>
+
+<section class="card">
+  <h2>メンバーを追加</h2>
+  <% if (role !== 'admin') { %>
+    <p class="muted">メンバーを追加できるのは管理者だけです。</p>
+  <% } else { %>
+  <form method="post" action="/mock/manager/oa/<%= oa.id %>/settings/members/invite" class="inline-form">
+    <label>権限の種類
+      <select name="role">
+        <option value="operator">運用担当者（リッチメニュー・応答設定・Messaging API が扱える）</option>
+        <option value="admin">管理者（すべて）</option>
+      </select>
+    </label>
+    <button>URLを発行</button>
+  </form>
+  <% } %>
+  <% if (invite) { %>
+    <div class="ok-box">
+      <p>招待URLを発行しました（<strong>24時間有効・1回だけ</strong>）。このURLを、参加してもらう人に渡してください。</p>
+      <div class="copy-row"><code id="inv"><%= inviteUrl %></code><button type="button" onclick="navigator.clipboard.writeText(document.getElementById('inv').textContent); this.textContent='コピーしました'">コピー</button></div>
+      <p class="hint">受け取った人は、<strong>自分のアカウントでログインしてから</strong>このURLを開きます。体験では画面上部の「ログイン中」を「会社の作業アカウント」に切り替えてから開きます。</p>
+    </div>
+  <% } %>
+</section>
+<%- include('_end') %>

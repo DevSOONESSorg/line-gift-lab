@@ -1,0 +1,49 @@
+<%- include('../partials/admin-start') %>
+<p><a href="/admin/stores">← 店舗管理</a></p>
+<h1><%= store.name %> <% if (store.approved) { %><span class="badge ok">承認済み</span><% } else { %><span class="badge warn">未承認</span><% } %></h1>
+<p><a class="button" href="/admin/stores/<%= store.id %>/edit">編集</a></p>
+
+<div class="grid2">
+  <section class="card">
+    <h2>基本情報</h2>
+    <dl class="dl">
+      <dt>スラッグ</dt><dd><code><%= store.slug %></code></dd>
+      <dt>デフォルト手数料率</dt><dd><%= store.fee_rate %>%</dd>
+      <dt>紐付け代理店</dt><dd><%= agent ? agent.name + '（' + agent.code + '）' : '—' %></dd>
+      <dt>店舗管理者</dt><dd><%= store.manager_line_user_id ? store.manager_line_user_id : '—（管理画面から作成した店舗）' %></dd>
+      <dt>共通アプリに掲載</dt><dd><%= store.listed ? 'する' : 'しない' %></dd>
+      <dt>身分証提示</dt><dd><%= store.id_required ? '必須' : '不要' %></dd>
+    </dl>
+  </section>
+  <section class="card">
+    <h2>店舗紐づけQRコード</h2>
+    <% if (liffUrl) { %>
+      <img src="<%= qr %>" alt="QR" class="qr">
+      <p><code><%= liffUrl %></code></p>
+      <p><a class="button small" href="/mock/phone?open=<%= encodeURIComponent(liffUrl) %>">疑似スマホで読み取る</a></p>
+      <p class="muted">本物のLINEとつないだ店舗（コースB）は、このQRを自分のスマホのLINEで読み取れます。</p>
+    <% } else { %>
+      <p class="empty">LIFF ID が未設定です（第4章・第5章）。</p>
+    <% } %>
+  </section>
+</div>
+
+<section class="card">
+  <h2>メニュー一覧</h2>
+  <table class="table">
+    <thead><tr><th>商品名</th><th>価格</th><th></th></tr></thead>
+    <tbody>
+      <% menus.forEach(function (m) { %>
+        <tr><td><%= m.name %></td><td><%= yen(m.price) %></td>
+          <td><form method="post" action="/admin/stores/<%= store.id %>/menus/<%= m.id %>/delete"><button class="link danger">削除</button></form></td></tr>
+      <% }) %>
+      <% if (!menus.length) { %><tr><td colspan="3" class="empty">メニューがありません。これが無いと購入できません。</td></tr><% } %>
+    </tbody>
+  </table>
+  <form method="post" action="/admin/stores/<%= store.id %>/menus" class="inline-form">
+    <label>商品名 <input name="name" required></label>
+    <label>価格 <input name="price" type="number" min="1" required></label>
+    <button>＋ 追加</button>
+  </form>
+</section>
+<%- include('../partials/admin-end') %>

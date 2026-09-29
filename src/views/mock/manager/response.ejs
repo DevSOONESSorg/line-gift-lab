@@ -1,0 +1,29 @@
+<%- include('_start') %>
+<h1>応答設定</h1>
+<form method="post" class="card form">
+  <h2>基本設定</h2>
+  <p>応答モード</p>
+  <label class="check"><input type="radio" name="response_mode" value="bot" <%= oa.response_mode === 'bot' ? 'checked' : '' %>> Bot（プログラムや自動応答が返事をする）</label>
+  <label class="check"><input type="radio" name="response_mode" value="chat" <%= oa.response_mode === 'chat' ? 'checked' : '' %>> チャット（人が手で返事をする）</label>
+
+  <h2>詳細設定</h2>
+  <p>あいさつメッセージ（友だち追加されたとき）</p>
+  <label class="check"><input type="radio" name="greeting_on" value="1" <%= oa.greeting_on ? 'checked' : '' %>> オン</label>
+  <label class="check"><input type="radio" name="greeting_on" value="0" <%= !oa.greeting_on ? 'checked' : '' %>> オフ</label>
+  <textarea name="greeting_text" rows="2"><%= oa.greeting_text %></textarea>
+
+  <p>Webhook<% if (!channel) { %>（Messaging API を有効にすると使えます）<% } %></p>
+  <% if (channel) { %>
+    <label class="check"><input type="radio" name="webhook" value="1" <%= channel.use_webhook ? 'checked' : '' %>> オン</label>
+    <label class="check"><input type="radio" name="webhook" value="0" <%= !channel.use_webhook ? 'checked' : '' %>> オフ</label>
+    <p class="hint">Developers Console の「Use webhook」と同じスイッチです。</p>
+  <% } %>
+
+  <p>応答メッセージ（LINE社が自動で返す定型文）</p>
+  <label class="check"><input type="radio" name="auto_reply_on" value="1" <%= oa.auto_reply_on ? 'checked' : '' %>> オン</label>
+  <label class="check"><input type="radio" name="auto_reply_on" value="0" <%= !oa.auto_reply_on ? 'checked' : '' %>> オフ</label>
+  <textarea name="auto_reply_text" rows="3"><%= oa.auto_reply_text %></textarea>
+
+  <button>保存</button>
+</form>
+<%- include('_end') %>

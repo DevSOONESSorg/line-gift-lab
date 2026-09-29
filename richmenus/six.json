@@ -1,0 +1,14 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "6分割メニュー（コースB4）",
+  "chatBarText": "メニュー",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,   "width": 833, "height": 843 }, "action": { "type": "uri", "label": "贈る", "uri": "https://liff.line.me/{LIFF_ID}" } },
+    { "bounds": { "x": 833,  "y": 0,   "width": 834, "height": 843 }, "action": { "type": "message", "label": "メニュー", "text": "メニュー" } },
+    { "bounds": { "x": 1667, "y": 0,   "width": 833, "height": 843 }, "action": { "type": "message", "label": "こんにちは", "text": "こんにちは" } },
+    { "bounds": { "x": 0,    "y": 843, "width": 833, "height": 843 }, "action": { "type": "uri", "label": "お店の場所", "uri": "https://maps.google.com/?q=沖縄県庁" } },
+    { "bounds": { "x": 833,  "y": 843, "width": 834, "height": 843 }, "action": { "type": "postback", "label": "postbackテスト", "data": "action=test&item=1", "displayText": "postbackを押しました" } },
+    { "bounds": { "x": 1667, "y": 843, "width": 833, "height": 843 }, "action": { "type": "uri", "label": "Webサイト", "uri": "https://example.com/" } }
+  ]
+}

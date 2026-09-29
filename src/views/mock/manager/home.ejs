@@ -1,0 +1,12 @@
+<%- include('_start') %>
+<h1><%= oa.name %></h1>
+<div class="stats">
+  <div><span>友だち</span><strong><%= friends %></strong></div>
+  <div><span>応答モード</span><strong><%= oa.response_mode === 'bot' ? 'Bot' : 'チャット' %></strong></div>
+  <div><span>応答メッセージ</span><strong><%= oa.auto_reply_on ? 'ON' : 'OFF' %></strong></div>
+  <div><span>Messaging API</span><strong><%= channel ? '有効' : '未設定' %></strong></div>
+  <div><span>Webhook</span><strong><%= channel ? (channel.use_webhook ? 'ON' : 'OFF') : '—' %></strong></div>
+</div>
+<p>ベーシックID：<code><%= oa.basic_id %></code>
+  <a class="button small" href="/mock/phone?add=<%= encodeURIComponent(oa.basic_id) %>">疑似スマホで友だち追加</a></p>
+<%- include('_end') %>

@@ -1,0 +1,14 @@
+<%- include('../partials/admin-start') %>
+<h1>売上集計</h1>
+<p class="hint">「受取済み」になった注文だけが売上です。「リクエスト中」はまだ確定していないので別の列に出しています。</p>
+<table class="table">
+  <thead><tr><th>店舗</th><th>件数</th><th>売上（確定）</th><th>手数料</th><th>未確定（リクエスト中）</th><th>1次代理店</th><th>代理店報酬</th></tr></thead>
+  <tbody>
+  <% rows.forEach(function (r) { %>
+    <tr><td><%= r.name %></td><td><%= r.count %></td><td><%= yen(r.sales) %></td><td><%= yen(r.fee) %></td><td><%= yen(r.pending) %></td>
+      <td><%= r.agent_name || '—' %><%= r.agent_name ? '（' + r.agent_rate + '%）' : '' %></td><td><%= r.agent_name ? yen(r.commission) : '—' %></td></tr>
+  <% }) %>
+  </tbody>
+</table>
+<p class="hint">代理店報酬 ＝ 手数料 × 1次代理店の報酬率。2次代理店経由の店舗も、報酬は1次代理店に計上します（2次の取り分は1次から受け取る）。</p>
+<%- include('../partials/admin-end') %>

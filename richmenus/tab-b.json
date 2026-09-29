@@ -1,0 +1,13 @@
+{
+  "size": { "width": 2500, "height": 1686 },
+  "selected": true,
+  "name": "タブB（お店の情報）",
+  "chatBarText": "メニュー",
+  "areas": [
+    { "bounds": { "x": 0,    "y": 0,   "width": 1250, "height": 303 }, "action": { "type": "richmenuswitch", "richMenuAliasId": "tab-a", "data": "tab=a" } },
+    { "bounds": { "x": 1250, "y": 0,   "width": 1250, "height": 303 }, "action": { "type": "richmenuswitch", "richMenuAliasId": "tab-b", "data": "tab=b" } },
+    { "bounds": { "x": 0,    "y": 303, "width": 833,  "height": 1383 }, "action": { "type": "uri", "uri": "https://maps.google.com/?q=沖縄県庁" } },
+    { "bounds": { "x": 833,  "y": 303, "width": 834,  "height": 1383 }, "action": { "type": "postback", "data": "info=hours", "displayText": "営業時間は？" } },
+    { "bounds": { "x": 1667, "y": 303, "width": 833,  "height": 1383 }, "action": { "type": "uri", "uri": "https://example.com/" } }
+  ]
+}

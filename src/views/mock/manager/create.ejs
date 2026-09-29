@@ -1,0 +1,16 @@
+<%- include('_start') %>
+<h1>LINE公式アカウントの作成</h1>
+<% if (error) { %><p class="error-box"><%= error %></p><% } %>
+<form method="post" action="/mock/manager/create" class="card form">
+  <label>アカウント名 <input name="name" placeholder="新しい店舗名" required></label>
+  <label>メールアドレス <input name="email" value="<%= account.email %>"></label>
+  <label>所在国・地域 <select name="country"><option value="">選択してください</option><option value="JP">日本</option></select></label>
+  <label>業種 <select name="industry"><option>飲食</option><option>美容</option><option>小売</option><option>ナイトワーク</option><option>その他</option></select></label>
+  <label>運用目的 <select name="purpose"><option>販促・集客</option><option>顧客サポート</option></select></label>
+  <label>主な使い方 <select name="use"><option>メッセージ配信</option><option>チャット</option></select></label>
+  <label>ビジネスマネージャー <select name="bm"><option>組織を作成</option></select></label>
+  <label class="check"><input type="checkbox" name="agree" value="1"> LINE公式アカウント利用規約に同意する</label>
+  <button>確認 → 完了</button>
+</form>
+<p class="hint">作った人（いまログイン中のアカウント）が、この公式アカウントの「管理者」になります。</p>
+<%- include('_end') %>

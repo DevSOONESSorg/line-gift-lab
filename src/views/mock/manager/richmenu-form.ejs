@@ -1,0 +1,55 @@
+<%- include('_start') %>
+<h1>リッチメニューを作成</h1>
+<% if (error) { %><p class="error-box"><%= error %></p><% } %>
+<form method="post" enctype="multipart/form-data" class="card form" id="rmform">
+  <h2>表示設定</h2>
+  <label>タイトル（管理用・ユーザーには見えない） <input name="title" value="<%= form.title || '' %>"></label>
+  <label>表示期間 <input value="今日 〜 1年後（体験では固定）" disabled></label>
+  <label>メニューバーのテキスト <input name="bar_text" value="<%= form.bar_text || 'メニュー' %>"></label>
+  <label class="check"><input type="checkbox" name="is_default" value="1" checked> メニューのデフォルト表示：表示する（トークを開いたときに出る）</label>
+
+  <h2>コンテンツ設定</h2>
+  <label>テンプレート
+    <select name="template" id="tpl">
+      <option value="">選択</option>
+      <% Object.keys(templates).forEach(function (k) { %>
+        <option value="<%= k %>" <%= form.template === k ? 'selected' : '' %>><%= templates[k].label %>（<%= sizes[templates[k].size].map(function (s) { return s.join('×'); }).join(' / ') %>）</option>
+      <% }) %>
+    </select>
+  </label>
+  <p class="hint">デザインガイド：テンプレートの枠つき画像は <a href="/samples/templates/" target="_blank">こちら</a>（例 <code>/samples/templates/large-6_1200x810.png</code>）。まずは「小・1分割」で1ボタンから。</p>
+  <label>画像（PNG / JPEG・1MBまで） <input type="file" name="image" accept="image/png,image/jpeg"></label>
+
+  <div id="preview" class="tpl-preview"></div>
+  <h2>アクション</h2>
+  <div id="actions"></div>
+  <button>保存</button>
+</form>
+<script>
+  const templates = <%- JSON.stringify(templates) %>;
+  const form = <%- JSON.stringify(form) %>;
+  function render() {
+    const t = templates[document.getElementById('tpl').value];
+    const box = document.getElementById('actions');
+    const pv = document.getElementById('preview');
+    box.innerHTML = ''; pv.innerHTML = '';
+    if (!t) return;
+    pv.style.aspectRatio = t.size === 'large' ? '2500 / 1686' : '2500 / 843';
+    t.areas.forEach((a, i) => {
+      const L = String.fromCharCode(65 + i);
+      pv.insertAdjacentHTML('beforeend', `<div style="left:${a.x*100}%;top:${a.y*100}%;width:${a.w*100}%;height:${a.h*100}%">${L}</div>`);
+      const type = form['action_type_' + i] || 'link';
+      const val = (form['action_value_' + i] || '').replace(/"/g, '&quot;');
+      box.insertAdjacentHTML('beforeend', `<div class="action-row"><strong>${L}</strong>
+        <select name="action_type_${i}">
+          <option value="link" ${type==='link'?'selected':''}>リンク</option>
+          <option value="text" ${type==='text'?'selected':''}>テキスト</option>
+          <option value="none" ${type==='none'?'selected':''}>設定しない</option>
+        </select>
+        <input name="action_value_${i}" value="${val}" placeholder="https://liff.line.me/{LIFF_ID} または送る文字"></div>`);
+    });
+  }
+  document.getElementById('tpl').addEventListener('change', render);
+  render();
+</script>
+<%- include('_end') %>

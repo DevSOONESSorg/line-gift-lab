@@ -1,0 +1,15 @@
+<%- include('_start') %>
+<h1>メンバー招待</h1>
+<% if (error) { %>
+  <p class="error-box"><%= error %></p>
+<% } else if (already) { %>
+  <p class="ok-box">「<%= account.name %>」はすでに「<%= oa.name %>」のメンバーです。<a href="/mock/manager/oa/<%= oa.id %>">開く</a></p>
+  <p class="hint">招待した本人のアカウントのまま開いていませんか？ 参加させたいアカウントに切り替えてから、もう一度開いてください。</p>
+<% } else { %>
+  <section class="card">
+    <p>「<strong><%= oa.name %></strong>」に <strong><%= ROLE_LABELS[inv.role] %></strong> として参加します。</p>
+    <p>参加するアカウント：<strong><%= account.name %></strong>（<%= account.email %>）</p>
+    <form method="post"><button>参加する</button></form>
+  </section>
+<% } %>
+<%- include('_end') %>

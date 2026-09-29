@@ -1,0 +1,21 @@
+{
+  "name": "line-gift-lab",
+  "version": "1.0.0",
+  "description": "公式LINE連携ギフトサービスの仕組みを体験で学ぶ教材（SE仕事体験コース）",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "reset": "node scripts/reset.js",
+    "drill": "node scripts/drill.js",
+    "richmenu": "node scripts/richmenu.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "multer": "^2.0.2",
+    "qrcode": "^1.5.4"
+  }
+}

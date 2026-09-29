@@ -1,0 +1,11 @@
+<%- include('_head') %>
+<h1>店舗管理</h1>
+<% if (!stores.length) { %><p>あなたが管理しているお店はまだありません。「出店登録」から登録してください。</p><% } %>
+<% stores.forEach(function (s) { %>
+  <div class="store-card">
+    <div><strong><%= s.name %></strong> <% if (!s.approved) { %><span class="tag warn">承認待ち</span><% } %></div>
+    <div class="small">受け取り待ち：<%= s.waiting %> 件</div>
+    <a class="btn small" href="/liff/platform/manage/<%= s.id %>?mock_uid=<%= uid %>">贈り物一覧</a>
+  </div>
+<% }) %>
+<%- include('_foot') %>

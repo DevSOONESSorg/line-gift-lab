@@ -1,0 +1,18 @@
+<%- include('../../partials/top') %>
+<%- include('../../partials/account-bar') %>
+<div class="mock-wrap">
+  <% if (typeof oa !== 'undefined' && oa) { %>
+  <aside class="mock-side">
+    <div class="oa-title"><span class="oa-icon"><%= oa.name.slice(0, 1) %></span><div><strong><%= oa.name %></strong><br><small><%= oa.basic_id %> ・ <%= { admin: '管理者', operator: '運用担当者' }[role] %></small></div></div>
+    <a href="/mock/manager/oa/<%= oa.id %>">ホーム</a>
+    <a href="/mock/manager/oa/<%= oa.id %>/response">応答設定</a>
+    <a href="/mock/manager/oa/<%= oa.id %>/richmenus">リッチメニュー</a>
+    <div class="side-label">設定</div>
+    <a href="/mock/manager/oa/<%= oa.id %>/settings">アカウント設定</a>
+    <a href="/mock/manager/oa/<%= oa.id %>/settings/members">権限管理</a>
+    <a href="/mock/manager/oa/<%= oa.id %>/settings/messaging-api">Messaging API</a>
+    <div class="side-label"></div>
+    <a href="/mock/manager">← アカウントリスト</a>
+  </aside>
+  <% } %>
+  <main class="mock-main">

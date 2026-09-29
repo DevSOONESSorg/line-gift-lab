@@ -1,0 +1,13 @@
+<div class="account-bar">
+  <form method="post" action="/mock/switch-account">
+    <input type="hidden" name="back" value="<%= typeof back !== 'undefined' ? back : '' %>">
+    <span>ログイン中：</span>
+    <strong class="acc acc-<%= account.id %>"><%= account.name %></strong>
+    <span class="muted">（<%= account.email %>）</span>
+    <select name="account_id" onchange="this.form.back.value = location.pathname + location.search; this.form.submit()">
+      <% accounts.forEach(function (a) { %>
+        <option value="<%= a.id %>" <%= a.id === account.id ? 'selected' : '' %>><%= a.name %> に切り替え</option>
+      <% }) %>
+    </select>
+  </form>
+</div>

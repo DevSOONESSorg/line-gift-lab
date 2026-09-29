@@ -1,0 +1,37 @@
+<%- include('partials/top') %>
+<main class="container">
+  <h1><%= appName %>（教材）へようこそ</h1>
+  <p class="lead">公式LINEでお店のギフトを贈る仕組みを、手を動かしながら理解するための教材です。<br>
+    この画面の上のメニューは、実際の仕事で使う3つの画面と、お客さんのスマホの「代わり」です。</p>
+
+  <h2>登場人物（だれが・どこで・何をしているか）</h2>
+  <div class="actors">
+    <div class="actor actor-phone">
+      <h3>スマホ<small>お客さん・お店の人</small></h3>
+      <p>LINEアプリで友だち追加し、トークやリッチメニューから操作する。</p>
+      <a href="/mock/phone">疑似スマホを開く →</a>
+    </div>
+    <div class="arrow">⇄</div>
+    <div class="actor actor-line">
+      <h3>LINE社<small>疑似LINE</small></h3>
+      <p>公式アカウント・チャネル・LIFF・リッチメニューを持っている。<br>
+        <a href="/mock/manager">Manager</a> ／ <a href="/mock/developers">Developers Console</a></p>
+      <p class="muted">本物では LINE社のサーバー。中身は見えない。</p>
+    </div>
+    <div class="arrow">⇄</div>
+    <div class="actor actor-app">
+      <h3>自社サーバー<small>おくりギフト</small></h3>
+      <p>店舗・メニュー・注文を持っている。LINEの設定値の「コピー」を持ち、LINE社とやりとりする。</p>
+      <a href="/admin">管理画面を開く →</a>
+    </div>
+  </div>
+  <p class="center"><a class="button" href="/inside">裏側ビュー</a>　…　3者の間で何が起きたかが、時間順に全部見えます</p>
+
+  <h2>まずやること</h2>
+  <ol>
+    <li><a href="/mock/phone">疑似スマホ</a> で、すでに友だちになっている「見本カフェ」を開き、下のメニュー「ギフトを贈る」を押してみる</li>
+    <li>買ってみたら、<a href="/inside">裏側ビュー</a> で何が起きたかを見る</li>
+    <li>手順書（<code>docs/course-a/</code>）の第1章から、自分のお店をつくっていく</li>
+  </ol>
+</main>
+<%- include('partials/bottom') %>

@@ -1,0 +1,13 @@
+<%- include('_head') %>
+<h1>出店登録</h1>
+<p class="small">おくりギフトに、あなたのお店を登録します。登録したLINEアカウントが、そのお店の「店舗管理者」になります。</p>
+<% if (error) { %><p class="err"><%= error %></p><% } %>
+<form method="post" action="/liff/platform/register">
+  <input type="hidden" name="mock_uid" value="<%= uid %>">
+  <label>店名 <input name="name" value="<%= form.name || '' %>" placeholder="例：クラブ アズール"></label>
+  <h2>最初のメニュー（あとからでも追加できます）</h2>
+  <label>商品名 <input name="menu_name" value="<%= form.menu_name || '' %>" placeholder="例：乾杯ドリンク"></label>
+  <label>価格（円） <input name="menu_price" type="number" min="1" value="<%= form.menu_price || '' %>"></label>
+  <button class="btn wide">送信</button>
+</form>
+<%- include('_foot') %>

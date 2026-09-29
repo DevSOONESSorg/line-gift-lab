@@ -1,0 +1,133 @@
+<%- include('../partials/top') %>
+<main class="phone-page">
+  <div class="phone">
+    <div class="phone-status"><span>9:41</span><span><%= me.display_name %> のLINE</span><span>●●●</span></div>
+
+    <% if (open) { %>
+      <!-- ===== スマホの中のブラウザ（LIFF） ===== -->
+      <div class="browser-bar">
+        <a href="/mock/phone<%= chat ? '?chat=' + chat.id : '' %>">✕ 閉じる</a>
+        <span><%= open.liffId ? 'LIFF ' + open.liffId : 'ブラウザ' %></span>
+      </div>
+      <% if (open.error) { %>
+        <div class="phone-body pad"><p class="error-box"><%= open.error %></p></div>
+      <% } else if (open.external) { %>
+        <div class="phone-body pad"><p>外部のページです。</p><p><a href="<%= open.external %>" target="_blank" rel="noopener"><%= open.external %></a></p></div>
+      <% } else { %>
+        <iframe class="phone-frame" src="<%= open.iframe %>"></iframe>
+      <% } %>
+
+    <% } else if (addOa) { %>
+      <!-- ===== 友だち追加 ===== -->
+      <div class="chat-head"><a href="/mock/phone">‹</a><span>友だち追加</span><span></span></div>
+      <div class="phone-body pad center">
+        <% if (addOa.notFound) { %>
+          <p class="error-box">「<%= addOa.notFound %>」というIDの公式アカウントは見つかりません。</p>
+        <% } else { %>
+          <div class="oa-icon big"><%= addOa.name.slice(0, 1) %></div>
+          <h3><%= addOa.name %></h3>
+          <p class="muted"><%= addOa.basic_id %></p>
+          <form method="post" action="/mock/phone/add">
+            <input type="hidden" name="basic_id" value="<%= addOa.basic_id %>">
+            <button class="line-btn">追加</button>
+          </form>
+        <% } %>
+      </div>
+
+    <% } else if (chat) { %>
+      <!-- ===== トーク画面 ===== -->
+      <div class="chat-head">
+        <a href="/mock/phone">‹</a><span><%= chat.name %></span>
+        <form method="post" action="/mock/phone/chat/<%= chat.id %>/block">
+          <input type="hidden" name="blocked" value="<%= friendRow && friendRow.blocked ? '0' : '1' %>">
+          <button class="link small"><%= friendRow && friendRow.blocked ? 'ブロック解除' : 'ブロック' %></button>
+        </form>
+      </div>
+      <div class="phone-body chat" id="chat">
+        <% messages.forEach(function (m) { %>
+          <div class="msg <%= m.direction %>">
+            <div class="bubble"><%= m.text %></div>
+            <div class="meta"><%= m.at.slice(11, 16) %> <%= { bot: 'bot', auto: '応答メッセージ', greeting: 'あいさつ', user: '' }[m.via] %></div>
+          </div>
+        <% }) %>
+        <% if (!messages.length) { %><p class="muted center">まだメッセージはありません</p><% } %>
+      </div>
+      <% if (!friendRow) { %>
+        <div class="phone-foot pad center"><form method="post" action="/mock/phone/add"><input type="hidden" name="basic_id" value="<%= chat.basic_id %>"><button class="line-btn">友だち追加</button></form></div>
+      <% } else if (friendRow.blocked) { %>
+        <div class="phone-foot pad center muted">ブロック中です</div>
+      <% } else { %>
+        <% if (richMenu) { const tpl = templates[richMenu.template]; %>
+          <div class="richmenu" id="richmenu">
+            <img src="/mock/uploads/richmenu/<%= richMenu.image_path %>" alt="">
+            <% tpl.areas.forEach(function (a, i) { const act = richMenu.actions[i] || { type: 'none' }; %>
+              <% const style = 'left:' + a.x * 100 + '%;top:' + a.y * 100 + '%;width:' + a.w * 100 + '%;height:' + a.h * 100 + '%'; %>
+              <% if (act.type === 'link') { %>
+                <a class="rm-area" style="<%= style %>" href="/mock/phone?chat=<%= chat.id %>&open=<%= encodeURIComponent(act.value) %>" title="<%= act.value %>"></a>
+              <% } else if (act.type === 'text') { %>
+                <form method="post" action="/mock/phone/chat/<%= chat.id %>/send" class="rm-area" style="<%= style %>">
+                  <input type="hidden" name="text" value="<%= act.value %>"><button title="「<%= act.value %>」を送る"></button>
+                </form>
+              <% } else { %>
+                <span class="rm-area none" style="<%= style %>"></span>
+              <% } %>
+            <% }) %>
+          </div>
+        <% } %>
+        <form class="chat-input" method="post" action="/mock/phone/chat/<%= chat.id %>/send">
+          <% if (richMenu) { %><button type="button" class="rm-toggle" onclick="document.getElementById('richmenu').classList.toggle('hide')">≡ <%= richMenu.bar_text %></button><% } %>
+          <input name="text" placeholder="メッセージを入力" autocomplete="off" autofocus>
+          <button>送信</button>
+        </form>
+      <% } %>
+
+    <% } else { %>
+      <!-- ===== ホーム ===== -->
+      <div class="chat-head"><span></span><span>ホーム</span><span></span></div>
+      <div class="phone-body pad">
+        <form method="post" action="/mock/phone/name" class="profile">
+          <div class="oa-icon">私</div>
+          <input name="display_name" value="<%= me.display_name %>" maxlength="20">
+          <button class="link small">名前を変更</button>
+        </form>
+        <p class="muted small">あなたのユーザーID：<code><%= me.user_id %></code></p>
+        <h4>友だち（公式アカウント）</h4>
+        <% friends.forEach(function (f) { %>
+          <a class="friend" href="/mock/phone?chat=<%= f.id %>"><span class="oa-icon"><%= f.name.slice(0, 1) %></span><span><%= f.name %><%= f.blocked ? '（ブロック中）' : '' %></span></a>
+        <% }) %>
+        <% if (!friends.length) { %><p class="muted">まだいません</p><% } %>
+        <h4>ID検索で友だち追加</h4>
+        <form method="get" action="/mock/phone" class="row">
+          <input name="add" placeholder="@123abcde">
+          <button>検索</button>
+        </form>
+      </div>
+    <% } %>
+  </div>
+
+  <aside class="phone-help">
+    <h2>疑似スマホ</h2>
+    <p>あなたのスマホのLINEの代わりです。友だち追加・トーク・リッチメニュー・LIFF（LINEの中で開くページ）を体験できます。</p>
+    <ul>
+      <li>緑の吹き出し＝あなたが送ったもの、白＝公式アカウントから届いたもの</li>
+      <li>吹き出しの下の小さな文字で「誰が返したか」がわかります<br>（<strong>bot</strong>＝自社サーバー／<strong>応答メッセージ</strong>＝LINE社の定型文）</li>
+      <li>リッチメニューのボタンにマウスを乗せると、設定されている動作が見えます</li>
+    </ul>
+    <p><a href="/inside" target="_blank">裏側ビューを別タブで開く →</a></p>
+  </aside>
+</main>
+<% if (chat && !open) { %>
+<script>
+  // 新しいメッセージが来たら画面を更新する
+  const box = document.getElementById('chat');
+  if (box) box.scrollTop = box.scrollHeight;
+  let last = <%= lastId %>;
+  setInterval(async () => {
+    const input = document.querySelector('.chat-input input[name=text]');
+    if (input && input.value) return; // 入力中は更新しない
+    const r = await fetch('/mock/phone/chat/<%= chat.id %>/last.json').then((x) => x.json()).catch(() => null);
+    if (r && r.lastId !== last) location.reload();
+  }, 2000);
+</script>
+<% } %>
+<%- include('../partials/bottom') %>

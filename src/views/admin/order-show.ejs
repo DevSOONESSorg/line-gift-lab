@@ -1,0 +1,20 @@
+<%- include('../partials/admin-start') %>
+<p><a href="/admin/orders">← 注文管理</a></p>
+<h1>注文 #<%= o.id %></h1>
+<section class="card">
+  <dl class="dl">
+    <dt>状態</dt><dd><% if (o.status === 'received') { %><span class="badge info">受取済み</span>（<%= o.received_at %>）<% } else { %><span class="badge warn">リクエスト中</span><% } %></dd>
+    <dt>決済方法</dt><dd>テストカード **** <%= o.card_last4 %></dd>
+    <dt>決済の状態</dt><dd><%= o.payment === 'captured' ? '確定（お金が動いた）' : '仮押さえ（まだ確定していない）' %></dd>
+    <dt>店舗</dt><dd><%= o.store_name %></dd>
+    <dt>メニュー</dt><dd><%= o.menu_name %></dd>
+    <dt>売上</dt><dd><%= yen(o.amount) %></dd>
+    <dt>手数料</dt><dd><%= yen(o.fee) %>（注文時の手数料率 <%= Math.round(o.fee / o.amount * 1000) / 10 %>%）</dd>
+    <dt>送り主</dt><dd><%= o.buyer_name %> <code><%= o.buyer_line_user_id %></code></dd>
+    <dt>宛先</dt><dd><%= o.recipient %></dd>
+    <dt>メッセージ</dt><dd><%= o.message || '—' %></dd>
+    <dt>身分証画像</dt><dd><%= o.id_image || '—' %></dd>
+    <dt>お礼</dt><dd><%= o.thanks_sent ? '送信済み' : '—' %></dd>
+  </dl>
+</section>
+<%- include('../partials/admin-end') %>
