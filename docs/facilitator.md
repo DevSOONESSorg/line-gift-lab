@@ -2,6 +2,7 @@
 
 ## 事前準備
 
+- **初めて使う前・アプリを更新したあとは、[動作チェックリスト](checklist.md) を職員が一度通す**
 - 参加者用PCに Docker Desktop を入れ、**事前に一度 `docker compose up` を完了させておく**（初回は Laravel 本体のダウンロードで3〜5分かかる）
 - コースBをやる場合は `docker compose --profile tunnel pull` も済ませ、事業所のネットワークで `*.trycloudflare.com` が使えるか確認
 - 障害ドリルの症状カード（下の表の「症状カード」列）を印刷しておく
