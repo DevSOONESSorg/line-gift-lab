@@ -270,7 +270,7 @@ line-gift-lab/
 
 | 役割 | 技術 | ポイント |
 |---|---|---|
-| 言語・フレームワーク | PHP 8.3 / **Laravel 12** | 本番環境の管理画面と同じ種類の作り |
+| 言語・フレームワーク | PHP 8.4 / **Laravel 12** | 本番環境の管理画面と同じ種類の作り |
 | 画面 | Blade ＋ **Bootstrap 5.3** ＋ Bootstrap Icons | サーバー側でHTMLを組み立てる方式 |
 | データベース | SQLite（3ファイル） | DBサーバーがいらない。接続は `config/database.php` |
 | ログイン | Laravel の認証（セッション＋Cookie） | `app/Http/Controllers/Admin/LoginController.php` |
