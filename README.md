@@ -126,7 +126,7 @@ docker compose up
 
 ### 止め方
 
-アプリを動かしているターミナルで `Ctrl + C`（Macも同じ `Ctrl`）を押したあと、
+アプリを動かしているターミナルで `Ctrl + C` を押したあと、
 
 ```bash
 docker compose down
