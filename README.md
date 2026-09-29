@@ -68,18 +68,6 @@ flowchart LR
 - **Docker Desktop**（Windows / Mac）：インストールして**起動しておく**（画面上部のメニューバー／タスクバーにクジラのアイコンが出ていればOK）
 - **Git**：ダウンロードに使います（なければ下の「方法B：zipでダウンロード」でもOK）
 
-### 最短手順（慣れている人向け）
-
-```bash
-git clone https://github.com/DevSOONESSorg/line-gift-lab.git
-cd line-gift-lab
-docker compose up
-```
-
-起動したら、ブラウザで <http://localhost:3000> を開きます。
-
----
-
 ### 手順（くわしく）
 
 #### ① ターミナルを開く
