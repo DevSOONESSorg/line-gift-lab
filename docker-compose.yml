@@ -10,6 +10,7 @@ services:
       - "${PORT:-3000}:3000"        # 左がPC側のポート（.env の PORT で変えられる）
     volumes:
       - ./:/app                     # フォルダをまるごと共有。コードを直すとすぐ反映される
+      - vendor:/app/vendor          # Laravel 本体など（数千ファイル）はコンテナの中だけに置く（Macの共有だと遅く、失敗しやすい）
     environment:
       - TZ=Asia/Tokyo
       - PORT=${PORT:-3000}
@@ -23,3 +24,6 @@ services:
     command: tunnel --no-autoupdate --metrics 0.0.0.0:2000 --url http://app:3000
     depends_on:
       - app
+
+volumes:
+  vendor:

@@ -12,7 +12,7 @@ set -e
 cd /app
 
 [ -f .env ] || cp .env.example .env
-[ -d vendor ] || composer install --no-interaction --prefer-dist
+[ -f vendor/autoload.php ] || composer install --no-interaction --prefer-dist
 grep -q '^APP_KEY=base64' .env || php artisan key:generate --force
 
 touch database/database.sqlite database/mockline.sqlite database/inside.sqlite
