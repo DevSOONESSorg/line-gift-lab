@@ -1,0 +1,93 @@
+/* =====================================================
+   教材の見た目（Bootstrap 5 に足りない分だけ）
+   色は手順書のバッジに合わせる：管理画面＝紫 / Manager＝緑 / Developers＝青 / スマホ＝オレンジ
+   ===================================================== */
+:root { --admin: #6b46c1; --manager: #06a54b; --dev: #2563eb; --phone: #e8590c; --line: #06c755; }
+body { background: #f5f6f8; font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+
+/* 教材ナビ */
+.labnav { display: flex; flex-wrap: wrap; background: #111827; padding: 0 12px; gap: 2px; font-size: 14px; }
+.labnav a { color: #e5e7eb; text-decoration: none; padding: 8px 12px; display: flex; flex-direction: column; line-height: 1.2; border-bottom: 4px solid transparent; }
+.labnav a small { font-size: 10px; opacity: .7; }
+.labnav .brand { font-weight: bold; font-size: 16px; margin-right: 12px; justify-content: center; }
+.labnav .g-admin.on, .labnav .g-admin:hover { border-color: var(--admin); }
+.labnav .g-phone.on, .labnav .g-phone:hover { border-color: var(--phone); }
+.labnav .g-manager.on, .labnav .g-manager:hover { border-color: var(--manager); }
+.labnav .g-dev.on, .labnav .g-dev:hover { border-color: var(--dev); }
+.labnav .g-inside.on, .labnav .g-inside:hover { border-color: #facc15; }
+
+/* 管理画面（実物と同じく左が黒いサイドバー） */
+.admin-side { width: 230px; min-height: calc(100vh - 48px); background: #212529; color: #fff; flex-shrink: 0; }
+.admin-brand { font-weight: bold; font-size: 18px; text-align: center; padding: 18px 0; }
+.admin-side .nav-link { color: rgba(255,255,255,.75); padding: 9px 20px; border-radius: 6px; margin: 1px 8px; }
+.admin-side .nav-link:hover { color: #fff; background: rgba(255,255,255,.08); }
+.admin-side .nav-link.active { color: #fff; background: rgba(255,255,255,.15); }
+.admin-main { min-width: 0; }
+.card.stat .fs-3, .card.stat .fs-4 { font-weight: 500; }
+.stage-badge { position: fixed; right: 12px; bottom: 12px; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; color: #fff; z-index: 1000; }
+.stage-dev { background: #2563eb; } .stage-stg { background: #d97706; } .stage-prod { background: #dc2626; }
+.swatch { display: inline-block; width: 40px; height: 40px; border-radius: 6px; }
+pre.sql { white-space: pre-wrap; background: #111827; color: #e5e7eb; padding: 10px; border-radius: 6px; }
+@media (max-width: 768px) { .admin-body > .d-flex { flex-direction: column; } .admin-side { width: auto; min-height: 0; } }
+
+/* 疑似LINE（Manager / Developers） */
+.account-bar { background: #fff; border-bottom: 1px solid #dee2e6; padding: 8px 20px; font-size: 14px; }
+.acc { padding: 2px 8px; border-radius: 4px; }
+.acc-personal { background: #fff7ed; color: #9a3412; }
+.acc-company { background: #eff6ff; color: #1e40af; }
+.mock-wrap { min-height: calc(100vh - 100px); }
+.mock-side { width: 230px; background: #fff; border-right: 1px solid #dee2e6; padding: 14px 0; flex-shrink: 0; }
+.mock-side > a { display: block; padding: 7px 18px; color: #212529; text-decoration: none; }
+.mock-side > a:hover { background: #effaf3; color: var(--manager); }
+.side-label { padding: 12px 18px 2px; font-size: 12px; color: #6c757d; }
+.oa-icon { width: 38px; height: 38px; border-radius: 50%; background: var(--line); color: #fff; display: inline-grid; place-items: center; font-weight: bold; flex-shrink: 0; }
+.oa-icon.dev { background: var(--dev); border-radius: 8px; }
+.oa-icon.big { width: 80px; height: 80px; font-size: 32px; display: grid; }
+.oa-card, .ch-card { display: flex; gap: 10px; align-items: center; background: #fff; border: 1px solid #dee2e6; border-radius: 10px; padding: 12px 16px; text-decoration: none; color: #212529; min-width: 260px; }
+.ch-card { flex-direction: column; align-items: flex-start; gap: 2px; }
+.ch-card small { color: #6c757d; }
+.ch-card.disabled { opacity: .45; background: #f1f3f5; cursor: not-allowed; }
+.tpl-preview { position: relative; width: 100%; max-width: 420px; background: #f1f3f5; border: 1px solid #dee2e6; margin: 8px 0; }
+.tpl-preview div { position: absolute; border: 1px dashed #6c757d; display: grid; place-items: center; font-weight: bold; }
+.btn-line { background: var(--line); color: #fff; } .btn-line:hover { background: #05a847; color: #fff; }
+
+/* 疑似スマホ */
+.phone-page { display: flex; gap: 30px; justify-content: center; padding: 24px 16px; flex-wrap: wrap; }
+.phone { width: 380px; height: 760px; border: 12px solid #111; border-radius: 40px; background: #fff; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+.phone-status { display: flex; justify-content: space-between; font-size: 11px; padding: 6px 18px; background: #111; color: #fff; }
+.chat-head, .browser-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 1px solid #dee2e6; font-weight: bold; }
+.chat-head a, .browser-bar a { text-decoration: none; color: #212529; font-size: 20px; }
+.browser-bar { background: #f1f3f5; font-size: 13px; } .browser-bar a { font-size: 13px; }
+.phone-body { flex: 1; overflow-y: auto; }
+.phone-frame { flex: 1; border: 0; width: 100%; }
+.chat { background: #8cabd9; padding: 12px; }
+.msg { display: flex; flex-direction: column; margin: 8px 0; align-items: flex-start; }
+.msg.in { align-items: flex-end; }
+.bubble { background: #fff; padding: 8px 12px; border-radius: 16px; max-width: 80%; white-space: pre-wrap; word-break: break-word; font-size: 14px; }
+.msg.in .bubble { background: #85e249; }
+.meta { font-size: 10px; opacity: .75; margin-top: 2px; }
+.richmenu { position: relative; border-top: 1px solid #dee2e6; }
+.richmenu img { width: 100%; display: block; }
+.rm-area { position: absolute; display: block; margin: 0; }
+.rm-area:hover { background: rgba(255,255,255,.25); outline: 2px solid #fff; }
+.rm-area button { width: 100%; height: 100%; background: transparent; border: 0; padding: 0; }
+.rm-area.none:hover { background: none; outline: none; }
+.chat-input { display: flex; gap: 6px; padding: 8px; border-top: 1px solid #dee2e6; }
+.chat-input input { flex: 1; min-width: 0; }
+.friend { display: flex; align-items: center; gap: 10px; padding: 8px 4px; text-decoration: none; color: #212529; border-bottom: 1px solid #f1f3f5; }
+.phone-help { max-width: 360px; }
+
+/* 裏側ビュー */
+.log { background: #fff; border-left: 6px solid #adb5bd; margin: 3px 0; border-radius: 4px; }
+.log summary { display: flex; gap: 10px; padding: 7px 10px; cursor: pointer; align-items: baseline; list-style: none; font-size: 14px; }
+.log summary::-webkit-details-marker { display: none; }
+.log .time { color: #6c757d; font-family: ui-monospace, monospace; font-size: 12px; }
+.log .side { font-size: 12px; min-width: 150px; font-weight: bold; }
+.log .lv { font-size: 11px; font-weight: bold; min-width: 22px; }
+.log.lv-ok .lv { color: #198754; } .log.lv-ng .lv { color: #dc3545; } .log.lv-ng { background: #fff5f5; }
+.log pre { margin: 0; padding: 10px 14px; background: #111827; color: #e5e7eb; font-size: 12px; white-space: pre-wrap; word-break: break-all; }
+.log.side-phone { border-color: var(--phone); } .log.side-phone .side { color: var(--phone); }
+.log.side-line { border-color: var(--line); } .log.side-line .side { color: #059669; }
+.log.side-app { border-color: var(--admin); } .log.side-app .side { color: var(--admin); }
+.log.side-admin { border-color: #a78bfa; } .log.side-admin .side { color: #7c3aed; }
+.log.new { animation: flash 1.5s; } @keyframes flash { from { background: #fef9c3; } }

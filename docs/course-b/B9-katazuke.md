@@ -5,7 +5,7 @@
 ## 1. API で作ったリッチメニュー（B4）
 
 ```bash
-docker compose exec app npm run richmenu -- --store yamada-real delete-all
+docker compose exec app php artisan lab:richmenu delete-all --store=yamada-real
 ```
 
 ## 2. 公式アカウント
@@ -28,10 +28,10 @@ docker compose exec app npm run richmenu -- --store yamada-real delete-all
 
 ```bash
 docker compose down
-docker compose run --rm app npm run reset
+docker compose up -d && docker compose exec app php artisan migrate:fresh --seed && docker compose down
 ```
 
-`.env` に書いたトークンがあれば消しておきましょう。
+
 
 ## 6. 方法B（メールアドレスのビジネスID）の人
 

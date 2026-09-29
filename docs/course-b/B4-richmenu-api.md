@@ -10,7 +10,7 @@
 2. **画像をアップロード**：その `richMenuId` に画像を付ける
 3. **表示する**：全員のデフォルトにする／特定の人に紐付ける
 
-教材には、これを実行するスクリプト [scripts/richmenu.js](../../scripts/richmenu.js) と、定義の JSON（[richmenus/](../../richmenus/)）が入っています。
+教材には、これを実行する artisan コマンド [app/Console/Commands/RichMenu.php](../../app/Console/Commands/RichMenu.php)（`php artisan lab:richmenu`）と、定義の JSON（[richmenus/](../../richmenus/)）が入っています。
 
 ## 1. 6分割メニュー（postback つき）
 
@@ -22,13 +22,13 @@ JSON を開いて、中身を読んでみましょう：[richmenus/six.json](../
 実行します（B3 で作った店舗の slug を `--store` に入れる。トークンは管理画面に入れたものが使われます）。
 
 ```bash
-docker compose exec app npm run richmenu -- --store yamada-real create richmenus/six.json richmenus/images/six.png
+docker compose exec app php artisan lab:richmenu create richmenus/six.json richmenus/images/six.png --store=yamada-real
 ```
 
 `○ 作成しました: richmenu-xxxxxxxx` と出たら、その ID を全員のデフォルトにします。
 
 ```bash
-docker compose exec app npm run richmenu -- --store yamada-real default richmenu-xxxxxxxx
+docker compose exec app php artisan lab:richmenu default richmenu-xxxxxxxx --store=yamada-real
 ```
 
 スマホでトークを開き直し、「postbackテスト」を押す → bot が「ボタンが押されました（data: action=test&item=1）」と返せば成功です。
@@ -40,18 +40,18 @@ docker compose exec app npm run richmenu -- --store yamada-real default richmenu
 `richmenuswitch` アクションと **エイリアス**（メニューのあだ名）を使うと、タブのように切り替えられます。
 
 ```bash
-docker compose exec app npm run richmenu -- --store yamada-real setup-tabs
+docker compose exec app php artisan lab:richmenu setup-tabs --store=yamada-real
 ```
 
-スマホで「タブB：お店の情報」を押すとメニューが切り替わり、「営業時間」を押すと bot が返事をします（[richmenus/tab-b.json](../../richmenus/tab-b.json) の postback `info=hours` を、[storeBot.js](../../src/app/bot/storeBot.js) が受け取っています）。
+スマホで「タブB：お店の情報」を押すとメニューが切り替わり、「営業時間」を押すと bot が返事をします（[richmenus/tab-b.json](../../richmenus/tab-b.json) の postback `info=hours` を、[StoreBot.php](../../app/Services/Bots/StoreBot.php) が受け取っています）。
 
 ## 3. 人ごとにちがうメニュー
 
 自分のユーザーIDは、裏側ビューの Webhook受信 の行を開くと `"userId": "U..."` で見つかります。
 
 ```bash
-docker compose exec app npm run richmenu -- --store yamada-real list
-docker compose exec app npm run richmenu -- --store yamada-real link Uxxxxxxxx richmenu-yyyyyyyy
+docker compose exec app php artisan lab:richmenu list --store=yamada-real
+docker compose exec app php artisan lab:richmenu link Uxxxxxxxx richmenu-yyyyyyyy --store=yamada-real
 ```
 
 自分にだけ、別のメニューが出ます。会員と非会員でメニューを変える、などに使うしくみです。

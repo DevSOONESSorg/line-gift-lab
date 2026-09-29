@@ -55,7 +55,7 @@ HTTP のステータスコードで、**「受け取りました。問題あり�
 
 **Q. 署名（X-Line-Signature）って何？**
 Webhook URL は、知っていれば誰でも POST できてしまいます。そこで LINE社は、送る本文を **チャネルシークレットで計算した値**（署名）を添えて送ります。自社サーバーも、自分が持っているシークレットで同じ計算をして、一致すれば「本物のLINE社から・書きかえられていない」とわかります。
-計算は [src/util.js](../../src/util.js) の `sign()` の1行です（HMAC-SHA256 という方式）。
+計算は [app/Services/Line/Signature.php](../../app/Services/Line/Signature.php) の `sign()` の1行です（HMAC-SHA256 という方式）。受け取り側は [app/Http/Controllers/WebhookController.php](../../app/Http/Controllers/WebhookController.php) の `store()` で確かめています。
 
 ## 壊してみよう（あとで必ず元に戻す）
 

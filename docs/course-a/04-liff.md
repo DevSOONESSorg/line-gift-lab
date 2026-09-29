@@ -15,11 +15,14 @@
    |---|---|
    | サイズ | Full（手順書は Tall/Full） |
    | エンドポイントURL | `http://localhost:3000/liff/s/{slug}`（管理画面の編集ページの「LIFFのエンドポイントURL」をコピーすると確実） |
-   | Scope | profile・openid |
+   | Scope | profile・openid・chat_message.write |
+   | 友だち追加オプション | On |
 
 5. 表の中に **LIFF ID**（例 `2322485069-Gzqp84r0`）が出る。控える
 
 LIFF タブに、いま作った LIFF ID とエンドポイントURLが並んでいればOKです。
+
+6. **Basic settings** タブで、チャネルの状態を **公開する** にする（本番でいちばん忘れやすいポイント）
 
 ## 裏側を見る
 
@@ -42,11 +45,15 @@ flowchart TB
 お客さんに配るのは `https://liff.line.me/{LIFF_ID}` のほう（QRコードやリッチメニューに入れる）。本当の行き先（エンドポイントURL）はLINE社の中で決まります。
 
 **Q. なぜ名前を入れていないのに「ようこそ ○○ さん」と出たの？**
-Scope に **profile** を付けたからです。LIFFのページは、LINEから「いま開いている人のユーザーIDと名前」を受け取れます（本物では LIFF SDK の `liff.getProfile()`。[liff/store.ejs](../../src/views/liff/store.ejs) の下の方にあります）。だから自社サーバーは「誰が買ったか」がわかり、その人のLINEにお知らせを送れます。
+Scope に **profile** を付けたからです。LIFFのページは、LINEから「いま開いている人のユーザーIDと名前」を受け取れます（本物では LIFF SDK の `liff.getProfile()`。[resources/views/liff/store.blade.php](../../resources/views/liff/store.blade.php) の下の方にあります）。だから自社サーバーは「誰が買ったか」がわかり、その人のLINEにお知らせを送れます。
 
 **Q. なぜ Messaging API チャネルではなく、LINEログインチャネルに作るの？**
 LIFF は「LINEでログインしてもらう」しくみの上に乗っているからです。LIFF は LINEログインチャネルにしか追加できません。
 ただし、**Messaging APIチャネルと同じプロバイダーに作る**のがポイントです（同じ箱の中なので、LIFFで分かったユーザーIDに、Messaging APIでメッセージを送れる）。
+
+**Q. chat_message.write と 友だち追加オプションは？**
+- `chat_message.write`：LIFF の画面から、お客さん本人の発言としてトークにメッセージを送れる（`liff.sendMessages()`）。贈ったあとの「トークに『贈りました』と送る」ボタンがこれです
+- 友だち追加オプション：LIFF を開いたとき、お店の公式アカウントの友だち追加をすすめる。友だちでないとお知らせ（push）が届かないので、実物ではオンにしています
 
 ## 本物の仕事では
 

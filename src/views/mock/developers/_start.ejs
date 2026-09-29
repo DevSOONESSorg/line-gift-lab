@@ -1,5 +1,0 @@
-<%- include('../../partials/top') %>
-<%- include('../../partials/account-bar') %>
-<div class="mock-wrap">
-  <main class="mock-main">
-    <div class="crumbs"><a href="/mock/developers">プロバイダー</a><% if (typeof provider !== 'undefined' && provider) { %> › <a href="/mock/developers/provider/<%= provider.id %>"><%= provider.name %></a><% } %><% if (typeof channel !== 'undefined' && channel) { %> › <%= channel.name %><% } %></div>

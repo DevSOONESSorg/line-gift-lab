@@ -34,15 +34,15 @@ LINEログインチャネルが **「開発中」** のままだと、チャネ�
 ## 3. リッチメニューにつなぐ
 
 - **Manager で作る場合**：B2 のメニューのどこかを、タイプ **リンク**・URL `https://liff.line.me/{LIFF_ID}` にする
-- **API で作る場合**：`.env` に `LINE_LIFF_ID` を書かなくても、`--store` を付ければ店舗の LIFF ID が `{LIFF_ID}` に入ります
+- **API で作る場合**：`--store` を付ければ、店舗の LIFF ID が JSON の `{LIFF_ID}` に入ります
 
   ```bash
-  docker compose exec app npm run richmenu -- --store yamada-real create richmenus/six.json richmenus/images/six.png
+  docker compose exec app php artisan lab:richmenu create richmenus/six.json richmenus/images/six.png --store=yamada-real
   ```
 
 ## しくみの確認
 
-- 教材アプリの [src/views/liff/store.ejs](../../src/views/liff/store.ejs) の下の方にある `liff.init()` → `liff.getProfile()` が、名前とユーザーIDを取り出している部分です
+- 教材アプリの [resources/views/liff/store.blade.php](../../resources/views/liff/store.blade.php) の下の方にある `liff.init()` → `liff.getProfile()` が、名前とユーザーIDを取り出している部分です
 - 疑似スマホのときは URL の `mock_uid` で「誰か」を渡していました。本物は LIFF SDK が LINE から受け取ります
 
 > 教材アプリは「画面から送られてきたユーザーID」をそのまま信じています。本物のサービスでは、なりすましを防ぐため **IDトークン** をサーバーで検証します（B6 の発展課題）。

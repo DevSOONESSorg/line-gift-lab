@@ -7,21 +7,13 @@ services:
   app:
     build: .
     ports:
-      - "${PORT:-3000}:3000"        # 左がPC側のポート（.envで変更できる）
+      - "${PORT:-3000}:3000"        # 左がPC側のポート（.env の PORT で変えられる）
     volumes:
-      - ./src:/app/src              # コードを直すとすぐ反映される
-      - ./public:/app/public
-      - ./scripts:/app/scripts
-      - ./richmenus:/app/richmenus
-      - ./data:/app/data            # DBファイルはPC側の data/ に保存される
+      - ./:/app                     # フォルダをまるごと共有。コードを直すとすぐ反映される
     environment:
       - TZ=Asia/Tokyo
-      - APP_NAME=${APP_NAME:-おくりギフト}
-      - HOST_PORT=${PORT:-3000}
-      - PUBLIC_URL=${PUBLIC_URL:-}
-      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN:-}
-      - LINE_LIFF_ID=${LINE_LIFF_ID:-}
-      - TUNNEL_METRICS=http://tunnel:2000
+      - PORT=${PORT:-3000}
+      - APP_INTERNAL_PORT=3000
 
   # インターネット → あなたのPC への一時的な入口（Cloudflare Quick Tunnel）
   # アカウント登録は不要。ただし起動するたびにURLが変わります。
