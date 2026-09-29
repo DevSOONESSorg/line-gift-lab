@@ -34,11 +34,9 @@ LIFF タブに、いま作った LIFF ID とエンドポイントURLが並んで
 **Q. LIFF ID とエンドポイントURLの関係は？**
 LINE社は「LIFF ID → エンドポイントURL」の対応表を持っています。
 
-```
-https://liff.line.me/2322485069-Gzqp84r0
-        │ LINE社が対応表を見る
-        ▼
-http://localhost:3000/liff/s/club-azure   ← 自社サーバーのページがLINEの中で開く
+```mermaid
+flowchart TB
+    a["https://liff.line.me/2322485069-Gzqp84r0"] -- "LINE社が対応表を見る" --> b["http://localhost:3000/liff/s/club-azure<br>自社サーバーのページがLINEの中で開く"]
 ```
 
 お客さんに配るのは `https://liff.line.me/{LIFF_ID}` のほう（QRコードやリッチメニューに入れる）。本当の行き先（エンドポイントURL）はLINE社の中で決まります。
