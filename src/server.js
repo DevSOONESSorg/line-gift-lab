@@ -16,6 +16,31 @@ const mock = require('./mockline/core');
 
 require('./seed').run();
 
+// ---- 古いデータのまま新しい版を動かしていないかチェック ----
+{
+  const cols = require('./app/db').prepare('PRAGMA table_info(orders)').all().map((c) => c.name);
+  if (!cols.includes('route')) {
+    console.warn('\n★ data/ のデータが古い版のものです。止めてから次を実行して、作り直してください:');
+    console.warn('   docker compose run --rm app npm run reset\n');
+  }
+}
+
+// ---- async の処理でエラーが起きても、サーバーが落ちないようにする ----
+// （Express 4 は async 関数のエラーを拾わないので、ここで拾ってエラー画面に回す）
+const Layer = require('express/lib/router/layer');
+const origFn = Layer.prototype.handle_request;
+Layer.prototype.handle_request = function (req, res, next) {
+  const fn = this.handle;
+  if (fn.length > 3) return origFn.call(this, req, res, next);
+  try {
+    const r = fn(req, res, next);
+    if (r && typeof r.catch === 'function') r.catch(next);
+  } catch (e) {
+    next(e);
+  }
+};
+process.on('unhandledRejection', (e) => console.error('処理されなかったエラー:', e));
+
 const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -61,7 +86,11 @@ app.use((req, res) => {
 });
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).render('error', { title: 'エラーが発生しました', message: err.message });
+  const old = /no such column|has no column/.test(err.message);
+  res.status(500).render('error', {
+    title: 'エラーが発生しました',
+    message: err.message + (old ? '（data/ のデータが古い版のものです。止めてから「docker compose run --rm app npm run reset」で作り直してください）' : ''),
+  });
 });
 
 const PORT = 3000;
