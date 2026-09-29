@@ -1,5 +1,5 @@
 <%- include('_head') %>
 <h1><%= title %></h1>
 <p><%= message %></p>
-<% if (typeof back !== 'undefined' && back) { %><p><a class="btn" href="<%= back %>">店舗管理へ</a></p><% } %>
+<% if (typeof back !== 'undefined' && back) { %><p><a class="btn" href="<%= back %>"><%= typeof backLabel !== 'undefined' ? backLabel : '店舗管理へ' %></a></p><% } %>
 <%- include('_foot') %>

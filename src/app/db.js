@@ -30,10 +30,19 @@ db.exec(`
     slug        TEXT NOT NULL UNIQUE,     -- URLに入る店舗の住所（例 club-azure）
     approved    INTEGER NOT NULL DEFAULT 0,
     fee_rate    REAL NOT NULL DEFAULT 10, -- デフォルト手数料率（%）
-    listed      INTEGER NOT NULL DEFAULT 0, -- 共通アプリの店舗一覧に掲載
+    listed      INTEGER NOT NULL DEFAULT 1, -- 共通掲載（運営LINEの「ギフトを贈る」の店舗一覧に出す）
     id_required INTEGER NOT NULL DEFAULT 0, -- 身分証提示を必須
     agent_id    INTEGER REFERENCES agents(id),
-    manager_line_user_id TEXT,            -- 出店登録した人（店舗管理者）のLINEユーザーID
+    manager_line_user_id TEXT,            -- 出店登録した人（店舗オーナー）のLINEユーザーID
+    -- オーナーのユーザー登録・口座登録（体験用。本物の口座番号は入れない）
+    owner_name   TEXT NOT NULL DEFAULT '',
+    owner_phone  TEXT NOT NULL DEFAULT '',
+    bank_name    TEXT NOT NULL DEFAULT '',
+    bank_branch  TEXT NOT NULL DEFAULT '',
+    bank_type    TEXT NOT NULL DEFAULT '',
+    bank_number  TEXT NOT NULL DEFAULT '',
+    bank_holder  TEXT NOT NULL DEFAULT '',
+    wants_original INTEGER NOT NULL DEFAULT 0, -- 自前の公式LINE（オリジナル）でもやりたい
     -- LINE 連携設定（店舗専用チャネル）＝ 5つの値
     liff_id        TEXT NOT NULL DEFAULT '',
     channel_id     TEXT NOT NULL DEFAULT '',
@@ -61,6 +70,7 @@ db.exec(`
     fee          INTEGER NOT NULL,
     buyer_line_user_id TEXT NOT NULL,
     buyer_name   TEXT NOT NULL,
+    route        TEXT NOT NULL DEFAULT 'common', -- common（運営LINEの共通掲載から） / original（店の公式LINEから）
     recipient    TEXT NOT NULL,
     message      TEXT NOT NULL DEFAULT '',
     id_image     TEXT NOT NULL DEFAULT '',
@@ -70,6 +80,15 @@ db.exec(`
     thanks_sent  INTEGER NOT NULL DEFAULT 0,
     created_at   TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
     received_at  TEXT
+  );
+
+  -- お客さんが登録したカード（初回だけ入力。2回目からはこれを使う）
+  -- 本物のサービスでは、カード番号は決済会社が保管し、自社は「どのカードか」の目印だけを持つ
+  CREATE TABLE IF NOT EXISTS cards (
+    line_user_id TEXT PRIMARY KEY,
+    last4        TEXT NOT NULL,
+    exp          TEXT NOT NULL,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
   );
 
   -- サービス全体の設定（運営の公式LINEの値など）

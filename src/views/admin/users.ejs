@@ -2,19 +2,19 @@
 <h1>ユーザー管理</h1>
 <h2>贈り物を買ったユーザー</h2>
 <table class="table">
-  <thead><tr><th>LINEユーザーID</th><th>名前</th><th>購入回数</th><th>合計</th><th>最終購入</th></tr></thead>
+  <thead><tr><th>LINEユーザーID</th><th>名前</th><th>購入回数</th><th>合計</th><th>最終購入</th><th>登録カード</th></tr></thead>
   <tbody>
   <% users.forEach(function (u) { %>
-    <tr><td><code><%= u.id %></code></td><td><%= u.name %></td><td><%= u.count %></td><td><%= yen(u.total) %></td><td><%= u.last %></td></tr>
+    <tr><td><code><%= u.id %></code></td><td><%= u.name %></td><td><%= u.count %></td><td><%= yen(u.total) %></td><td><%= u.last %></td><td><%= cards[u.id] ? '**** ' + cards[u.id].last4 : '—' %></td></tr>
   <% }) %>
-  <% if (!users.length) { %><tr><td colspan="5" class="empty">まだいません。</td></tr><% } %>
+  <% if (!users.length) { %><tr><td colspan="6" class="empty">まだいません。</td></tr><% } %>
   </tbody>
 </table>
-<h2>店舗管理者（出店登録した人）</h2>
+<h2>お店のオーナー（出店登録した人）</h2>
 <table class="table">
-  <thead><tr><th>LINEユーザーID</th><th>管理している店舗</th></tr></thead>
+  <thead><tr><th>LINEユーザーID</th><th>名前</th><th>お店</th></tr></thead>
   <tbody>
-  <% managers.forEach(function (m) { %><tr><td><code><%= m.id %></code></td><td><%= m.stores %></td></tr><% }) %>
+  <% managers.forEach(function (m) { %><tr><td><code><%= m.id %></code></td><td><%= m.name || '—' %></td><td><%= m.stores %></td></tr><% }) %>
   </tbody>
 </table>
 <p class="hint">LINEユーザーIDは「U」で始まる33文字。公式アカウント（プロバイダー）ごとに同じ人でも同じIDになります。名前は変えられますがIDは変わりません。</p>

@@ -1,0 +1,11 @@
+<%- include('_head') %>
+<h1>ギフトを贈る</h1>
+<p class="small">おくりギフトに共通掲載しているお店です。お店を選んで、贈る商品を選びましょう。</p>
+<% stores.forEach(function (s) { %>
+  <a class="shop" href="/liff/s/<%= s.slug %>?mock_uid=<%= uid %>&via=common">
+    <span class="shop-icon"><%= s.name.slice(0, 1) %></span>
+    <span><strong><%= s.name %></strong><br><span class="small"><%= s.menu_count %> 商品<%= s.min_price ? '・' + yen(s.min_price) + '〜' : '' %></span></span>
+  </a>
+<% }) %>
+<% if (!stores.length) { %><p>いま掲載しているお店はありません。</p><% } %>
+<%- include('_foot') %>

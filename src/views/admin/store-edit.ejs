@@ -15,7 +15,8 @@
       <h2>管理設定</h2>
       <label class="check"><input type="checkbox" name="approved" value="1" <%= store.approved ? 'checked' : '' %>> 承認済み</label>
       <label>デフォルト手数料率（%） <input name="fee_rate" type="number" step="0.1" min="0" value="<%= store.fee_rate %>"></label>
-      <label class="check"><input type="checkbox" name="listed" value="1" <%= store.listed ? 'checked' : '' %>> 共通アプリの店舗一覧に掲載</label>
+      <label class="check"><input type="checkbox" name="listed" value="1" <%= store.listed ? 'checked' : '' %>> 共通掲載（運営LINEの「ギフトを贈る」に並べる）</label>
+      <% if (store.wants_original) { %><p class="hint">このお店は出店登録で「オリジナル（自前の公式LINE）」を希望しています。</p><% } %>
       <label class="check"><input type="checkbox" name="id_required" value="1" <%= store.id_required ? 'checked' : '' %>> 身分証提示を必須</label>
       <label>紐付け代理店
         <select name="agent_id">
@@ -28,8 +29,18 @@
     </section>
   </div>
 
+  <section class="card">
+    <h2>オーナー・口座（出店登録でオーナーが入力）</h2>
+    <dl class="dl">
+      <dt>オーナー</dt><dd><%= store.owner_name || '—' %> <%= store.owner_phone || '' %></dd>
+      <dt>振込口座</dt><dd><%= store.bank_name ? store.bank_name + ' ' + store.bank_branch + ' ' + store.bank_type + ' ****' + String(store.bank_number).slice(-3) + ' ' + store.bank_holder : '—（未登録）' %></dd>
+    </dl>
+    <p class="hint">承認するときに、口座が登録されているかを確認します。口座番号は画面では下3桁だけ表示します。</p>
+  </section>
+
   <section class="card" id="line">
     <h2>LINE 連携設定（店舗専用チャネル）</h2>
+    <p class="hint">オリジナル（お店の公式LINE）で贈れるようにするお店だけ設定します。共通掲載だけのお店は空のままでOKです。</p>
     <div class="grid2">
       <label>LIFF ID <input name="liff_id" value="<%= store.liff_id %>" placeholder="2009896760-NLWo39Yw"></label>
       <label>Messaging API チャネルID <input name="channel_id" value="<%= store.channel_id %>" placeholder="10桁の数字"></label>

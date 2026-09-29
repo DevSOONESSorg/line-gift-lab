@@ -1,6 +1,9 @@
 <%- include('_head') %>
 <h1>ありがとうございました</h1>
-<p><strong><%= menu.name %></strong> の贈り物を受け付けました（注文番号 #<%= orderId %>）。</p>
-<div class="notice">いまの状態は <span class="tag warn">リクエスト中</span> です。<br>まだ決済は確定していません。お店の人が「受け取る」を押すと完了します。</div>
-<p><a class="btn" href="/liff/s/<%= store.slug %><%= uid ? '?mock_uid=' + uid : '' %>">もう一度贈る</a></p>
+<p><strong><%= store.name %>「<%= menu.name %>」</strong> の贈り物を受け付けました（注文番号 #<%= orderId %>）。</p>
+<div class="notice">いまの状態は <span class="tag warn">リクエスト中</span> です。<br>まだ決済は確定していません。お店のオーナーが「受け取る」を押すと完了します。</div>
+<p>
+  <a class="btn" href="/liff/s/<%= store.slug %>?<%= uid ? 'mock_uid=' + uid + '&' : '' %><%= route === 'common' ? 'via=common' : '' %>">もう一度贈る</a>
+  <% if (route === 'common' && uid) { %><a class="btn secondary" href="/liff/platform/shops?mock_uid=<%= uid %>">ほかのお店を見る</a><% } %>
+</p>
 <%- include('_foot') %>

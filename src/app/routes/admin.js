@@ -41,7 +41,7 @@ router.post('/stores', (req, res) => {
   if (!name || !/^[a-z0-9][a-z0-9-]{1,40}$/.test(slug) || db.prepare('SELECT 1 FROM stores WHERE slug = ?').get(slug)) {
     return res.redirect('/admin/stores?msg=' + encodeURIComponent('店名と、まだ使われていない slug（半角英小文字・数字・ハイフン）を入れてください'));
   }
-  const id = db.prepare('INSERT INTO stores (name, slug, approved) VALUES (?, ?, 1)').run(name, slug).lastInsertRowid;
+  const id = db.prepare('INSERT INTO stores (name, slug, approved, listed, wants_original) VALUES (?, ?, 1, 0, 1)').run(name, slug).lastInsertRowid;
   log.info('admin', `管理画面から店舗「${name}」（${slug}）を作成しました`);
   res.redirect(`/admin/stores/${id}`);
 });
@@ -184,8 +184,10 @@ router.get('/orders/:id', (req, res) => {
 router.get('/users', (req, res) => {
   const users = db.prepare(`SELECT buyer_line_user_id AS id, buyer_name AS name, COUNT(*) AS count, SUM(amount) AS total, MAX(created_at) AS last
                             FROM orders GROUP BY buyer_line_user_id ORDER BY last DESC`).all();
-  const managers = db.prepare('SELECT manager_line_user_id AS id, GROUP_CONCAT(name, \'、\') AS stores FROM stores WHERE manager_line_user_id IS NOT NULL GROUP BY manager_line_user_id').all();
-  res.render('admin/users', { title: 'ユーザー管理', users, managers });
+  const managers = db.prepare(`SELECT manager_line_user_id AS id, MAX(owner_name) AS name, GROUP_CONCAT(name, '、') AS stores
+                               FROM stores WHERE manager_line_user_id IS NOT NULL GROUP BY manager_line_user_id`).all();
+  const cards = Object.fromEntries(db.prepare('SELECT * FROM cards').all().map((c) => [c.line_user_id, c]));
+  res.render('admin/users', { title: 'ユーザー管理', users, managers, cards });
 });
 
 // =====================================================

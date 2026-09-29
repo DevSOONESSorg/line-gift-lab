@@ -186,7 +186,7 @@ details.card summary { cursor: pointer; font-weight: bold; }
 .rm-area button { width: 100%; height: 100%; background: transparent !important; padding: 0; }
 .rm-area.none:hover { background: none; outline: none; }
 .chat-input { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--border); background: #fff; }
-.chat-input input { flex: 1; }
+.chat-input input { flex: 1; min-width: 0; }
 .chat-input button { background: var(--line); white-space: nowrap; }
 .rm-toggle { background: #fff !important; color: var(--text) !important; border: 1px solid var(--border); font-size: 12px; padding: 4px 8px; }
 .line-btn { background: var(--line) !important; padding: 10px 40px; }

@@ -4,6 +4,7 @@
 <section class="card">
   <dl class="dl">
     <dt>状態</dt><dd><% if (o.status === 'received') { %><span class="badge info">受取済み</span>（<%= o.received_at %>）<% } else { %><span class="badge warn">リクエスト中</span><% } %></dd>
+    <dt>どこから</dt><dd><%= o.route === 'common' ? '運営LINEの共通掲載から' : 'お店の公式LINEから' %></dd>
     <dt>決済方法</dt><dd>テストカード **** <%= o.card_last4 %></dd>
     <dt>決済の状態</dt><dd><%= o.payment === 'captured' ? '確定（お金が動いた）' : '仮押さえ（まだ確定していない）' %></dd>
     <dt>店舗</dt><dd><%= o.store_name %></dd>
