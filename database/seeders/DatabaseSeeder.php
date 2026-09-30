@@ -189,6 +189,7 @@ class DatabaseSeeder extends Seeder
         foreach ($plan as $i => [$store, $days, $status, $method, $route]) {
             $menu = $store->menus()->inRandomOrder()->first();
             $at = now()->subDays($days)->setTime(20 + $i % 3, 10 * ($i % 6));
+            if ($at->isFuture()) $at = now()->subMinutes(30 + 10 * $i);   // 夜より前に作り直したとき、未来の日時にしない
             $rate = CommissionService::rateFor($store, $at);
             $o = Order::create([
                 'store_id' => $store->id, 'menu_id' => $menu->id, 'customer_id' => $customers[$i % 5]->id, 'menu_name' => $menu->name, 'amount' => $menu->price,
