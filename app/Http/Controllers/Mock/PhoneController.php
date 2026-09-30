@@ -86,10 +86,14 @@ class PhoneController extends Controller
         $messages = collect();
         $richMenu = null;
         $friendRow = null;
+        $rmLocked = false;
         if ($chat) {
             $friendRow = DB::connection('mockline')->table('friends')->where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->first();
             $messages = Message::where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->orderBy('id')->get();
             $richMenu = $chat->richMenus()->where('is_default', true)->latest('id')->first();
+            // 構築中のお店は、構築ナビのリッチメニューの手順が終わるまで、リッチメニューを押せないようにする
+            $guide = \App\Services\BuildGuide::current();
+            $rmLocked = $guide && $guide->oa && $guide->oa->id == $chat->id && ! $guide->isDone('richmenu');
         }
         $open = null;
         $addTarget = $request->query('add');
@@ -99,7 +103,7 @@ class PhoneController extends Controller
         }
         $addOa = $addTarget ? (OfficialAccount::byBasicId($addTarget) ?? (object) ['notFound' => $addTarget]) : null;
 
-        return view('mock.phone', compact('phone', 'me', 'friends', 'talks', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa') + [
+        return view('mock.phone', compact('phone', 'me', 'friends', 'talks', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa', 'rmLocked') + [
             'lastId' => $messages->last()?->id ?? 0,
         ]);
     }

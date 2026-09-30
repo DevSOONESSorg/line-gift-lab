@@ -64,7 +64,9 @@
           <img src="{{ asset('storage/'.$richMenu->image_path) }}" alt="">
           @foreach ($richMenu->areas() as $i => $a)
             @php $act = $richMenu->actions[$i] ?? ['type' => 'none']; $style = 'left:'.($a['x']*100).'%;top:'.($a['y']*100).'%;width:'.($a['w']*100).'%;height:'.($a['h']*100).'%'; @endphp
-            @if ($act['type'] === 'link')
+            @if ($rmLocked)
+              <span class="rm-area none" style="{{ $style }}" title="構築ナビの「リッチメニュー」の手順が終わると押せます"></span>
+            @elseif ($act['type'] === 'link')
               <a class="rm-area" style="{{ $style }}" href="{{ route('mock.phone.screen', ['phone' => $phone, 'chat' => $chat->id, 'open' => $act['value']]) }}" title="{{ $act['value'] }}"></a>
             @elseif ($act['type'] === 'text')
               <form method="post" action="{{ route('mock.phone.send', [$phone, $chat]) }}" class="rm-area" style="{{ $style }}">@csrf<input type="hidden" name="text" value="{{ $act['value'] }}"><button title="「{{ $act['value'] }}」を送る"></button></form>

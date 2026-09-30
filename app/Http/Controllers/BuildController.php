@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Mock\Account;
-use App\Models\Store;
 use App\Services\BuildGuide;
+use App\Services\BuildScenario;
+use App\Models\Store;
 use Illuminate\Http\Request;
 
 // 構築ナビ：どのお店を構築中かを覚え、手順の一覧を表示する
@@ -12,27 +12,35 @@ class BuildController extends Controller
 {
     public function index(Request $r)
     {
-        // 管理画面の「構築ナビで進める」から来たとき（?store=ID）
-        if ($r->query('store') && Store::find($r->query('store'))) { $r->session()->put('build.store', (int) $r->query('store')); return redirect()->route('build'); }
-        // まだ選んでいなければ、オリジナル希望でまだつながっていないお店（課題のお店）を選んでおく
-        if (! session('build.store') && ($s = Store::where('wants_original', true)->whereNull('liff_id')->orderBy('id')->first())) session(['build.store' => $s->id]);
+        // まだ選んでいなければ、最初の課題のお店を選んでおく（作り直しはしない）
+        if (! Store::find(session('build.store')) && ($id = BuildScenario::storeId(array_key_first(BuildScenario::SCENARIOS))) && Store::find($id)) {
+            session(['build.store' => $id]);
+        }
         $guide = BuildGuide::current();
-        return view('build.index', [
-            'guide' => $guide, 'steps' => $guide?->steps() ?? [],
-            'stores' => Store::orderByDesc('wants_original')->orderBy('id')->get(),
-        ]);
+        return view('build.index', ['guide' => $guide, 'steps' => $guide?->steps() ?? [], 'scenarios' => BuildScenario::SCENARIOS]);
     }
 
+    // お店を選ぶ＝そのお店を「スタート地点」に作り直して、新しく構築を始める
     public function select(Request $r)
     {
-        $store = Store::findOrFail($r->input('store_id'));
-        $r->session()->put('build.store', $store->id);
-        return redirect()->to($r->input('back') ?: route('build'))->with('msg', "「{$store->name}」の構築ナビを始めました");
+        $key = (string) $r->input('scenario');
+        abort_unless(isset(BuildScenario::SCENARIOS[$key]), 404);
+        $store = BuildScenario::reset($key);
+        session()->forget('build');
+        session(['build.store' => $store->id, 'mock_account' => 'personal']);
+        return redirect()->route('build')->with('msg', "「{$store->name}」を最初の状態に戻して、新しく構築を始めました。お客さんのスマホにお店の公式LINEが出ています（リッチメニューはまだ押せません）。");
+    }
+
+    // 右下のナビの中身だけ（数秒ごとに読み直す）
+    public function nav()
+    {
+        $guide = BuildGuide::current();
+        return $guide ? view('build._nav-body', ['guide' => $guide]) : response('');
     }
 
     public function stop(Request $r)
     {
-        $r->session()->forget('build.store');
-        return redirect()->to($r->input('back') ?: route('build'));
+        $r->session()->forget('build');
+        return redirect()->route('build');
     }
 }

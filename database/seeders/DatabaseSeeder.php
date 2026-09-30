@@ -154,37 +154,13 @@ class DatabaseSeeder extends Seeder
             'representative_name' => '申込 次郎', 'representative_tel' => '090-0000-0003', 'commission_rate' => 10, 'is_approved' => false]);
 
         // ---------- 課題のお店：クラブ アズール（コースAで、あなたがつなぐお店） ----------
-        // 本番と同じ「スタート地点」：
-        //   ・オーナーが運営LINEのQRから出店登録済み（店舗管理一覧に「未承認」で並んでいる。slug は仮の store-番号）
-        //   ・お店はもう自分の公式LINEを持っていて、お客さんも友だち追加している
-        //   ・リッチメニューもある。「ギフトを贈る」ボタンだけ、まだどこにもつながっていない
-        // ここから、運営スタッフとして「公式LINE ⇔ 自社サービス」をつなぐのが課題です（構築ナビで進められます）
-        $azure = Store::create([
-            'name' => 'クラブ アズール', 'slug' => 'tmp', 'description' => '那覇のラウンジ。スタッフへのギフトはこちらから。', 'image_color' => '#1d4ed8',
-            'prefecture' => '沖縄県', 'city' => '那覇市', 'address' => '松山1-2-3 アズールビル2F', 'tel' => '098-000-0004', 'business_license_number' => '那保第000号（架空）',
-            'representative_name' => '東 あおい', 'representative_tel' => '090-0000-0004',
-            'bank_name' => 'みなと銀行', 'bank_branch' => '松山支店', 'bank_account_type' => '普通', 'bank_account_number' => '7654321', 'bank_account_name' => 'アズマ アオイ',
-            'commission_rate' => 10, 'is_approved' => false, 'is_listed_in_directory' => false, 'wants_original' => true,
-            'owner_line_user_id' => $owner->user_id,
-        ]);
-        $azure->update(['slug' => "store-{$azure->id}"]);   // 出店登録したときと同じ、仮の slug
-        foreach ([7, 6, 4] as $tid) {
-            $t = MenuTemplate::find($tid);
-            $azure->menus()->create(['menu_template_id' => $t->id, 'name' => $t->name, 'price' => $t->reference_price]);
-        }
-        $aoa = MockLine::createOfficialAccount('クラブ アズール', 'personal', 'ナイトワーク');   // 持ち主はオーナー（個人アカウント）
-        $this->richMenu($aoa, 'お店のメニュー', 'large-4', 'azure-menu.png', [
-            ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],               // ← ここに贈る画面（LIFF）の URL を入れるのが課題
-            ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
-            ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
-            ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
-        ]);
+        // 中身は app/Services/BuildScenario.php。構築ナビでお店を選ぶたびに、同じスタート地点に作り直されます
+        \App\Services\BuildScenario::reset('club-azure');
 
         // お客さんのスマホは、最初から見本カフェの友だち
         //   本物ではお客さんが運営LINEを入れていることもあるが、教材では左右の役割がまざらないように入れない
         // オーナーのスマホは、運営LINEの友だち（出店登録・店舗管理・ギフトのお知らせは運営LINEから）
-        // クラブ アズールの公式LINEも、お客さんはもう友だち追加している（お店がもともと持っていた公式LINEなので）
-        foreach ([[$guest, $soa], [$guest, $aoa], [$owner, $poa]] as [$user, $oa]) {
+        foreach ([[$guest, $soa], [$owner, $poa]] as [$user, $oa]) {
             $ml->table('friends')->insert(['official_account_id' => $oa->id, 'user_id' => $user->user_id, 'blocked' => false]);
             MockLine::greet($oa, $user);
         }

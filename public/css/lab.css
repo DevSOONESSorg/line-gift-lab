@@ -159,21 +159,33 @@ body.phone-screen .phone { box-shadow: 0 4px 12px rgba(0,0,0,.2); }
 
 /* 構築ナビ */
 .labnav .g-build.on, .labnav .g-build:hover { border-color: #f59f00; }
-.bstep { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
-.bstep-head { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; }
+.bstep { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 8px; }
+.bstep-head { display: flex; gap: 10px; align-items: flex-start; padding: 9px 12px; cursor: default; list-style: none; }
+.bstep-head::-webkit-details-marker { display: none; }
+details > .bstep-head { cursor: pointer; }
 .bstep .bno { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: #e5e7eb; color: #555; flex-shrink: 0; }
 .bstep-done .bno { background: #06c755; color: #fff; }
-.bstep-done { opacity: .7; }
-.bstep-current { border-color: #f59f00; box-shadow: 0 0 0 3px rgba(245,159,0,.18); }
+.bstep-done b { color: #15803d; }
+.bdone { font-size: 11px; font-weight: 700; color: #15803d; background: #dcfce7; border-radius: 4px; padding: 2px 8px; align-self: center; }
+.bstep-current { border: 2px solid #f59f00; box-shadow: 0 0 0 3px rgba(245,159,0,.15); }
 .bstep-current .bno { background: #f59f00; color: #fff; }
-.bstep .bwho { display: block; font-size: 12px; color: #6b7280; }
-.bstep-body { padding: 0 12px 12px 48px; }
-.bstep-body ol { padding-left: 18px; }
+.bstep-locked { background: #f3f4f6; color: #9ca3af; border-style: dashed; }
+.bstep-locked .bno { background: #e5e7eb; color: #9ca3af; font-size: 11px; }
+.bstep .bwho { display: block; font-size: 12px; color: #6b7280; font-weight: 400; }
+.bstep-body { padding: 0 12px 12px 12px; }
+.bacts { padding-left: 0; list-style: none; counter-reset: a; margin-bottom: 10px; }
+.bacts li { counter-increment: a; padding: 6px 0 6px 28px; border-bottom: 1px dashed #eee; position: relative; font-size: 14px; }
+.bacts li::before { content: counter(a); position: absolute; left: 0; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: #111827; color: #fff; font-size: 11px; display: grid; place-items: center; }
+.bact { display: inline-block; font-size: 11px; font-weight: 700; border-radius: 4px; padding: 1px 6px; margin-right: 4px; color: #fff; }
+.bact-open { background: #2563eb; } .bact-click { background: #dc2626; } .bact-select { background: #7c3aed; } .bact-copy { background: #0891b2; }
+.bact-paste { background: #059669; } .bact-switch { background: #d97706; } .bact-check { background: #6b7280; }
+.bval { display: flex; gap: 6px; align-items: center; margin-top: 4px; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 4px 8px; }
+.bval code { flex: 1; word-break: break-all; font-size: 12px; }
 .bwhy { background: #fffbeb; border-radius: 6px; padding: 6px 8px; color: #78350f; }
-.build-nav { position: fixed; right: 16px; bottom: 16px; width: 380px; max-height: 75vh; z-index: 1050; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); display: flex; flex-direction: column; overflow: hidden; }
-.build-nav-toggle { border: 0; background: #1f2937; color: #fff; padding: 9px 14px; text-align: left; font-weight: 600; font-size: 14px; }
+.bjust { background: #dcfce7; color: #166534; border-radius: 8px; padding: 8px 10px; font-size: 13px; margin-bottom: 8px; }
+.build-nav { position: fixed; right: 16px; bottom: 16px; width: 420px; max-height: 82vh; z-index: 1050; background: #f9fafb; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); display: flex; flex-direction: column; overflow: hidden; }
+.build-nav-toggle { border: 0; background: #1f2937; color: #fff; padding: 10px 14px; text-align: left; font-weight: 600; font-size: 14px; width: 100%; }
 .build-nav-body { padding: 10px; overflow-y: auto; }
-.build-nav-body .bstep { margin-bottom: 8px; }
 .build-nav.min { width: auto; } .build-nav.min .build-nav-body { display: none; }
 
 /* 疑似 LINE Official Account Manager / LINE Developers の見た目 */
