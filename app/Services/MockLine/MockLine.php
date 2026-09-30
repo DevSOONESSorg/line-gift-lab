@@ -39,7 +39,7 @@ class MockLine
         $oa = OfficialAccount::create([
             'name' => $name, 'basic_id' => $basic, 'bot_user_id' => 'U'.bin2hex(random_bytes(16)), 'industry' => $industry,
             'auto_reply_text' => config('lab.default_auto_reply'),
-            'greeting_text' => $name.'です。'.config('lab.default_greeting'),
+            'greeting_text' => config('lab.default_greeting'),
             'is_platform' => $isPlatform,
         ]);
         self::db()->table('oa_members')->insert(['official_account_id' => $oa->id, 'account_id' => $owner, 'role' => 'admin']);
@@ -108,6 +108,12 @@ class MockLine
     }
 
     // ---------- メッセージのやりとり ----------
+
+    // あいさつメッセージ。本物の Manager と同じく {Nickname}（友だちの表示名）と {AccountName}（アカウント名）が使える
+    public static function greet(OfficialAccount $oa, LineUser $user): void
+    {
+        self::addMessage($oa->id, $user->user_id, 'out', 'greeting', strtr($oa->greeting_text, ['{Nickname}' => $user->display_name, '{AccountName}' => $oa->name]));
+    }
 
     public static function addMessage(int $oaId, string $userId, string $direction, string $via, string $text): void
     {
@@ -185,7 +191,7 @@ class MockLine
         if ($row && ! $row->blocked) return;
         self::db()->table('friends')->updateOrInsert(['official_account_id' => $oa->id, 'user_id' => $user->user_id], ['blocked' => false]);
         Inside::info('phone', "「{$oa->name}」を友だち追加しました", "あなたのユーザーID: {$user->user_id}");
-        if ($oa->greeting_on && ! $row) self::addMessage($oa->id, $user->user_id, 'out', 'greeting', $oa->greeting_text);
+        if ($oa->greeting_on && ! $row) self::greet($oa, $user);
 
         [$ch, $why] = self::webhookReady($oa);
         if ($why) { Inside::info('line', "followイベントは自社サーバーに送りません（{$why}）"); return; }

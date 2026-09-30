@@ -153,11 +153,12 @@ class DatabaseSeeder extends Seeder
         Store::create(['name' => '承認待ちスナック', 'slug' => 'store-pending', 'prefecture' => '沖縄県', 'city' => '沖縄市', 'tel' => '098-000-0003',
             'representative_name' => '申込 次郎', 'representative_tel' => '090-0000-0003', 'commission_rate' => 10, 'is_approved' => false]);
 
-        // お客さんのスマホは、最初から運営LINEと見本カフェの友だち
+        // お客さんのスマホは、最初から見本カフェの友だち
+        //   本物ではお客さんが運営LINEを入れていることもあるが、教材では左右の役割がまざらないように入れない
         // オーナーのスマホは、運営LINEの友だち（出店登録・店舗管理・ギフトのお知らせは運営LINEから）
-        foreach ([[$guest, $poa], [$guest, $soa], [$owner, $poa]] as [$user, $oa]) {
+        foreach ([[$guest, $soa], [$owner, $poa]] as [$user, $oa]) {
             $ml->table('friends')->insert(['official_account_id' => $oa->id, 'user_id' => $user->user_id, 'blocked' => false]);
-            MockLine::addMessage($oa->id, $user->user_id, 'out', 'greeting', $oa->greeting_text);
+            MockLine::greet($oa, $user);
         }
 
         $this->sampleOrders($bar, $cafe);

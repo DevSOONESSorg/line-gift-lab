@@ -10,7 +10,8 @@
   <h2 class="h6">詳細設定</h2>
   <p class="mb-1">あいさつメッセージ（友だち追加されたとき）</p>
   <div class="d-flex gap-3"><div class="form-check"><input class="form-check-input" type="radio" name="greeting_on" value="1" @checked($oa->greeting_on)><label class="form-check-label">オン</label></div><div class="form-check"><input class="form-check-input" type="radio" name="greeting_on" value="0" @checked(! $oa->greeting_on)><label class="form-check-label">オフ</label></div></div>
-  <textarea name="greeting_text" class="form-control mb-3" rows="2">{{ $oa->greeting_text }}</textarea>
+  <textarea name="greeting_text" class="form-control" rows="2">{{ $oa->greeting_text }}</textarea>
+  <div class="form-text mb-3"><code>{Nickname}</code> は友だちの表示名、<code>{AccountName}</code> はこのアカウント名に置きかわります（本物の Manager と同じ）</div>
   <p class="mb-1">Webhook @unless ($channel)（Messaging API を有効にすると使えます）@endunless</p>
   @if ($channel)
     <div class="d-flex gap-3"><div class="form-check"><input class="form-check-input" type="radio" name="webhook" value="1" @checked($channel->use_webhook)><label class="form-check-label">オン</label></div><div class="form-check"><input class="form-check-input" type="radio" name="webhook" value="0" @checked(! $channel->use_webhook)><label class="form-check-label">オフ</label></div></div>

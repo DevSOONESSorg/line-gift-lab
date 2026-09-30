@@ -34,7 +34,7 @@ return [
 
     // 疑似LINE：応答メッセージ・あいさつの初期値
     'default_auto_reply' => "メッセージありがとうございます！\n申し訳ありませんが、このアカウントから個別のご返信はできません。",
-    'default_greeting' => '友だち追加ありがとうございます！',
+    'default_greeting' => "{Nickname}さん はじめまして！{AccountName}です。\n友だち追加ありがとうございます！",
 
     // 疑似LINE：リッチメニューのテンプレート（x, y, 幅 w, 高さ h は画像全体を 1 とした割合）
     'richmenu_templates' => [
