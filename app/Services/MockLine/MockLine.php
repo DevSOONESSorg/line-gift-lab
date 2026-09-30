@@ -2,6 +2,7 @@
 
 namespace App\Services\MockLine;
 
+use App\Models\Mock\AutoReply;
 use App\Models\Mock\Channel;
 use App\Models\Mock\LiffApp;
 use App\Models\Mock\LineUser;
@@ -43,6 +44,8 @@ class MockLine
             'is_platform' => $isPlatform,
         ]);
         self::db()->table('oa_members')->insert(['official_account_id' => $oa->id, 'account_id' => $owner, 'role' => 'admin']);
+        // 本物と同じく、作った直後から「一律応答」が1件入っている（どのメッセージにも同じ定型文を返す）
+        $oa->autoReplies()->create(['title' => '一律応答メッセージ', 'keywords' => '', 'text' => config('lab.default_auto_reply'), 'enabled' => true]);
         Inside::ok('line', "公式アカウント「{$name}」を作成しました（{$basic}）", '作成したアカウント: '.self::accountName($owner)."\n→ この人が「管理者」になります");
         return $oa;
     }
@@ -72,12 +75,13 @@ class MockLine
         return $ch;
     }
 
-    public static function createLoginChannel(int $providerId, string $name, string $account, string $description = ''): Channel
+    // $extra: email / privacy_url / terms_url / country / two_factor（本番のチャネル作成画面にある項目）
+    public static function createLoginChannel(int $providerId, string $name, string $account, string $description = '', array $extra = []): Channel
     {
         $ch = Channel::create([
             'channel_id' => self::newChannelId(), 'type' => 'login', 'name' => $name, 'description' => $description,
             'provider_id' => $providerId, 'secret' => bin2hex(random_bytes(16)), 'created_by' => $account,
-        ]);
+        ] + array_intersect_key($extra, array_flip(['email', 'privacy_url', 'terms_url', 'country', 'two_factor'])));
         self::db()->table('channel_roles')->insert(['channel_id' => $ch->id, 'account_id' => $account, 'role' => 'admin']);
         Inside::ok('line', "LINEログインチャネルを作成しました（{$ch->channel_id}）", "チャネル名: {$name}\n※ 作った直後は「開発中」。一般の人が LIFF を開くには「公開」が必要");
         return $ch;
@@ -85,7 +89,12 @@ class MockLine
 
     public static function addLiff(Channel $channel, string $name, string $endpoint, string $size = 'Full', string $scopes = 'profile openid', bool $botPrompt = false): LiffApp
     {
-        $liffId = $channel->channel_id.'-'.Str::ucfirst(Str::random(8));
+        // 本物の LIFF ID にも I（大文字アイ）と l（小文字エル）、O と 0 が混ざる。目で写すと間違えやすいので、必ず1つは入れる
+        do {
+            $suffix = Str::random(8);
+            $suffix[random_int(1, 7)] = ['I', 'l', 'O', '0'][random_int(0, 3)];
+            $liffId = $channel->channel_id.'-'.Str::ucfirst($suffix);
+        } while (LiffApp::find($liffId));
         $liff = LiffApp::create(['liff_id' => $liffId, 'channel_id' => $channel->id, 'name' => $name, 'size' => $size,
             'endpoint_url' => $endpoint, 'scopes' => $scopes, 'bot_prompt' => $botPrompt]);
         Inside::ok('line', "LIFFアプリを追加しました（LIFF ID: {$liffId}）", "エンドポイントURL: {$endpoint}\n→ https://liff.line.me/{$liffId} を開くと、このURLのページがLINEの中で開きます");
@@ -215,9 +224,14 @@ class MockLine
         self::addMessage($oa->id, $user->user_id, 'in', $via, $text);
         Inside::info('phone', "「{$oa->name}」に「{$text}」と送信しました".($via === 'liff' ? '（LIFFから送信）' : ''));
 
-        if ($oa->auto_reply_on && $oa->response_mode === 'bot') {
-            self::addMessage($oa->id, $user->user_id, 'out', 'auto', $oa->auto_reply_text);
-            Inside::info('line', '応答メッセージ（定型文）を自動で返しました', '応答メッセージがONなので、botの返事とは別にLINE社が返しています');
+        // 応答メッセージ（LINE社が返す）：キーワードが一致した行 → なければ一律応答
+        if ($oa->auto_reply_on && $oa->response_mode === 'bot' && ($ar = AutoReply::match($oa, $text))) {
+            self::addMessage($oa->id, $user->user_id, 'out', 'auto', $ar->text);
+            Inside::info('line', "応答メッセージ「{$ar->title}」を自動で返しました",
+                ($ar->isCatchAll() ? '一律応答（キーワードに関係なく返す）' : 'キーワード「'.$text.'」に一致')."\n応答メッセージがONなので、botの返事とは別にLINE社が返しています");
+        } elseif (! $oa->auto_reply_on && $oa->autoReplies()->where('enabled', true)->get()->contains(fn ($a) => in_array(trim($text), $a->keywordList(), true))) {
+            Inside::info('line', "キーワード「{$text}」の応答メッセージは登録されていますが、応答メッセージがOFFなので返しません",
+                'お店が使っていたキーワード応答が止まっています。既存のアカウントで応答メッセージをOFFにすると、こうなります（本番で実際に起きた事故）');
         }
         [$ch, $why] = self::webhookReady($oa);
         if ($why) { Inside::info('line', "メッセージを自社サーバーに送りません（{$why}）"); return; }

@@ -15,6 +15,9 @@
     <a class="{{ request()->routeIs('mock.manager.oa.home') ? 'on' : '' }}" href="{{ route('mock.manager.oa.home', $oa) }}"><i class="bi bi-house"></i> ホーム</a>
     <span class="off"><i class="bi bi-chat-dots"></i> チャット</span>
     <span class="off"><i class="bi bi-bar-chart"></i> 分析</span>
+    <div class="side-label">自動応答</div>
+    <a class="{{ request()->routeIs('mock.manager.oa.auto-replies') ? 'on' : '' }}" href="{{ route('mock.manager.oa.auto-replies', $oa) }}"><i class="bi bi-chat-square-text"></i> 応答メッセージ</a>
+    <a class="{{ request()->routeIs('mock.manager.oa.greeting') ? 'on' : '' }}" href="{{ route('mock.manager.oa.greeting', $oa) }}"><i class="bi bi-hand-wave"></i> あいさつメッセージ</a>
     <div class="side-label">トークルーム管理</div>
     <a class="{{ request()->routeIs('mock.manager.oa.richmenus*') ? 'on' : '' }}" href="{{ route('mock.manager.oa.richmenus', $oa) }}"><i class="bi bi-grid-3x2"></i> リッチメニュー</a>
     <div class="side-label">設定</div>

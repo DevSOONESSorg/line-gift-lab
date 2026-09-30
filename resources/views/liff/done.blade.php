@@ -14,7 +14,9 @@
   <div class="order-no"><small>ORDER NO</small><b>{{ $order->order_code }}</b></div>
 
   <a class="btn-gold" href="{{ route('liff.history') }}">贈った履歴を見る</a>
-  @if (($lineUser['mock'] ?? false) && $openedLiff && $order->store->line_official_account_id && $order->route === 'original')
+  {{-- liff.sendMessages は scope に chat_message.write があるときだけ使える（本番の店舗 LIFF は openid・profile だけなので出ない） --}}
+  @if (($lineUser['mock'] ?? false) && $openedLiff && $order->store->line_official_account_id && $order->route === 'original'
+       && str_contains((string) \App\Models\Mock\LiffApp::find($openedLiff)?->scopes, 'chat_message.write'))
     <button class="btn-ghost" onclick="sendToChat(this)">トークに「贈りました」と送る（liff.sendMessages）</button>
   @endif
   <button class="btn-ghost" onclick="closeLiff()">閉じる</button>

@@ -34,6 +34,8 @@ class Drill extends Command
         8 => 'リッチメニューの「贈る」を押すとエラーになる',
         9 => 'ギフトを贈ったのに、お知らせがLINEに届かない',
         10 => 'トークで話しかけても、ギフトの案内が返ってこない（D）',
+        11 => '「贈る」を押すと「400 Bad Request」になる',
+        12 => 'お店から「メニューの『お店の情報』を押しても、いつもの案内が返らなくなった」と連絡が来た',
     ];
 
     public function handle(): int
@@ -59,8 +61,8 @@ class Drill extends Command
             1 => $store->update(['line_messaging_channel_secret' => substr($store->line_messaging_channel_secret, 0, -1).(str_ends_with($store->line_messaging_channel_secret, 'a') ? 'b' : 'a')]),
             // 2: LINE側でトークンを再発行（自社は古いまま） → 返信 401
             2 => $ch->update(['access_token' => bin2hex(random_bytes(8)).'/'.base64_encode(random_bytes(40))]),
-            // 3: 応答メッセージ ON → 2通
-            3 => $oa->update(['auto_reply_on' => true]),
+            // 3: 返事が2通。ケースA：応答メッセージ ON ／ ケースB：自社の自動返信（ギフト誘導）ON
+            3 => $store->auto_reply_enabled ? $oa->update(['auto_reply_on' => true]) : $store->update(['auto_reply_enabled' => true]),
             // 4: Webhook URL の slug を打ち間違える → 404
             4 => $ch->update(['webhook_url' => str_replace("/store/{$store->slug}", '/store/'.(str_contains($store->slug, '-') ? str_replace('-', '_', $store->slug) : $store->slug.'s'), $ch->webhook_url)]),
             // 5: LIFF のエンドポイントURL を別のお店に → ちがう店が開く
@@ -75,6 +77,10 @@ class Drill extends Command
             9 => DB::connection('mockline')->table('friends')->where('official_account_id', $oa->id)->update(['blocked' => true]),
             // 10: 自動返信（ギフト誘導）OFF → bot が反応しない
             10 => $store->update(['auto_reply_enabled' => false]),
+            // 11: LINEログインチャネルを「開発中」に戻す → お客さんは LIFF を開けない（本番で実際に起きた）
+            11 => LiffApp::find($store->liff_id)?->channel?->update(['is_published' => false]),
+            // 12: 応答メッセージを OFF（ケースBのお店で起きる、本番で実際に起きた事故）
+            12 => $oa->update(['auto_reply_on' => false]),
             default => $this->error('番号が正しくありません'),
         };
         $this->info("仕込みました。対象：「{$store->name}」");

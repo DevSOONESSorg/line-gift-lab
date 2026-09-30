@@ -24,6 +24,12 @@ class ShopController extends Controller
     public function show(Request $r, string $slug)
     {
         $store = Store::where('slug', $slug)->first();
+        // 本番と同じく、お店の LIFF に ?action= を付けると、送信履歴（領収書）・お礼一覧を開ける
+        //   https://liff.line.me/{LIFF_ID}?action=send-history ／ ?action=thanks （リッチメニューのボタンに使う）
+        if ($store && in_array($r->query('action'), ['send-history', 'thanks'], true)) {
+            Inside::info('app', "「{$store->name}」の LIFF から ?action={$r->query('action')} で開きました");
+            return redirect()->route($r->query('action') === 'thanks' ? 'liff.thanks' : 'liff.history', $r->except(['action']));
+        }
         if (! $store) {
             Inside::ng('app', "LIFF画面: slug「{$slug}」の店舗はありません", 'LIFF のエンドポイントURL に入れた slug が正しいか確認しましょう');
             return response()->view('liff.message', ['title' => '店舗が見つかりません', 'message' => "「{$slug}」というお店はありません。"], 404);

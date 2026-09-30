@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Mock;
 
 use App\Http\Controllers\Controller;
 use App\Models\Mock\Account;
+use App\Models\Mock\AutoReply;
 use App\Models\Mock\OfficialAccount;
 use App\Models\Mock\Provider;
 use App\Services\MockLine\MockLine;
@@ -111,7 +112,8 @@ class ManagerController extends Controller
         $newName = trim((string) $r->input('new_provider'));
         if (! $pid && ! $newName) return back()->with('msg', 'プロバイダーを選んでください');
         abort_if($pid && ! Provider::find($pid)?->hasMember($me), 403, 'そのプロバイダーのメンバーではありません。');
-        MockLine::enableMessagingApi($oa, $pid, $me, $newName ?: null);
+        $ch = MockLine::enableMessagingApi($oa, $pid, $me, $newName ?: null);
+        $ch->update(['privacy_url' => trim((string) $r->input('privacy_url')), 'terms_url' => trim((string) $r->input('terms_url')), 'email' => (string) Account::find($me)?->email]);
         return redirect()->route('mock.manager.oa.messaging', $oa)->with('msg', 'Messaging APIを有効にしました');
     }
 
@@ -121,19 +123,81 @@ class ManagerController extends Controller
         return view('mock.manager.response', ['channel' => $oa->messagingChannel]);
     }
 
+    // 応答設定：本物と同じく、スイッチを切り替えた時点で保存される（「保存」ボタンはない）。送られてきた項目だけ変える
     public function saveResponse(Request $r, OfficialAccount $oa)
     {
         $this->guard($r, $oa);
-        $oa->update([
-            'response_mode' => $r->input('response_mode') === 'chat' ? 'chat' : 'bot',
-            'auto_reply_on' => $r->input('auto_reply_on') === '1', 'auto_reply_text' => (string) $r->input('auto_reply_text'),
-            'greeting_on' => $r->input('greeting_on') === '1', 'greeting_text' => (string) $r->input('greeting_text'),
-        ]);
+        $upd = [];
+        if ($r->has('chat')) $upd['response_mode'] = $r->input('chat') === '1' ? 'chat' : 'bot';
+        if ($r->has('greeting_on')) $upd['greeting_on'] = $r->input('greeting_on') === '1';
+        if ($r->has('auto_reply_on')) $upd['auto_reply_on'] = $r->input('auto_reply_on') === '1';
+        if ($upd) $oa->update($upd);
         // Manager の「Webhook」と Developers の「Webhookの利用」は同じ1つのスイッチ
         if ($oa->messagingChannel && $r->has('webhook')) $oa->messagingChannel->update(['use_webhook' => $r->input('webhook') === '1']);
         Inside::info('line', "「{$oa->name}」の応答設定を変更しました",
-            '応答モード: '.($oa->response_mode === 'bot' ? 'Bot' : 'チャット')."\n応答メッセージ: ".($oa->auto_reply_on ? 'ON' : 'OFF')
-            ."\nWebhook: ".($oa->messagingChannel ? ($oa->messagingChannel->fresh()->use_webhook ? 'ON' : 'OFF') : '（Messaging API未設定）'));
-        return redirect()->route('mock.manager.oa.response', $oa)->with('msg', '保存しました');
+            'チャット: '.($oa->response_mode === 'chat' ? 'ON' : 'OFF')."\nあいさつメッセージ: ".($oa->greeting_on ? 'ON' : 'OFF')
+            ."\nWebhook: ".($oa->messagingChannel ? ($oa->messagingChannel->fresh()->use_webhook ? 'ON' : 'OFF') : '（Messaging API未設定）')
+            ."\n応答メッセージ: ".($oa->auto_reply_on ? 'ON' : 'OFF'));
+        return redirect()->route('mock.manager.oa.response', $oa)->with('msg', '設定を変更しました');
+    }
+
+    // Messaging API の設定（有効化したあと）：プライバシーポリシー・利用規約
+    public function saveMessagingSettings(Request $r, OfficialAccount $oa)
+    {
+        $this->guard($r, $oa);
+        $ch = $oa->messagingChannel;
+        abort_unless($ch, 404);
+        $r->validate(['privacy_url' => 'nullable|url|starts_with:https://', 'terms_url' => 'nullable|url|starts_with:https://'],
+            ['url' => ':attribute は https:// から始まるURLを入れてください', 'starts_with' => ':attribute は https:// から始まるURLを入れてください'], ['privacy_url' => 'プライバシーポリシー', 'terms_url' => '利用規約']);
+        $ch->update(['privacy_url' => trim((string) $r->input('privacy_url')), 'terms_url' => trim((string) $r->input('terms_url'))]);
+        Inside::info('line', "「{$oa->name}」の Messaging API 設定（プライバシーポリシー・利用規約）を変更しました", $ch->privacy_url ?: '（空）');
+        return redirect()->route('mock.manager.oa.messaging', $oa)->with('msg', '保存しました');
+    }
+
+    // あいさつメッセージ（文面）
+    public function greeting(Request $r, OfficialAccount $oa) { $this->guard($r, $oa); return view('mock.manager.greeting'); }
+
+    public function saveGreeting(Request $r, OfficialAccount $oa)
+    {
+        $this->guard($r, $oa);
+        $oa->update(['greeting_text' => (string) $r->input('greeting_text')]);
+        Inside::info('line', "「{$oa->name}」のあいさつメッセージの文面を変更しました");
+        return redirect()->route('mock.manager.oa.greeting', $oa)->with('msg', '保存しました');
+    }
+
+    // 応答メッセージ（キーワードごとの一覧）
+    public function autoReplies(Request $r, OfficialAccount $oa)
+    {
+        $this->guard($r, $oa);
+        $items = $oa->autoReplies()->orderBy('id')->get();
+        return view('mock.manager.auto-replies', ['items' => $items, 'edit' => $r->query('edit') ? $items->firstWhere('id', (int) $r->query('edit')) : null, 'creating' => $r->boolean('create')]);
+    }
+
+    public function saveAutoReply(Request $r, OfficialAccount $oa)
+    {
+        $this->guard($r, $oa);
+        $data = $r->validate(['title' => 'required|max:100', 'keywords' => 'nullable|max:1000', 'text' => 'required|max:500'], [], ['title' => 'タイトル', 'text' => 'メッセージ']);
+        $item = $r->filled('id') ? $oa->autoReplies()->findOrFail($r->input('id')) : new AutoReply(['official_account_id' => $oa->id, 'enabled' => true]);
+        $item->fill(['title' => $data['title'], 'keywords' => (string) ($data['keywords'] ?? ''), 'text' => $data['text']])->save();
+        Inside::info('line', "「{$oa->name}」の応答メッセージ「{$item->title}」を保存しました", $item->isCatchAll() ? '一律応答（キーワードなし）' : 'キーワード: '.implode('、', $item->keywordList()));
+        return redirect()->route('mock.manager.oa.auto-replies', $oa)->with('msg', '保存しました');
+    }
+
+    public function toggleAutoReply(Request $r, OfficialAccount $oa, AutoReply $autoReply)
+    {
+        $this->guard($r, $oa);
+        abort_unless($autoReply->official_account_id === $oa->id, 404);
+        $autoReply->update(['enabled' => ! $autoReply->enabled]);
+        Inside::info('line', "応答メッセージ「{$autoReply->title}」の利用を ".($autoReply->enabled ? 'オン' : 'オフ').' にしました');
+        return redirect()->route('mock.manager.oa.auto-replies', $oa);
+    }
+
+    public function deleteAutoReply(Request $r, OfficialAccount $oa, AutoReply $autoReply)
+    {
+        $this->guard($r, $oa);
+        abort_unless($autoReply->official_account_id === $oa->id, 404);
+        $autoReply->delete();
+        Inside::info('line', "応答メッセージ「{$autoReply->title}」を削除しました");
+        return redirect()->route('mock.manager.oa.auto-replies', $oa)->with('msg', '削除しました');
     }
 }

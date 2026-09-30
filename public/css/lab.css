@@ -230,3 +230,11 @@ details > .bstep-head { cursor: pointer; }
 .rm-box { position: absolute; border: 2px dashed rgba(255,255,255,.9); outline: 1px dashed rgba(0,0,0,.5); }
 .rm-box span { position: absolute; left: 6px; top: 4px; background: #111; color: #fff; font-weight: 700; font-size: 12px; border-radius: 4px; padding: 0 6px; }
 .oam-cur { white-space: nowrap; }
+
+/* 構築ナビが画面のボタンに重ならないように：広い画面では、ひらいているあいだ右側にナビのぶんの余白をとる */
+@media (min-width: 1200px) {
+  body.buildnav-open { padding-right: 452px; }
+}
+.bsnap { margin-top: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 4px 8px; }
+.bsnap-form { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 8px 10px; }
+.bsnap-form label { white-space: nowrap; }

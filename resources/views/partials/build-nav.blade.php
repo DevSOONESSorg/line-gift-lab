@@ -7,8 +7,12 @@
   <script>
     (() => {
       const nav = document.getElementById('buildnav');
-      try { if (localStorage.getItem('buildnav-min')) nav.classList.add('min'); } catch (e) {}
-      window.toggleBuildNav = () => { nav.classList.toggle('min'); try { localStorage.setItem('buildnav-min', nav.classList.contains('min') ? '1' : ''); } catch (e) {} };
+      // せまい画面では、はじめは小さくしておく（フォームのボタンをふさがないため）
+      let saved = null; try { saved = localStorage.getItem('buildnav-min'); } catch (e) {}
+      if (saved === '1' || (saved === null && window.innerWidth < 1200)) nav.classList.add('min');
+      const sync = () => document.body.classList.toggle('buildnav-open', !nav.classList.contains('min'));
+      sync();
+      window.toggleBuildNav = () => { nav.classList.toggle('min'); sync(); try { localStorage.setItem('buildnav-min', nav.classList.contains('min') ? '1' : '0'); } catch (e) {} };
       const scroll = () => nav.querySelector('.bstep-current')?.scrollIntoView({ block: 'nearest' });
       scroll();
       // ほかのタブや疑似スマホで操作したときも、ナビが追いつくように3秒ごとに確かめる

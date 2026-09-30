@@ -32,6 +32,16 @@ return [
     'tunnel_metrics' => env('TUNNEL_METRICS', ''),
     'host_port' => env('PORT', 3000),
 
+    // 構築で毎回使う「会社の共通の値」（本番では会社の共通メールアドレスと、自社サービスのプライバシーポリシーURLにあたる）
+    //   LINEログインチャネル・Messaging API を作るときに入れる。個人のメールや空欄にしない
+    'build' => [
+        'service_name' => 'おくりギフト',                        // LINEログインチャネル名の頭：「おくりギフト {店名} LIFF」（20文字以内）
+        'email' => 'info@okuri-gift.example',                   // チャネルのメールアドレス
+        'privacy_url' => 'https://okuri-gift.example/privacy',  // プライバシーポリシーURL
+        'liff_suffix' => '-gift',                               // LIFFアプリ名：{slug}-gift
+        'channel_name_max' => 20,                               // LINEログインチャネル名の文字数の上限（本物と同じ）
+    ],
+
     // 疑似LINE：応答メッセージ・あいさつの初期値
     'default_auto_reply' => "メッセージありがとうございます！\n申し訳ありませんが、このアカウントから個別のご返信はできません。",
     'default_greeting' => "{Nickname}さん はじめまして！{AccountName}です。\n友だち追加ありがとうございます！",

@@ -141,7 +141,7 @@
           <a class="liff-close" href="{{ $closeUrl }}" title="閉じる"><i class="bi bi-x-lg"></i></a>
         </div>
         @if (!empty($open['error']))
-          <div class="phone-body p-3"><div class="alert alert-danger">{{ $open['error'] }}</div></div>
+          <div class="phone-body p-3"><div class="alert alert-danger" style="white-space:pre-line">{{ $open['error'] }}</div></div>
         @elseif (!empty($open['external']))
           <div class="phone-body p-3"><p>外部のページです。</p><a href="{{ $open['external'] }}" target="_blank" rel="noopener">{{ $open['external'] }}</a></div>
         @else

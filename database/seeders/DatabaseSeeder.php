@@ -127,15 +127,20 @@ class DatabaseSeeder extends Seeder
         $soa->update(['auto_reply_on' => false]);
         $sch = MockLine::enableMessagingApi($soa, $providerId, 'company');
         $stoken = MockLine::issueToken($sch);
-        $sch->update(['webhook_url' => "{$local}/api/webhook/line/store/lumiere", 'use_webhook' => true]);
-        $slogin = MockLine::createLoginChannel($providerId, 'シャンパンバー ルミエール LIFF', 'company');
-        $slogin->update(['is_published' => true]);
-        $sliff = MockLine::addLiff($slogin, 'ルミエールでギフトを贈る', "{$local}/liff/s/lumiere", 'Tall', 'profile openid chat_message.write', true);
-        // お店の公式LINEのメニュー：店舗ページ（このお店の LIFF）／送信履歴・お礼一覧（運営の LIFF）
+        $bc = config('lab.build');
+        $sch->update(['webhook_url' => "{$local}/api/webhook/line/store/lumiere", 'use_webhook' => true, 'privacy_url' => $bc['privacy_url']]);
+        $soa->update(['greeting_on' => false]);   // ケースA（運用していなかったアカウント）の完成形：応答・あいさつはオフ、bot が案内する
+        // 本番と同じ値：チャネル名「おくりギフト {店名} LIFF」（20文字以内）、メール・プライバシーポリシーは会社のもの、2要素認証オフ
+        $slogin = MockLine::createLoginChannel($providerId, "{$bc['service_name']} ルミエール LIFF", 'company', 'ルミエール ギフト用LIFF',
+            ['email' => $bc['email'], 'privacy_url' => $bc['privacy_url'], 'country' => 'JP', 'two_factor' => false]);
+        $slogin->update(['is_published' => true, 'linked_oa_id' => $soa->id]);
+        // LIFF：{slug}-gift・Full・openid profile・友だち追加オプション On (normal)
+        $sliff = MockLine::addLiff($slogin, 'lumiere'.$bc['liff_suffix'], "{$local}/liff/s/lumiere", 'Full', 'openid profile', true);
+        // お店の公式LINEのメニュー：贈る／送信履歴（領収書）／お礼一覧。どれもこのお店の LIFF（?action= で行き先を変える。本番と同じ）
         $this->richMenu($soa, '店舗メニュー', 'small-3', 'lumiere-menu.png', [
             ['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}"],
-            ['type' => 'link', 'value' => "https://liff.line.me/{$lHistory->liff_id}"],
-            ['type' => 'link', 'value' => "https://liff.line.me/{$lThanks->liff_id}"],
+            ['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}?action=send-history"],
+            ['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}?action=thanks"],
         ]);
         $cafe = Store::create([
             'name' => 'シャンパンバー ルミエール', 'slug' => 'lumiere', 'description' => '店舗専用の公式LINEから贈れる見本のお店です。今夜の一杯をスタッフに。', 'image_color' => '#b45309',

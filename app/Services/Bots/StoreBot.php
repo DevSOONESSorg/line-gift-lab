@@ -25,7 +25,8 @@ class StoreBot
 
         if ($event['type'] === 'message' && ($event['message']['type'] ?? '') === 'text') {
             if (! $store->auto_reply_enabled) return;   // OFF のときは反応しない
-            $line->reply($event['replyToken'], "ギフトはこちらから贈れます 🎁\n{$giftUrl}");
+            // 文面は本番の自動返信と同じ形
+            $line->reply($event['replyToken'], "🎁 {$store->name} へギフトを贈る\n{$giftUrl}");
             return;
         }
 

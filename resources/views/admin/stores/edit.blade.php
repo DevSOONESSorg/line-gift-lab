@@ -74,7 +74,8 @@
         <div class="form-text mb-2">空欄で保存すると現在の値を維持します。</div>
         <label class="form-label">LINE公式アカウントID (@xxx)</label><input name="line_official_account_id" class="form-control mb-2" value="{{ old('line_official_account_id', $store->line_official_account_id) }}">
         <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="auto_reply_enabled" value="1" id="ar" @checked($store->auto_reply_enabled)><label class="form-check-label" for="ar">テキスト受信時にギフト誘導を自動返信する</label></div>
-        <div class="form-text">オンにすると、この店舗の専用LINEチャネルにメッセージが届くたびにギフトリンクを自動返信します。オフにすると、通常の問い合わせには反応しません。</div>
+        <div class="form-text">オンにすると、この店舗の専用LINEチャネルにメッセージが届くたびにギフトリンクを自動返信します。オフにすると、通常の問い合わせ（「今日空いてる？」等）に反応しなくなります。共通チャネルのみを使う店舗には影響しません。<br>
+          <b>お店がキーワード応答（応答メッセージ）を使っているとき（ケースB）はオフ</b>にします。オンのままだと、どのメッセージにもギフトのリンクが返ってしまいます。</div>
       </div></div>
     </div>
   </div>
@@ -93,7 +94,8 @@
   @endforeach
 
   <div class="d-flex justify-content-between align-items-center mt-3"><span class="fw-bold">設定整合性</span>
-    <form method="post" action="{{ route('admin.stores.check', $store) }}">@csrf<button class="btn btn-sm btn-outline-primary">チェックする</button></form></div>
+    <form method="post" action="{{ route('admin.stores.check', $store) }}">@csrf<button class="btn btn-sm btn-link small p-0" title="結果を裏側ビューにも記録します">裏側ビューに記録</button></form></div>
+  <p class="form-text mb-0">このページを開くたびに自動で確認しています。<b>形と、トークがどのチャネルのものか</b>までは確かめますが、<b>LIFF ID が LINE 側に本当にあるか</b>までは確かめません（本番の管理画面と同じ）。LIFF ID は必ずコピーで貼り、最後はスマホで押して確かめます。</p>
   @if ($checks)
     <ul class="list-group mt-2">
       @foreach ($checks as $c)

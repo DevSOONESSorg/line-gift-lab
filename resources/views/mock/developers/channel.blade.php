@@ -25,12 +25,42 @@
     <div class="f"><label>プロバイダー</label><div>{{ $provider->name }}</div></div>
     @if ($channel->officialAccount)<div class="f"><label>LINE公式アカウント</label><div>{{ $channel->officialAccount->name }}（{{ $channel->officialAccount->basic_id }}）</div></div>@endif
     <div class="f"><label>作成者</label><div>{{ \App\Services\BuildGuide::ACCOUNTS[$channel->created_by] ?? $channel->created_by }}</div></div>
+    @php $countries = ['JP' => '日本', 'TW' => '台湾', 'TH' => 'タイ', 'ID' => 'インドネシア', 'US' => 'アメリカ合衆国']; @endphp
+    @if (request('edit') === 'basic')
+      <form method="post" action="{{ route('mock.developers.channel.basic', $channel) }}" class="border rounded p-3 my-2 bg-light">@csrf
+        @if ($errors->any())<div class="alert alert-danger py-2 small">@foreach ($errors->all() as $e)<div>{{ $e }}</div>@endforeach</div>@endif
+        <div class="f"><label>会社・事業者の所在国・地域</label><div><select name="country" class="form-select form-select-sm w-auto"><option value="">未設定</option>@foreach ($countries as $v => $t)<option value="{{ $v }}" @selected(old('country', $channel->country) === $v)>{{ $t }}</option>@endforeach</select></div></div>
+        <div class="f"><label>メールアドレス</label><div><input name="email" class="form-control form-control-sm" value="{{ old('email', $channel->email) }}"></div></div>
+        <div class="f"><label>プライバシーポリシーURL</label><div><input name="privacy_url" class="form-control form-control-sm" value="{{ old('privacy_url', $channel->privacy_url) }}" placeholder="https://"></div></div>
+        <div class="f"><label>サービス利用規約URL</label><div><input name="terms_url" class="form-control form-control-sm" value="{{ old('terms_url', $channel->terms_url) }}" placeholder="https://"></div></div>
+        @if ($channel->type === 'login')<div class="f"><label>2要素認証の必須化</label><div><div class="form-check form-switch"><input type="hidden" name="two_factor" value="0"><input class="form-check-input" type="checkbox" name="two_factor" value="1" @checked($channel->two_factor)></div></div></div>@endif
+        <button class="btn btn-sm btn-primary">更新</button> <a class="btn btn-sm btn-light" href="?tab=basic">キャンセル</a>
+      </form>
+    @else
+      <div class="f"><label>会社・事業者の所在国・地域</label><div>{{ $countries[$channel->country] ?? '未設定' }} <a class="small ms-2" href="?tab=basic&edit=basic">編集</a></div></div>
+      <div class="f"><label>メールアドレス</label><div>{{ $channel->email ?: '—' }} <a class="small ms-2" href="?tab=basic&edit=basic">編集</a></div></div>
+      <div class="f"><label>プライバシーポリシーURL</label><div>{{ $channel->privacy_url ?: '—' }} <a class="small ms-2" href="?tab=basic&edit=basic">編集</a></div></div>
+      <div class="f"><label>サービス利用規約URL</label><div>{{ $channel->terms_url ?: '—' }} <a class="small ms-2" href="?tab=basic&edit=basic">編集</a></div></div>
+      @if ($channel->type === 'login')<div class="f"><label>2要素認証の必須化</label><div>{{ $channel->two_factor ? 'オン' : 'オフ' }} <a class="small ms-2" href="?tab=basic&edit=basic">編集</a>
+        <div class="form-text">オンだと、お客さんが LIFF を開くときにも2要素認証を求められます。</div></div></div>
+        <div class="f"><label>アプリタイプ</label><div>ウェブアプリ</div></div>@endif
+    @endif
     @if ($channel->type === 'login')
       <div class="f"><label>チャネルの状態</label><div><span class="badge {{ $channel->is_published ? 'text-bg-success' : 'text-bg-warning' }}">{{ $channel->is_published ? '公開済み' : '開発中' }}</span>
         <form method="post" action="{{ route('mock.developers.channel.publish', $channel) }}" class="d-inline">@csrf<button class="btn btn-sm btn-outline-primary ms-2">{{ $channel->is_published ? '開発中に戻す' : '公開' }}</button></form>
         <div class="form-text">「開発中」のあいだは、チャネルの管理者・テスター以外は LIFF を開けません。お店では必ず「公開」にします。</div></div></div>
     @endif
   </div></div>
+  @if ($channel->type === 'login')
+  <div class="card mt-3"><div class="card-body ldc-fields">
+    <h2 class="h6">友だち追加オプション</h2>
+    <div class="f"><label>リンクされたLINE公式アカウント</label><div>
+      <form method="post" action="{{ route('mock.developers.channel.linked-oa', $channel) }}" class="d-flex gap-2">@csrf
+        <select name="linked_oa_id" class="form-select form-select-sm w-auto"><option value="">–</option>@foreach ($linkable as $o)<option value="{{ $o->id }}" @selected($channel->linked_oa_id == $o->id)>{{ $o->basic_id }}/{{ $o->name }}</option>@endforeach</select>
+        <button class="btn btn-sm btn-outline-primary">更新</button></form>
+      <div class="form-text">LIFF の友だち追加オプション（On）で友だち追加をすすめる公式アカウント。同じプロバイダーに Messaging API チャネルがあるアカウントだけが出ます。未設定だと、友だち追加オプションが効きません。</div></div></div>
+  </div></div>
+  @endif
 @endif
 
 @if ($tab === 'messaging' && $channel->type === 'messaging')
@@ -82,26 +112,47 @@
 @endif
 
 @if ($tab === 'liff' && $channel->type === 'login')
+  @php $sizes = ['Compact' => '下半分', 'Tall' => 'ほぼ全体・トークが少し見える', 'Full' => '全画面']; $scopeList = ['openid', 'email', 'profile', 'chat_message.write']; $bp = ['normal' => 'On (normal)', 'aggressive' => 'On (aggressive)', 'off' => 'Off']; @endphp
+  @if ($editLiff)
+    {{-- LIFFアプリ詳細（本物と同じく、1項目ずつ直せる） --}}
+    <div class="d-flex align-items-center mb-2"><h2 class="h6 mb-0">LIFFアプリ詳細</h2><a class="btn btn-sm btn-light ms-auto" href="?tab=liff">戻る</a></div>
+    <form method="post" action="{{ route('mock.developers.channel.liff.update', [$channel, $editLiff->liff_id]) }}" class="card"><div class="card-body ldc-fields" style="max-width:820px">@csrf
+      <input type="hidden" name="scopes_sent" value="1">
+      <div class="f"><label>LIFF ID</label><div><code class="user-select-all">{{ $editLiff->liff_id }}</code> <button type="button" class="btn btn-sm btn-outline-secondary py-0" onclick="navigator.clipboard.writeText(@js($editLiff->liff_id)); this.textContent='コピーしました'">コピー</button></div></div>
+      <div class="f"><label>LIFF URL</label><div><code class="user-select-all">https://liff.line.me/{{ $editLiff->liff_id }}</code> <button type="button" class="btn btn-sm btn-outline-secondary py-0" onclick="navigator.clipboard.writeText(@js('https://liff.line.me/'.$editLiff->liff_id)); this.textContent='コピーしました'">コピー</button></div></div>
+      <div class="f"><label>LIFFアプリ名</label><div><input name="name" class="form-control form-control-sm" value="{{ $editLiff->name }}"></div></div>
+      <div class="f"><label>サイズ</label><div class="d-flex gap-3">@foreach ($sizes as $v => $d)<div class="form-check"><input class="form-check-input" type="radio" name="size" value="{{ $v }}" @checked($editLiff->size === $v)><label class="form-check-label">{{ $v }}</label></div>@endforeach</div></div>
+      <div class="f"><label>エンドポイントURL</label><div><input name="endpoint_url" class="form-control form-control-sm" value="{{ $editLiff->endpoint_url }}"></div></div>
+      <div class="f"><label>Scope</label><div><div class="d-flex gap-3 flex-wrap">@foreach ($scopeList as $sc)<div class="form-check"><input class="form-check-input" type="checkbox" name="scopes[]" value="{{ $sc }}" @checked(in_array($sc, explode(' ', $editLiff->scopes), true)) @disabled($sc === 'email')><label class="form-check-label">{{ $sc }}</label></div>@endforeach</div>
+        <div class="form-text">「chat_message.write」スコープを有効にすると、ブラウザの最小化機能が無効になります</div></div></div>
+      <div class="f"><label>友だち追加オプション</label><div class="d-flex gap-3">@foreach ($bp as $v => $t)<div class="form-check"><input class="form-check-input" type="radio" name="bot_prompt" value="{{ $v }}" @checked(($editLiff->bot_prompt ? 'normal' : 'off') === $v)><label class="form-check-label">{{ $t }}</label></div>@endforeach</div></div>
+      <div class="d-flex gap-2 mt-2"><button class="btn btn-primary">更新</button></div>
+    </div></form>
+    <form method="post" action="{{ route('mock.developers.channel.liff.delete', [$channel, $editLiff->liff_id]) }}" class="mt-2" onsubmit="return confirm('削除しますか？')">@csrf @method('DELETE')<button class="btn btn-sm btn-link text-danger">削除</button></form>
+  @else
   <div class="d-flex align-items-center mb-2"><h2 class="h6 mb-0">LIFFアプリ</h2><a class="btn btn-sm btn-primary ms-auto" href="?tab=liff&add=1">追加</a></div>
-  <div class="card mb-3"><table class="table mb-0 align-middle"><thead><tr><th>LIFFアプリ名</th><th>LIFF ID / LIFF URL</th><th>エンドポイントURL</th><th></th></tr></thead><tbody>
+  <div class="card mb-3"><table class="table mb-0 align-middle"><thead><tr><th>LIFFアプリ名</th><th>LIFF ID</th><th>LIFF URL</th><th>サイズ</th></tr></thead><tbody>
     @forelse ($liffs as $l)
-      <tr><td>{{ $l->name }}<div class="small text-muted">{{ $l->size }}・{{ $l->scopes }}{{ $l->bot_prompt ? '・友だち追加オプション On' : '' }}</div></td>
-        <td><code class="user-select-all">{{ $l->liff_id }}</code><div class="small"><code class="user-select-all">https://liff.line.me/{{ $l->liff_id }}</code></div></td>
-        <td><form method="post" action="{{ route('mock.developers.channel.liff.update', [$channel, $l->liff_id]) }}" class="d-flex gap-1">@csrf<input name="endpoint_url" class="form-control form-control-sm" value="{{ $l->endpoint_url }}"><button class="btn btn-sm btn-outline-primary">更新</button></form></td>
-        <td><form method="post" action="{{ route('mock.developers.channel.liff.delete', [$channel, $l->liff_id]) }}" onsubmit="return confirm('削除しますか？')">@csrf @method('DELETE')<button class="btn btn-sm btn-link text-danger">削除</button></form></td></tr>
+      <tr><td><a href="?tab=liff&liff={{ $l->liff_id }}">{{ $l->name }}</a></td>
+        <td><code class="user-select-all">{{ $l->liff_id }}</code></td>
+        <td><code class="user-select-all small">https://liff.line.me/{{ $l->liff_id }}</code></td>
+        <td>{{ $l->size }}</td></tr>
     @empty
       <tr><td colspan="4" class="text-center text-muted py-3">LIFFアプリはまだありません。「追加」から作りましょう。</td></tr>
     @endforelse
   </tbody></table></div>
+  <p class="small text-muted">LIFFアプリ名を押すと「LIFFアプリ詳細」が開き、エンドポイントURL・Scope・友だち追加オプションの確認や変更、LIFF ID のコピーができます。</p>
+  @endif
   @if (request('add'))
   <form method="post" action="{{ route('mock.developers.channel.liff', $channel) }}" class="card"><div class="card-body ldc-fields" style="max-width:820px">@csrf
     <h2 class="h6">LIFFアプリを追加</h2>
-    <div class="f"><label>LIFFアプリ名 <span class="text-danger">*</span></label><div><input name="name" class="form-control" value="{{ $channel->name }}"></div></div>
-    <div class="f"><label>サイズ <span class="text-danger">*</span></label><div class="d-flex gap-3">@foreach (['Compact' => '下半分', 'Tall' => 'ほぼ全体・トークが少し見える', 'Full' => '全画面'] as $s => $d)<div class="form-check"><input class="form-check-input" type="radio" name="size" value="{{ $s }}" @checked($s === 'Tall')><label class="form-check-label">{{ $s }} <small class="text-muted">{{ $d }}</small></label></div>@endforeach</div></div>
-    <div class="f"><label>エンドポイントURL <span class="text-danger">*</span></label><div><input name="endpoint_url" class="form-control" placeholder="{{ \App\Services\BuildGuide::current()?->liffUrl() ?? 'http://localhost:3000/liff/s/{slug}' }}"><div class="form-text">LIFF を開いたときに表示するページ。本番は https:// のみ。</div></div></div>
-    <div class="f"><label>Scope</label><div class="d-flex gap-3 flex-wrap">@foreach (['openid' => true, 'email' => false, 'profile' => true, 'chat_message.write' => true] as $s => $on)<div class="form-check"><input class="form-check-input" type="checkbox" name="scopes[]" value="{{ $s }}" @checked($on) @disabled($s === 'email')><label class="form-check-label">{{ $s }}</label></div>@endforeach</div></div>
-    <div class="f"><label>友だち追加オプション</label><div class="d-flex gap-3">@foreach (['normal' => 'On (normal)', 'aggressive' => 'On (aggressive)', 'off' => 'Off'] as $v => $t)<div class="form-check"><input class="form-check-input" type="radio" name="bot_prompt" value="{{ $v }}" @checked($v === 'normal')><label class="form-check-label">{{ $t }}</label></div>@endforeach</div>
-      <div class="form-text ms-0">LIFF を開いたとき、この LINEログインチャネルとつながった公式アカウントの友だち追加をすすめる</div></div>
+    <div class="f"><label>LIFFアプリ名 <span class="text-danger">*</span></label><div><input name="name" class="form-control" placeholder="例：{{ (\App\Services\BuildGuide::current()?->targetSlug() ?? 'slug').config('lab.build.liff_suffix') }}"></div></div>
+    <div class="f"><label>サイズ <span class="text-danger">*</span></label><div class="d-flex gap-3">@foreach ($sizes as $s => $d)<div class="form-check"><input class="form-check-input" type="radio" name="size" value="{{ $s }}"><label class="form-check-label">{{ $s }} <small class="text-muted">{{ $d }}</small></label></div>@endforeach</div></div>
+    <div class="f"><label>エンドポイントURL <span class="text-danger">*</span></label><div><input name="endpoint_url" class="form-control" placeholder="https://"><div class="form-text">LIFF を開いたときに表示するページ。本番は https:// のみ。</div></div></div>
+    <div class="f"><label>Scope</label><div><div class="d-flex gap-3 flex-wrap">@foreach (['openid' => true, 'email' => false, 'profile' => false, 'chat_message.write' => false] as $s => $on)<div class="form-check"><input class="form-check-input" type="checkbox" name="scopes[]" value="{{ $s }}" @checked($on) @disabled($s === 'email')><label class="form-check-label">{{ $s }}</label></div>@endforeach</div>
+      <div class="form-text">「chat_message.write」スコープを有効にすると、ブラウザの最小化機能が無効になります</div></div></div>
+    <div class="f"><label>友だち追加オプション</label><div class="d-flex gap-3">@foreach ($bp as $v => $t)<div class="form-check"><input class="form-check-input" type="radio" name="bot_prompt" value="{{ $v }}" @checked($v === 'off')><label class="form-check-label">{{ $t }}</label></div>@endforeach</div>
+      <div class="form-text ms-0">LIFF を開いたとき、このチャネルの「リンクされたLINE公式アカウント」の友だち追加をすすめる</div></div>
     <div class="f"><label>Scan QR</label><div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div></div></div>
     <div class="f"><label>モジュールモード</label><div><div class="form-check form-switch"><input class="form-check-input" type="checkbox" disabled></div><div class="form-text">Full のときだけ使えます</div></div></div>
     <button class="btn btn-primary mt-2">追加</button>

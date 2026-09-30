@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\DB;
 // チャネル（messaging = Messaging API / login = LINEログイン）
 class Channel extends MockModel
 {
-    protected $casts = ['use_webhook' => 'boolean', 'is_published' => 'boolean'];
+    protected $casts = ['use_webhook' => 'boolean', 'is_published' => 'boolean', 'two_factor' => 'boolean'];
 
     public function provider() { return $this->belongsTo(Provider::class); }
     public function officialAccount() { return $this->belongsTo(OfficialAccount::class); }
+    // LINEログインチャネルの「リンクされたLINE公式アカウント」（友だち追加オプションで友だち追加をすすめる相手）
+    public function linkedOa() { return $this->belongsTo(OfficialAccount::class, 'linked_oa_id'); }
     public function liffApps() { return $this->hasMany(LiffApp::class); }
 
     public function roleOf(string $accountId): ?string

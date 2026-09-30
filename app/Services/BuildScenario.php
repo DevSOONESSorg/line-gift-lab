@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Agent;
 use App\Models\MenuTemplate;
 use App\Models\Mock\Channel;
 use App\Models\Mock\LiffApp;
@@ -24,6 +25,9 @@ use Illuminate\Support\Facades\Storage;
 //   ・オーナーが運営LINEのQRから出店登録済み（未承認・slug は仮の store-番号）
 //   ・お店は自分の公式LINEを持っていて、お客さんも友だち追加している
 //   ・リッチメニューもある。「ギフトを贈る」ボタンだけ、まだどこにもつながっていない
+//   ・case：B＝お店が公式LINEを運用中（キーワード応答・独自のあいさつがある）／A＝運用していない（初期のまま）
+//       本番の「★★★ 既存設定を壊さない」ルール：B のお店で応答メッセージをOFFにすると、お店のキーワード応答が止まる
+//   ・agent：紹介元の代理店（agent_preset なら出店登録のときに紐付け済み）／menus_inactive：商品が全部「停止中」
 //
 // 課題を増やすときは SCENARIOS に1つ足す（店舗情報・商品・リッチメニュー）。
 // =====================================================
@@ -40,6 +44,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '松山支店', 'bank_account_type' => '普通', 'bank_account_number' => '7654321', 'bank_account_name' => 'アズマ アオイ',
             ],
             'menus' => [4, 7, 9],   // 商品テンプレートの番号
+            // ケースB：お店が公式LINEを運用中（キーワード応答・独自のあいさつ）→ 応答メッセージは触らず、自社の自動返信をOFF
+            'case' => 'B',
+            'agent' => 'うるま紹介センター', 'agent_preset' => true,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // large-4。「贈る」は A（ギフトを贈る）
             'richmenu' => ['title' => 'お店のメニュー', 'template' => 'large-4', 'image' => 'azure-menu.png', 'actions' => [
@@ -59,6 +67,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '北谷支店', 'bank_account_type' => '普通', 'bank_account_number' => '2223334', 'bank_account_name' => 'サンゴ ミオ',
             ],
             'menus' => [4, 5, 7],   // 商品テンプレートの番号
+            // ケースA：公式LINEはあるが運用していない（応答は初期のまま）→ 標準の設定
+            'case' => 'A',
+            'agent' => '那覇サブエージェント', 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // large-3。「贈る」は C（ギフトを贈る）
             'richmenu' => ['title' => 'コーラルメニュー', 'template' => 'large-3', 'image' => 'coral-menu.png', 'actions' => [
@@ -77,6 +89,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '新宿支店', 'bank_account_type' => '普通', 'bank_account_number' => '4445556', 'bank_account_name' => 'ホシノ ルナ',
             ],
             'menus' => [1, 2, 5, 7],   // 商品テンプレートの番号
+            // ケースB：お店が公式LINEを運用中（キーワード応答・独自のあいさつ）→ 応答メッセージは触らず、自社の自動返信をOFF
+            'case' => 'B',
+            'agent' => null, 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => true,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // large-6。「贈る」は B（シャンパンを贈る）
             'richmenu' => ['title' => 'エトワールメニュー', 'template' => 'large-6', 'image' => 'etoile-menu.png', 'actions' => [
@@ -98,6 +114,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '歌舞伎町支店', 'bank_account_type' => '普通', 'bank_account_number' => '5556667', 'bank_account_name' => 'クロサキ ユア',
             ],
             'menus' => [1, 3, 4, 7],   // 商品テンプレートの番号
+            // ケースA：公式LINEはあるが運用していない（応答は初期のまま）→ 標準の設定
+            'case' => 'A',
+            'agent' => 'うるま紹介センター', 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // small-3。「贈る」は B（ギフトを贈る）
             'richmenu' => ['title' => 'ルナノワールメニュー', 'template' => 'small-3', 'image' => 'lunanoir-menu.png', 'actions' => [
@@ -116,6 +136,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '心斎橋支店', 'bank_account_type' => '普通', 'bank_account_number' => '6667778', 'bank_account_name' => 'カンザキ レオ',
             ],
             'menus' => [3, 1, 8, 7],   // 商品テンプレートの番号
+            // ケースB：お店が公式LINEを運用中（キーワード応答・独自のあいさつ）→ 応答メッセージは触らず、自社の自動返信をOFF
+            'case' => 'B',
+            'agent' => 'うるま紹介センター', 'agent_preset' => true,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // large-4。「贈る」は D（推しに贈る）
             'richmenu' => ['title' => 'アルカディアメニュー', 'template' => 'large-4', 'image' => 'arcadia-menu.png', 'actions' => [
@@ -135,6 +159,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => 'なんば支店', 'bank_account_type' => '普通', 'bank_account_number' => '7778889', 'bank_account_name' => 'アマノ ソラ',
             ],
             'menus' => [2, 1, 8, 7],   // 商品テンプレートの番号
+            // ケースB：お店が公式LINEを運用中（キーワード応答・独自のあいさつ）→ 応答メッセージは触らず、自社の自動返信をOFF
+            'case' => 'B',
+            'agent' => 'うるま紹介センター', 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => true,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => 'ナイトワーク',
             // large-6。「贈る」は F（シャンパンを贈る）
             'richmenu' => ['title' => '蒼天メニュー', 'template' => 'large-6', 'image' => 'soten-menu.png', 'actions' => [
@@ -156,6 +184,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '祇園支店', 'bank_account_type' => '普通', 'bank_account_number' => '8889990', 'bank_account_name' => 'ツキオカ シズク',
             ],
             'menus' => [4, 6, 7],   // 商品テンプレートの番号
+            // ケースA：公式LINEはあるが運用していない（応答は初期のまま）→ 標準の設定
+            'case' => 'A',
+            'agent' => null, 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => '飲食店',
             // large-3。「贈る」は B（ギフトを贈る）
             'richmenu' => ['title' => '月影メニュー', 'template' => 'large-3', 'image' => 'tsukikage-menu.png', 'actions' => [
@@ -174,6 +206,10 @@ class BuildScenario
                 'bank_name' => 'みなと銀行', 'bank_branch' => '四条支店', 'bank_account_type' => '普通', 'bank_account_number' => '9990001', 'bank_account_name' => 'アカリ ハルカ',
             ],
             'menus' => [4, 5, 7],   // 商品テンプレートの番号
+            // ケースB：お店が公式LINEを運用中（キーワード応答・独自のあいさつ）→ 応答メッセージは触らず、自社の自動返信をOFF
+            'case' => 'B',
+            'agent' => '那覇サブエージェント', 'agent_preset' => false,   // 紹介元の代理店（preset=true なら出店登録のときに紐付け済み）
+            'menus_inactive' => false,   // true：オーナーが商品を登録したが、全部「停止中」のまま
             'industry' => '飲食店',
             // large-4。「贈る」は B（一杯を贈る）
             'richmenu' => ['title' => '灯メニュー', 'template' => 'large-4', 'image' => 'akari-menu.png', 'actions' => [
@@ -196,6 +232,44 @@ class BuildScenario
         return ($gift ?? ['letter' => 'A', 'label' => 'ギフトを贈る']) + ['others' => $others];
     }
 
+    public static function caseOf(string $key): string { return self::SCENARIOS[$key]['case'] ?? 'A'; }
+
+    public static function expectedAgent(string $key): ?Agent
+    {
+        $name = self::SCENARIOS[$key]['agent'] ?? null;
+        return $name ? Agent::where('name', $name)->first() : null;
+    }
+
+    public static function initial(string $key): array { return json_decode(Setting::get("scenario.{$key}.initial", '{}'), true) ?: []; }
+
+    // スタート地点のリッチメニューのボタン。ケースAのお店は応答メッセージを使っていないので、テキストのボタンはリンクにしておく
+    public static function actions(string $key): array
+    {
+        $acts = self::SCENARIOS[$key]['richmenu']['actions'];
+        if (self::caseOf($key) === 'B') return $acts;
+        return array_map(fn ($a) => $a['type'] === 'text' ? ['type' => 'link', 'value' => 'https://www.example.com/'.self::SCENARIOS[$key]['slug'].'/'.rawurlencode($a['value']), 'label' => $a['label']] : $a, $acts);
+    }
+
+    // ケースBのお店のキーワード応答（リッチメニューのテキストボタン＋よく来る問い合わせ）
+    public static function keywordReplies(string $key): array
+    {
+        $st = self::SCENARIOS[$key]['store'];
+        $texts = [
+            'お店の情報' => "{$st['name']}\n{$st['prefecture']}{$st['city']}{$st['address']}\nTEL {$st['tel']}",
+            '営業時間' => "営業時間 20:00〜翌1:00\n定休日：日曜日",
+            'キャスト紹介' => "在籍キャストは Instagram で紹介しています✨", 'キャスト' => "在籍キャストは Instagram で紹介しています✨",
+            'ホスト紹介' => "在籍ホストは Instagram で紹介しています✨", '出勤情報' => "本日の出勤は Instagram のストーリーズでお知らせしています。",
+            '料金システム' => "SET 60分 ¥5,000〜（税・サービス料別）\n延長 30分 ¥2,500",
+            '予約したい' => "ご予約ありがとうございます。\nお名前・日時・人数を送ってください。スタッフが確認してご返信します。",
+        ];
+        $rows = [];
+        foreach (self::SCENARIOS[$key]['richmenu']['actions'] as $a) {
+            if ($a['type'] === 'text' && isset($texts[$a['value']])) $rows[] = [$a['label'], $a['value'], $texts[$a['value']]];
+        }
+        $rows[] = ['シャンパン・ワイン', "シャンパン\nワイン", "ボトルメニューは店内でご案内しています🍾\nご来店をお待ちしております。"];
+        return $rows;
+    }
+
     // プルダウンで選んだとき：まだ作っていなければスタート地点を作る。作ってあれば、そのまま続きから
     public static function start(string $key): Store
     {
@@ -208,7 +282,7 @@ class BuildScenario
     {
         foreach (array_keys(self::SCENARIOS) as $key) {
             self::destroy($key);
-            Setting::whereIn('key', ["scenario.{$key}.store", "scenario.{$key}.oa"])->delete();
+            Setting::whereIn('key', ["scenario.{$key}.store", "scenario.{$key}.oa", "scenario.{$key}.initial", "build.snapshot.{$key}"])->delete();
         }
         Inside::info('app', '構築履歴をリセットしました', '課題のお店（公式LINE・チャネル・LIFF・注文）をすべて消しました');
     }
@@ -245,12 +319,20 @@ class BuildScenario
         ]);
         $store->update(['slug' => "store-{$store->id}"]);   // 出店登録したときと同じ、仮の slug
         foreach ($def['menus'] as $tid) {
-            if ($t = MenuTemplate::find($tid)) $store->menus()->create(['menu_template_id' => $t->id, 'name' => $t->name, 'price' => $t->reference_price]);
+            if ($t = MenuTemplate::find($tid)) $store->menus()->create(['menu_template_id' => $t->id, 'name' => $t->name, 'price' => $t->reference_price,
+                'is_active' => ! ($def['menus_inactive'] ?? false)]);
         }
+        if (($def['agent_preset'] ?? false) && ($agent = self::expectedAgent($key))) $store->update(['agent_id' => $agent->id]);
 
         // お店がもともと持っている公式LINE（持ち主はオーナー＝個人アカウント）とリッチメニュー
         $oa = MockLine::createOfficialAccount($def['store']['name'], 'personal', $def['industry']);
         $rm = $def['richmenu'];
+        $rm['actions'] = self::actions($key);
+        if (self::caseOf($key) === 'B') {
+            // 運用中のお店：独自のあいさつと、リッチメニューのボタン（テキスト）に合わせたキーワード応答
+            $oa->update(['greeting_text' => "{Nickname}さん、{AccountName}の公式LINEへようこそ✨\n下のメニューから、お店の情報や営業時間が見られます。"]);
+            foreach (self::keywordReplies($key) as [$title, $kw, $text]) $oa->autoReplies()->create(['title' => $title, 'keywords' => $kw, 'text' => $text, 'enabled' => true]);
+        }
         $path = "richmenus/scenario-{$oa->id}.png";
         Storage::disk('public')->put($path, file_get_contents(database_path("seeders/images/{$rm['image']}")));
         [$w, $h] = getimagesize(database_path("seeders/images/{$rm['image']}"));
@@ -262,6 +344,14 @@ class BuildScenario
 
         Setting::put("scenario.{$key}.store", $store->id);
         Setting::put("scenario.{$key}.oa", $oa->id);
+        $oa->refresh();   // DB の初期値（応答メッセージ・あいさつ＝オン）を読み直す
+        // 変更前の状態（構築ナビが「スナップショットを正しく取れたか」「最後に元どおりか」を確かめるのに使う）
+        Setting::put("scenario.{$key}.initial", json_encode([
+            'auto_reply_on' => (bool) $oa->auto_reply_on, 'greeting_on' => (bool) $oa->greeting_on,
+            'keywords' => $oa->autoReplies()->get()->reject->isCatchAll()->count(), 'case' => self::caseOf($key),
+            'keyword_list' => $oa->autoReplies()->get()->flatMap->keywordList()->values()->all(),
+        ], JSON_UNESCAPED_UNICODE));
+        Setting::where('key', 'like', "build.snapshot.{$key}")->delete();
         Inside::info('app', "構築の課題「{$store->name}」をスタート地点に戻しました", "出店登録済み（未承認・slug {$store->slug}）／公式LINE {$oa->basic_id}／リッチメニューの「ギフトを贈る」は未設定");
         return $store;
     }

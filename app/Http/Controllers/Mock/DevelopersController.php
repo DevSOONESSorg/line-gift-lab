@@ -37,10 +37,19 @@ class DevelopersController extends Controller
         if ($r->input('type') !== 'login') {
             return back()->with('msg', 'Messaging APIチャネルは、ここでは作れません。LINE Official Account Manager で「Messaging APIを利用する」から作ります。');
         }
-        if (! $r->filled('name') || $r->input('app_type') !== 'web') {
-            return redirect()->route('mock.developers.provider', [$provider, 'create' => 'login'])->with('msg', 'チャネル名を入れ、アプリタイプで「ウェブアプリ」を選んでください。');
-        }
-        $ch = MockLine::createLoginChannel($provider->id, $r->input('name'), $this->me($r), (string) $r->input('description'));
+        $max = config('lab.build.channel_name_max');
+        $data = $r->validate([
+            'country' => 'required', 'name' => "required|max:{$max}", 'description' => 'required|max:500', 'app_type' => 'required|in:web',
+            'email' => 'required|email|max:100', 'privacy_url' => 'nullable|url|starts_with:https://|max:500', 'terms_url' => 'nullable|url|starts_with:https://|max:500',
+        ], [
+            'required' => ':attribute は入力必須項目です', 'name.max' => "チャネル名は{$max}文字以内で入力してください",
+            'app_type.required' => 'アプリタイプで「ウェブアプリ」を選んでください', 'email' => '有効なメールアドレスを入力してください',
+            'starts_with' => ':attribute は有効なHTTPS URLを入力してください', 'url' => ':attribute は有効なHTTPS URLを入力してください',
+        ], ['country' => '所在国・地域', 'name' => 'チャネル名', 'description' => 'チャネル説明', 'email' => 'メールアドレス', 'privacy_url' => 'プライバシーポリシーURL', 'terms_url' => 'サービス利用規約URL']);
+        $ch = MockLine::createLoginChannel($provider->id, $data['name'], $this->me($r), $data['description'], [
+            'email' => $data['email'], 'privacy_url' => (string) ($data['privacy_url'] ?? ''), 'terms_url' => (string) ($data['terms_url'] ?? ''),
+            'country' => $data['country'], 'two_factor' => $r->input('two_factor') === '1',
+        ]);
         if ($sid = $r->session()->get('build.store')) $r->session()->put("build.login.{$sid}", $ch->id);   // 構築ナビ用
         return redirect()->route('mock.developers.channel.show', $ch)->with('msg', 'チャネルを作成しました');
     }
@@ -58,8 +67,10 @@ class DevelopersController extends Controller
     {
         $this->guard($r, $channel);
         $roles = DB::connection('mockline')->table('channel_roles')->join('accounts', 'accounts.id', '=', 'channel_roles.account_id')->where('channel_id', $channel->id)->get();
+        // リンクできる公式アカウント：同じプロバイダーに Messaging API チャネルがあるもの（本物と同じ）
+        $linkable = \App\Models\Mock\OfficialAccount::whereIn('id', Channel::where(['type' => 'messaging', 'provider_id' => $channel->provider_id])->pluck('official_account_id'))->orderBy('basic_id')->get();
         return view('mock.developers.channel', ['tab' => $r->query('tab', 'basic'), 'liffs' => $channel->liffApps, 'roles' => $roles,
-            'accounts' => Account::all(), 'verify' => session('verify')]);
+            'accounts' => Account::all(), 'verify' => session('verify'), 'linkable' => $linkable, 'editLiff' => $r->query('liff') ? $channel->liffApps->firstWhere('liff_id', $r->query('liff')) : null]);
     }
 
     private function back(Channel $ch, string $tab, ?string $msg = null)
@@ -104,23 +115,64 @@ class DevelopersController extends Controller
         return $this->back($channel, 'basic');
     }
 
+    // チャネル基本設定の編集（メール・プライバシーポリシー・所在国・2要素認証）
+    public function saveBasic(Request $r, Channel $channel)
+    {
+        $this->guard($r, $channel);
+        $data = $r->validate([
+            'email' => 'required|email|max:100', 'country' => 'required',
+            'privacy_url' => 'nullable|url|starts_with:https://|max:500', 'terms_url' => 'nullable|url|starts_with:https://|max:500',
+        ], ['required' => ':attribute は入力必須項目です', 'email' => '有効なメールアドレスを入力してください', 'url' => ':attribute は有効なHTTPS URLを入力してください', 'starts_with' => ':attribute は有効なHTTPS URLを入力してください'],
+            ['email' => 'メールアドレス', 'country' => '所在国・地域', 'privacy_url' => 'プライバシーポリシーURL', 'terms_url' => 'サービス利用規約URL']);
+        $channel->update(['email' => $data['email'], 'country' => $data['country'], 'privacy_url' => (string) ($data['privacy_url'] ?? ''),
+            'terms_url' => (string) ($data['terms_url'] ?? '')] + ($channel->type === 'login' ? ['two_factor' => $r->input('two_factor') === '1'] : []));
+        Inside::info('line', "チャネル {$channel->channel_id} の基本設定を変更しました",
+            "メール: {$channel->email}\nプライバシーポリシー: ".($channel->privacy_url ?: '（空）').($channel->type === 'login' ? "\n2要素認証の必須化: ".($channel->two_factor ? 'ON' : 'OFF') : ''));
+        return $this->back($channel, 'basic', '基本設定を更新しました');
+    }
+
+    // 友だち追加オプション：リンクされたLINE公式アカウント（同じプロバイダーの Messaging API チャネルを持つ公式アカウントから選ぶ）
+    public function saveLinkedOa(Request $r, Channel $channel)
+    {
+        $this->guard($r, $channel);
+        abort_unless($channel->type === 'login', 404);
+        $oaId = $r->input('linked_oa_id') ?: null;
+        abort_if($oaId && ! Channel::where(['type' => 'messaging', 'provider_id' => $channel->provider_id, 'official_account_id' => $oaId])->exists(), 422, 'そのアカウントは選べません');
+        $channel->update(['linked_oa_id' => $oaId]);
+        $oa = $channel->fresh()->linkedOa;
+        Inside::info('line', "LINEログインチャネル {$channel->channel_id} のリンクされたLINE公式アカウントを「".($oa ? "{$oa->basic_id} {$oa->name}" : '–')."」にしました",
+            'LIFF の友だち追加オプションは、ここでリンクした公式アカウントの友だち追加をすすめます。未設定だと友だち追加オプションが効きません');
+        return $this->back($channel, 'basic', 'リンクされたLINE公式アカウントを更新しました');
+    }
+
     public function addLiff(Request $r, Channel $channel)
     {
         $this->guard($r, $channel);
         if ($channel->type !== 'login') return $this->back($channel, 'basic', 'LIFFはLINEログインチャネルに追加します');
         $endpoint = trim((string) $r->input('endpoint_url'));
-        if (! preg_match('#^https?://#', $endpoint)) return redirect()->route('mock.developers.channel.show', [$channel, 'tab' => 'liff', 'add' => 1])->with('msg', 'エンドポイントURLは http:// か https:// で始まるURLを入れてください');
-        $liff = MockLine::addLiff($channel, $r->input('name') ?: $channel->name, $endpoint, $r->input('size', 'Full'),
-            implode(' ', (array) $r->input('scopes', ['profile'])), in_array($r->input('bot_prompt'), ['normal', 'aggressive', '1'], true));
+        $again = fn ($m) => redirect()->route('mock.developers.channel.show', [$channel, 'tab' => 'liff', 'add' => 1])->with('msg', $m);
+        if (! $r->filled('name')) return $again('LIFFアプリ名を入れてください');
+        if (! in_array($r->input('size'), ['Compact', 'Tall', 'Full'], true)) return $again('サイズを選んでください');
+        if (! preg_match('#^https?://#', $endpoint)) return $again('エンドポイントURLは http:// か https:// で始まるURLを入れてください');
+        $liff = MockLine::addLiff($channel, trim($r->input('name')), $endpoint, $r->input('size'),
+            implode(' ', (array) $r->input('scopes', ['openid'])), in_array($r->input('bot_prompt'), ['normal', 'aggressive', '1'], true));
         return $this->back($channel, 'liff', "LIFFアプリを追加しました。LIFF ID: {$liff->liff_id} ／ LIFF URL: https://liff.line.me/{$liff->liff_id}");
     }
 
     public function updateLiff(Request $r, Channel $channel, string $liffId)
     {
         $this->guard($r, $channel);
-        LiffApp::where(['liff_id' => $liffId, 'channel_id' => $channel->id])->update(['endpoint_url' => trim((string) $r->input('endpoint_url'))]);
-        Inside::info('line', "LIFF {$liffId} のエンドポイントURLを変更しました", $r->input('endpoint_url'));
-        return $this->back($channel, 'liff', 'エンドポイントURLを更新しました');
+        $liff = LiffApp::where(['liff_id' => $liffId, 'channel_id' => $channel->id])->firstOrFail();
+        $upd = array_filter([
+            'endpoint_url' => $r->filled('endpoint_url') ? trim((string) $r->input('endpoint_url')) : null,
+            'name' => $r->filled('name') ? trim((string) $r->input('name')) : null,
+            'size' => in_array($r->input('size'), ['Compact', 'Tall', 'Full'], true) ? $r->input('size') : null,
+        ], fn ($v) => $v !== null);
+        if ($r->has('scopes_sent')) $upd['scopes'] = implode(' ', (array) $r->input('scopes', ['openid']));
+        if ($r->has('bot_prompt')) $upd['bot_prompt'] = in_array($r->input('bot_prompt'), ['normal', 'aggressive'], true);
+        $liff->update($upd);
+        Inside::info('line', "LIFF {$liffId} の設定を変更しました", collect($upd)->map(fn ($v, $k) => "{$k}: ".var_export($v, true))->join("\n"));
+        return redirect()->route('mock.developers.channel.show', [$channel, 'tab' => 'liff', 'liff' => $liffId])->with('msg', 'LIFFアプリを更新しました');
     }
 
     public function deleteLiff(Request $r, Channel $channel, string $liffId)

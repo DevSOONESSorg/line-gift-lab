@@ -14,7 +14,7 @@
     </select>
   </form>
   <div class="form-text">
-    はじめて選んだお店は、「オーナーが出店登録した直後・お店の公式LINEとリッチメニューはあるが、まだつながっていない」状態で用意され、<strong>お客さんのスマホにお店の公式LINEが追加</strong>されます（リッチメニューは手順10が終わるまで押せません）。<br>
+    はじめて選んだお店は、「オーナーが出店登録した直後・お店の公式LINEとリッチメニューはあるが、まだつながっていない」状態で用意され、<strong>お客さんのスマホにお店の公式LINEが追加</strong>されます（「贈る」ボタンは、リッチメニューの設定が終わるまで押せません）。<br>
     ほかのお店に切り替えても、構築したものはそのまま残ります。完成したお店は、いつでもお客さんのスマホから贈れます。
   </div>
   <form method="post" action="{{ route('build.reset') }}" class="mt-2" onsubmit="return confirm('構築履歴をリセットします。\n課題のお店（{{ collect($scenarios)->pluck('store.name')->join('・') }}）の構築したもの（お店の公式LINE・チャネル・LIFF・注文など）がすべて消え、お客さんのスマホからも公式LINEがなくなります。よろしいですか？')">@csrf
@@ -39,21 +39,21 @@
     </div>
     <div class="col-lg-4">
       <div class="card"><div class="card-body small">
-        <h2 class="h6">このお店の値（いまの状態）</h2>
+        <h2 class="h6">このお店の進み具合</h2>
+        <p class="text-muted mb-2">ID やトークンの「正解」はここには出しません。本番と同じく、LINE Developers・Manager・管理画面の <b>コピー</b> から取ってください。</p>
         <dl class="mb-0">
           <dt>slug（決める値）</dt><dd><code>{{ $guide->targetSlug() }}</code></dd>
-          <dt>公式アカウント</dt><dd>{{ $guide->oa ? $guide->oa->name.'（'.$guide->oa->basic_id.'）' : '—' }}</dd>
-          <dt>Messaging API チャネル</dt><dd>{{ $guide->messaging?->channel_id ?? '—' }}</dd>
-          <dt>LINEログインチャネル</dt><dd>{{ $guide->login ? $guide->login->channel_id.'（'.($guide->login->is_published ? '公開済み' : '開発中').'）' : '—' }}</dd>
-          <dt>LIFF ID</dt><dd>{{ $guide->liff?->liff_id ?? '—' }}</dd>
-          <dt>LIFF のエンドポイントURL（正解）</dt><dd><code class="user-select-all">{{ $guide->liffUrl() }}</code></dd>
-          <dt>Webhook URL（正解）</dt><dd><code class="user-select-all">{{ $guide->webhookUrl() }}</code></dd>
+          <dt>公式アカウント</dt><dd>{{ $guide->oa ? $guide->oa->name : '—' }}</dd>
+          <dt>Messaging API チャネル</dt><dd>{{ $guide->messaging ? '作成済み' : '—' }}</dd>
+          <dt>LINEログインチャネル</dt><dd>{{ $guide->login ? ($guide->login->is_published ? '公開済み' : '開発中') : '—' }}</dd>
+          <dt>LIFF アプリ</dt><dd>{{ $guide->liff ? '作成済み（'.$guide->liff->size.'）' : '—' }}</dd>
+          @if ($sn = $guide->snapshot())<dt>控えた「変更前の状態」</dt><dd>応答メッセージ {{ $sn['auto_reply_on'] ? 'ON' : 'OFF' }}／キーワード応答 {{ $sn['keywords'] }}件／あいさつ {{ $sn['greeting_on'] ? 'ON' : 'OFF' }}／ケース{{ $sn['case'] }}</dd>@endif
         </dl>
       </div></div>
       <p class="small text-muted mt-2">管理画面・Manager・LINE Developers・疑似スマホの右下にも、同じナビが出ます（見出しを押すと小さくできます）。</p>
     </div>
   </div>
 @else
-  <div class="alert alert-info"><i class="bi bi-arrow-up"></i> 上のプルダウンで、構築するお店を選んでください。選ぶと、ここに手順（12ステップ）が出ます。</div>
+  <div class="alert alert-info"><i class="bi bi-arrow-up"></i> 上のプルダウンで、構築するお店を選んでください。選ぶと、ここに手順（17ステップ）が出ます。</div>
 @endif
 @endsection

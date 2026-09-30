@@ -36,7 +36,19 @@ class PhoneController extends Controller
             $liff = LiffApp::find($liffId);
             if (! $liff) {
                 Inside::ng('line', "LIFF ID「{$liffId}」は見つかりません", 'リッチメニューやQRに入れた LIFF ID が間違っていないか確認しましょう');
-                return ['error' => "LIFF ID「{$liffId}」のLIFFアプリはありません。LIFF IDの打ち間違いかもしれません。"];
+                return ['error' => "システムエラー\nLIFF app '{$liffId}' was not found.（LIFF IDの打ち間違いかもしれません。I と l、O と 0 に注意）"];
+            }
+            // LINEログインチャネルが「開発中」のままだと、チャネルの管理者・テスター以外は開けない（本番で実際に起きた「bad request」）
+            $ch = $liff->channel;
+            if ($ch && ! $ch->is_published) {
+                Inside::ng('line', "LIFF {$liffId} を開けません（LINEログインチャネル {$ch->channel_id} が「開発中」）",
+                    "お客さんはチャネルの管理者・テスターではないので、開発中のチャネルの LIFF は開けません。\nDevelopers Console でチャネルを「公開」にしましょう");
+                return ['error' => "400 Bad Request\nこのLIFFアプリは現在ご利用いただけません（チャネルが公開されていません）。"];
+            }
+            if ($liff->bot_prompt && $ch) {
+                $linked = $ch->linkedOa;
+                if (! $linked) Inside::info('line', "友だち追加オプションは On ですが、チャネルに「リンクされたLINE公式アカウント」がないので、友だち追加をすすめられません");
+                elseif (! $linked->isFriend($me->user_id)) Inside::info('line', "友だち追加オプション：「{$linked->name}」（{$linked->basic_id}）の友だち追加をすすめました", '本物のLINEでは、LIFF を開く同意画面に「友だち追加」のチェックが出ます');
             }
             $ep = parse_url($liff->endpoint_url);
             $path = rtrim($ep['path'] ?? '', '/').($parts ? '/'.implode('/', $parts) : '');
@@ -91,7 +103,7 @@ class PhoneController extends Controller
             $friendRow = DB::connection('mockline')->table('friends')->where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->first();
             $messages = Message::where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->orderBy('id')->get();
             $richMenu = $chat->richMenus()->where('is_default', true)->latest('id')->first();
-            // 課題のお店は、構築ナビのリッチメニューの手順（手順10）まで終わるまで、リッチメニューを押せないようにする
+            // 課題のお店は、構築ナビのリッチメニューの手順が終わるまで、リッチメニューを押せないようにする
             //   （完成したお店は、ほかのお店を構築中でも押せる）
             $scStore = \App\Services\BuildScenario::storeOfOa($chat->id);
             $rmLocked = $scStore && ! (new \App\Services\BuildGuide($scStore))->isDone('richmenu');

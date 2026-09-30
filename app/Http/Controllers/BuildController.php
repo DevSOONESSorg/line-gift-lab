@@ -34,7 +34,7 @@ class BuildController extends Controller
         $store = BuildScenario::start($key);
         session(['build.store' => $store->id, 'mock_account' => 'personal']);
         return redirect()->route('build')->with('msg', $isNew
-            ? "「{$store->name}」の構築を始めました。お客さんのスマホに、お店の公式LINEが追加されました（リッチメニューは手順10が終わるまで押せません）。"
+            ? "「{$store->name}」の構築を始めました。お客さんのスマホに、お店の公式LINEが追加されました（リッチメニューは、リッチメニューの手順が終わるまで押せません）。"
             : "「{$store->name}」に切り替えました。続きから構築できます。");
     }
 
@@ -44,6 +44,22 @@ class BuildController extends Controller
         BuildScenario::resetAll();
         $r->session()->forget('build');
         return redirect()->route('build')->with('msg', '構築履歴をリセットしました。課題のお店はすべて消え、お客さんのスマホからも公式LINEがなくなりました。プルダウンでお店を選ぶと、はじめから構築できます。');
+    }
+
+    // 手順5：変更前の状態を控える（控えた内容と実際の「変更前」が合っていれば、その手順が完了）
+    public function snapshot(Request $r)
+    {
+        $guide = BuildGuide::current();
+        abort_unless($guide?->scenario, 404);
+        $data = $r->validate(['auto_reply_on' => 'required|in:1,0', 'keywords' => 'required|integer|min:0|max:99', 'greeting_on' => 'required|in:1,0', 'case' => 'required|in:A,B'],
+            [], ['auto_reply_on' => '応答メッセージ', 'keywords' => 'キーワード応答の件数', 'greeting_on' => 'あいさつメッセージ', 'case' => 'ケース']);
+        \App\Models\Setting::put("build.snapshot.{$guide->scenario}", json_encode([
+            'auto_reply_on' => $data['auto_reply_on'] === '1', 'keywords' => (int) $data['keywords'], 'greeting_on' => $data['greeting_on'] === '1',
+            'case' => $data['case'], 'at' => now()->format('Y-m-d H:i'),
+        ], JSON_UNESCAPED_UNICODE));
+        \App\Support\Inside::info('app', "「{$guide->store->name}」の変更前の状態を控えました",
+            '応答メッセージ: '.($data['auto_reply_on'] === '1' ? 'ON' : 'OFF')."\nキーワード応答: {$data['keywords']}件\nあいさつメッセージ: ".($data['greeting_on'] === '1' ? 'ON' : 'OFF')."\n判定: ケース{$data['case']}");
+        return back();
     }
 
     // 右下のナビの中身だけ（数秒ごとに読み直す）

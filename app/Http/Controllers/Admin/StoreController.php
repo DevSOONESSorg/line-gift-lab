@@ -56,7 +56,8 @@ class StoreController extends Controller
             'webhookPublic' => $tunnel ? "{$tunnel}/api/webhook/line/store/{$store->slug}" : '',
             'liffLocal' => PublicUrl::local()."/liff/s/{$store->slug}",
             'liffPublic' => $tunnel ? "{$tunnel}/liff/s/{$store->slug}" : '',
-            'checks' => session('checks'),
+            // 本番と同じく、ページを開くたびに設定整合性を表示する（「チェックする」ボタンは押さなくてよい）
+            'checks' => $this->runChecks($store),
         ]);
     }
 
@@ -113,8 +114,8 @@ class StoreController extends Controller
         return back()->with('msg', '承認を取り消しました');
     }
 
-    // 設定整合性チェック
-    public function check(Store $store)
+    // 設定整合性チェック（ページを開くたびに自動で行う。結果を裏側ビューに記録したいときは check() から呼ぶ）
+    private function runChecks(Store $store): array
     {
         $checks = [];
         $add = function (string $label, bool $ok, string $hint = '') use (&$checks) { $checks[] = compact('label', 'ok', 'hint'); };
@@ -143,10 +144,19 @@ class StoreController extends Controller
                 }
             }
         }
+        if ($store->hasOwnMessagingChannel() && collect($checks)->every('ok')) {
+            $add('通知の送信元', true, "通知は店舗専用チャネル ({$store->line_official_account_id}) から送信されます");
+        }
+        return $checks;
+    }
+
+    public function check(Store $store)
+    {
+        $checks = $this->runChecks($store);
         $allOk = collect($checks)->every('ok');
         ($allOk ? [Inside::class, 'ok'] : [Inside::class, 'ng'])('admin', "「{$store->name}」の設定整合性チェック → ".($allOk ? 'すべてOK' : 'NGあり'),
             collect($checks)->map(fn ($c) => ($c['ok'] ? 'OK  ' : 'NG  ').$c['label'])->join("\n"));
-        return redirect()->route('admin.stores.edit', $store)->with('checks', $checks)->withFragment('line');
+        return redirect()->route('admin.stores.edit', $store)->withFragment('line');
     }
 
     // テスト送信（送信先の userId を指定）

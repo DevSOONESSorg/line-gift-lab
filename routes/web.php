@@ -20,6 +20,7 @@ Route::post('build/select', [\App\Http\Controllers\BuildController::class, 'sele
 Route::post('build/stop', [\App\Http\Controllers\BuildController::class, 'stop'])->name('build.stop');
 Route::get('build/nav', [\App\Http\Controllers\BuildController::class, 'nav'])->name('build.nav');
 Route::post('build/reset', [\App\Http\Controllers\BuildController::class, 'resetAll'])->name('build.reset');
+Route::post('build/snapshot', [\App\Http\Controllers\BuildController::class, 'snapshot'])->name('build.snapshot');
 
 // ---------------------------------------------------------------
 // 管理画面（運営スタッフ）… ログインが必要
@@ -121,6 +122,13 @@ Route::prefix('mock')->name('mock.')->group(function () {
         Route::post('messaging-api', [Mock\ManagerController::class, 'enableMessaging'])->name('messaging.enable');
         Route::get('response', [Mock\ManagerController::class, 'response'])->name('response');
         Route::post('response', [Mock\ManagerController::class, 'saveResponse'])->name('response.save');
+        Route::post('messaging-api/settings', [Mock\ManagerController::class, 'saveMessagingSettings'])->name('messaging.settings');
+        Route::get('greeting', [Mock\ManagerController::class, 'greeting'])->name('greeting');
+        Route::post('greeting', [Mock\ManagerController::class, 'saveGreeting'])->name('greeting.save');
+        Route::get('auto-replies', [Mock\ManagerController::class, 'autoReplies'])->name('auto-replies');
+        Route::post('auto-replies', [Mock\ManagerController::class, 'saveAutoReply'])->name('auto-replies.save');
+        Route::post('auto-replies/{autoReply}/toggle', [Mock\ManagerController::class, 'toggleAutoReply'])->name('auto-replies.toggle');
+        Route::delete('auto-replies/{autoReply}', [Mock\ManagerController::class, 'deleteAutoReply'])->name('auto-replies.delete');
         Route::get('richmenus', [Mock\RichMenuController::class, 'index'])->name('richmenus');
         Route::get('richmenus/create', [Mock\RichMenuController::class, 'create'])->name('richmenus.create');
         Route::post('richmenus', [Mock\RichMenuController::class, 'store'])->name('richmenus.store');
@@ -141,6 +149,8 @@ Route::prefix('mock')->name('mock.')->group(function () {
         Route::post('webhook/verify', [Mock\DevelopersController::class, 'verify'])->name('verify');
         Route::post('webhook/use', [Mock\DevelopersController::class, 'toggleWebhook'])->name('use');
         Route::post('publish', [Mock\DevelopersController::class, 'publish'])->name('publish');
+        Route::post('basic', [Mock\DevelopersController::class, 'saveBasic'])->name('basic');
+        Route::post('linked-oa', [Mock\DevelopersController::class, 'saveLinkedOa'])->name('linked-oa');
         Route::post('liff', [Mock\DevelopersController::class, 'addLiff'])->name('liff');
         Route::post('liff/{liffId}', [Mock\DevelopersController::class, 'updateLiff'])->name('liff.update');
         Route::delete('liff/{liffId}', [Mock\DevelopersController::class, 'deleteLiff'])->name('liff.delete');

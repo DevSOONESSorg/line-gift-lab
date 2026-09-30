@@ -10,6 +10,7 @@ class OfficialAccount extends MockModel
 
     public function messagingChannel() { return $this->hasOne(Channel::class)->where('type', 'messaging'); }
     public function richMenus() { return $this->hasMany(RichMenu::class); }
+    public function autoReplies() { return $this->hasMany(AutoReply::class); }
 
     public function roleOf(string $accountId): ?string
     {
