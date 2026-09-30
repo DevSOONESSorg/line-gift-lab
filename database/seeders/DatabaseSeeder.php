@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Storage;
 //   ・管理画面のログインユーザー
 //   ・商品テンプレート、代理店
 //   ・運営の公式LINE「おくりギフト(dev)」（共通チャネル・LIFF・リッチメニュー）
-//   ・見本のお店：見本バー（共通掲載）、シャンパンバー ルミエール（オリジナル：店舗専用LINE・全部つながった完成形）、承認待ちの店
+//   ・見本のお店：バー ノクターン（共通掲載）、シャンパンバー ルミエール（オリジナル：店舗専用LINE・全部つながった完成形）、承認待ちの店
 //   ・いろいろな状態の注文（管理画面の練習用）
 // =====================================================
 class DatabaseSeeder extends Seeder
@@ -104,9 +104,9 @@ class DatabaseSeeder extends Seeder
             'platform_basic_id' => $poa->basic_id, 'platform_liff_thanks' => $lThanks->liff_id, 'platform_liff_manage' => $lManage->liff_id,
         ] as $k => $v) Setting::put($k, $v);
 
-        // ---------- 見本バー（共通掲載。店舗専用LINEはなし） ----------
+        // ---------- バー ノクターン（共通掲載。店舗専用LINEはなし） ----------
         $bar = Store::create([
-            'name' => '見本バー', 'slug' => 'sample-bar', 'description' => '共通アプリに掲載している見本のお店です。', 'image_color' => '#7c3aed',
+            'name' => 'バー ノクターン', 'slug' => 'nocturne', 'description' => '共通アプリに掲載している見本のお店です。夜想曲の流れるバー。', 'image_color' => '#7c3aed',
             'prefecture' => '沖縄県', 'city' => '那覇市', 'address' => '体験町1-1', 'tel' => '098-000-0001',
             'representative_name' => '見本 花子', 'representative_tel' => '090-0000-0001',
             'bank_name' => 'さくら銀行', 'bank_branch' => '那覇支店', 'bank_account_type' => '普通', 'bank_account_number' => '1234567', 'bank_account_name' => 'ミホン ハナコ',
@@ -168,7 +168,7 @@ class DatabaseSeeder extends Seeder
         $this->sampleOrders($bar, $cafe);
 
         DB::connection('inside')->table('logs')->delete();   // 初期データづくりの記録は消しておく
-        \App\Support\Inside::info('app', '初期データを作りました（運営LINE・見本バー・シャンパンバー ルミエール・承認待ちの店・練習用の注文）');
+        \App\Support\Inside::info('app', '初期データを作りました（運営LINE・バー ノクターン・シャンパンバー ルミエール・承認待ちの店・練習用の注文）');
     }
 
     private function richMenu(OfficialAccount $oa, string $title, string $template, string $image, array $actions): void

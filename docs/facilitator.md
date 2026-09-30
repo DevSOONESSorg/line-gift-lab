@@ -46,7 +46,7 @@ docker compose exec app php artisan lab:drill 3 --store=club-azure
 | 2 | 案内が返ってこない（B） | LINE側でトークンを再発行した | 「LINEにお願い … → 401」「トークンが無効です」 | トークンを確認（または再発行）→ 管理画面に入れ直す |
 | 3 | 返事が2通来る | 応答メッセージを ON | LINE社「応答メッセージ（定型文）を自動で返しました」 | Manager の応答設定で応答メッセージ OFF |
 | 4 | 案内が返ってこない（C） | Webhook URL の slug を打ち間違えた | 自社サーバー「○○という slug の店舗はありません」404 | Dev Console の Webhook URL を直す → Verify |
-| 5 | ちがうお店が開く | LIFF のエンドポイントURL を見本バーにした | LINE社「LIFF ○○ を開きます → …/liff/s/sample-bar」 | Dev Console の LIFF タブでエンドポイントURLを直す |
+| 5 | ちがうお店が開く | LIFF のエンドポイントURL をバー ノクターンにした | LINE社「LIFF ○○ を開きます → …/liff/s/nocturne」 | Dev Console の LIFF タブでエンドポイントURLを直す |
 | 6 | 贈れない（A） | 承認を取り消した | 「まだ承認されていないので表示しません」 | 管理画面で承認 |
 | 7 | 贈れない（B） | 商品を全部「停止中」にした | （NGなし）画面に「商品がありません」 | オーナーの商品登録で「再開」（または管理画面） |
 | 8 | 「贈る」でエラー | リッチメニューの LIFF ID を1文字変えた | LINE社「LIFF ID ○○ は見つかりません」 | Manager でリッチメニューを作り直す |

@@ -39,7 +39,7 @@ class Drill extends Command
     public function handle(): int
     {
         $store = $this->option('store') ? Store::where('slug', $this->option('store'))->first()
-            : Store::whereNotIn('slug', ['sample-bar', 'lumiere', 'store-pending'])->latest('id')->first();
+            : Store::whereNotIn('slug', ['nocturne', 'lumiere', 'store-pending'])->latest('id')->first();
         $no = $this->argument('no');
 
         if (! $no) {
@@ -64,7 +64,7 @@ class Drill extends Command
             // 4: Webhook URL の slug を打ち間違える → 404
             4 => $ch->update(['webhook_url' => str_replace("/store/{$store->slug}", '/store/'.(str_contains($store->slug, '-') ? str_replace('-', '_', $store->slug) : $store->slug.'s'), $ch->webhook_url)]),
             // 5: LIFF のエンドポイントURL を別のお店に → ちがう店が開く
-            5 => LiffApp::where('liff_id', $store->liff_id)->update(['endpoint_url' => DB::raw("replace(endpoint_url, '/liff/s/{$store->slug}', '/liff/s/sample-bar')")]),
+            5 => LiffApp::where('liff_id', $store->liff_id)->update(['endpoint_url' => DB::raw("replace(endpoint_url, '/liff/s/{$store->slug}', '/liff/s/nocturne')")]),
             // 6: 承認を取り消す → 準備中
             6 => $store->update(['is_approved' => false]),
             // 7: 商品を全部「停止中」 → 商品がない

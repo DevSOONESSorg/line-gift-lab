@@ -39,7 +39,7 @@ tinker の中で：
 
 ```php
 App\Models\Store::count();
-App\Models\Store::where('slug', 'sample-bar')->first()->menus;      // 見本バーの商品
+App\Models\Store::where('slug', 'nocturne')->first()->menus;      // バー ノクターンの商品
 App\Models\Order::latest('id')->first()->status->label();            // 最新の注文の状態
 App\Models\Mock\OfficialAccount::pluck('name');                      // 疑似LINE側（別のDB）
 ```
