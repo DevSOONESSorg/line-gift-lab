@@ -45,7 +45,57 @@ class BuildScenario
                 ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
             ]],
         ],
+        'bar-tsukiakari' => [
+            'label' => 'バー 月あかり（バー・沖縄市）',
+            'slug' => 'bar-tsukiakari',
+            'store' => [
+                'name' => 'バー 月あかり', 'description' => '沖縄市のオーセンティックバー。バーテンダーへの一杯はこちらから。', 'image_color' => '#7c2d12',
+                'prefecture' => '沖縄県', 'city' => '沖縄市', 'address' => '中央2-3-4 月見ビル1F', 'tel' => '098-000-0005', 'business_license_number' => '中保第000号（架空）',
+                'representative_name' => '月城 ひかる', 'representative_tel' => '090-0000-0005',
+                'bank_name' => 'みなと銀行', 'bank_branch' => 'コザ支店', 'bank_account_type' => '普通', 'bank_account_number' => '1112223', 'bank_account_name' => 'ツキシロ ヒカル',
+            ],
+            'menus' => [4, 6, 7],
+            'industry' => '飲食店',
+            // 大・3分割（上1＋下2）。「贈る」は左下の B
+            'richmenu' => ['title' => '月あかりメニュー', 'template' => 'large-3', 'image' => 'tsukiakari-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],
+                ['type' => 'text', 'value' => '予約したい', 'label' => 'ご予約'],
+            ]],
+        ],
+        'yakiniku-harusaki' => [
+            'label' => '焼肉 はるさき（焼肉店・浦添市）',
+            'slug' => 'yakiniku-harusaki',
+            'store' => [
+                'name' => '焼肉 はるさき', 'description' => '浦添の焼肉店。がんばるスタッフへの差し入れはこちらから。', 'image_color' => '#b91c1c',
+                'prefecture' => '沖縄県', 'city' => '浦添市', 'address' => '港川5-6-7', 'tel' => '098-000-0006', 'business_license_number' => '浦保第000号（架空）',
+                'representative_name' => '春崎 たける', 'representative_tel' => '090-0000-0006',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '浦添支店', 'bank_account_type' => '普通', 'bank_account_number' => '3334445', 'bank_account_name' => 'ハルサキ タケル',
+            ],
+            'menus' => [7, 9, 6],
+            'industry' => '飲食店',
+            // 大・6分割（3×2）。「贈る」は右下の F
+            'richmenu' => ['title' => 'はるさきメニュー', 'template' => 'large-6', 'image' => 'harusaki-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'メニュー', 'label' => 'メニュー'],
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
+                ['type' => 'text', 'value' => 'クーポン', 'label' => 'クーポン'],
+                ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
+                ['type' => 'none', 'value' => '', 'label' => 'スタッフに贈る'],
+            ]],
+        ],
     ];
+
+    // リッチメニューの中で「贈る」ボタン（まだつながっていない場所）：['letter' => 'B', 'label' => 'ギフトを贈る', 'others' => ['A（お店の情報）', ...]]
+    public static function giftArea(string $key): array
+    {
+        $letters = range('A', 'Z'); $gift = null; $others = [];
+        foreach (self::SCENARIOS[$key]['richmenu']['actions'] as $i => $a) {
+            if ($a['type'] === 'none' && ! $gift) $gift = ['letter' => $letters[$i], 'label' => $a['label']];
+            else $others[] = $letters[$i].'（'.$a['label'].'）';
+        }
+        return ($gift ?? ['letter' => 'A', 'label' => 'ギフトを贈る']) + ['others' => $others];
+    }
 
     public static function storeId(string $key): ?int { return Setting::get("scenario.{$key}.store") ? (int) Setting::get("scenario.{$key}.store") : null; }
 

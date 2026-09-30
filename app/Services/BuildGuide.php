@@ -69,6 +69,7 @@ class BuildGuide
         $s = $this->store; $oa = $this->oa; $ch = $this->messaging; $login = $this->login; $liff = $this->liff;
         $platform = Provider::where('name', MockLine::PLATFORM_PROVIDER)->first();
         $slug = $this->targetSlug();
+        $ga = $this->scenario ? BuildScenario::giftArea($this->scenario) : ['letter' => 'A', 'label' => 'ギフトを贈る', 'others' => []];
         $inviteOpen = $oa && DB::connection('mockline')->table('invites')->where('official_account_id', $oa->id)->whereNull('used_by')->exists();
 
         $steps = [
@@ -198,24 +199,24 @@ class BuildGuide
                 'why' => '応答メッセージがオンのままだと、LINE社の定型文と自社の案内の2通が返ります。',
             ],
             [
-                'key' => 'richmenu', 'title' => 'リッチメニューの「ギフトを贈る」に、LIFF の URL を入れる', 'who' => 'company', 'chapter' => '08-richmenu',
+                'key' => 'richmenu', 'title' => 'リッチメニューの「'.$ga['label'].'」に、LIFF の URL を入れる', 'who' => 'company', 'chapter' => '08-richmenu',
                 'done' => $oa && $liff && $oa->richMenus()->where('is_default', true)->get()->contains(fn ($m) => collect($m->actions)->contains(fn ($a) => ($a['type'] ?? '') === 'link' && str_contains($a['value'] ?? '', $liff->liff_id))),
                 'actions' => [
                     ['open', 'Manager の「リッチメニュー」を開く', $oa ? route('mock.manager.oa.richmenus', $oa) : null],
                     ['click', '表示中のメニューの「編集」'],
-                    ['select', 'A（ギフトを贈る）のタイプを「リンク」に'],
-                    ['paste', 'A の URL にこれを貼る', $liff ? 'https://liff.line.me/'.$liff->liff_id : null],
-                    ['check', 'B〜D（お店の情報・営業時間・Instagram）は触らない'],
+                    ['select', $ga['letter'].'（'.$ga['label'].'）のタイプを「リンク」に'],
+                    ['paste', $ga['letter'].' の URL にこれを貼る', $liff ? 'https://liff.line.me/'.$liff->liff_id : null],
+                    ['check', ($ga['others'] ? implode('・', $ga['others']) : 'ほかのボタン').' は触らない'],
                     ['click', '「保存」'],
                 ],
-                'why' => 'お店のメニューはそのままに、「贈る」ボタンの行き先だけを LIFF の URL（https://liff.line.me/{LIFF ID}）にします。ここまで終わると、お客さんのスマホのリッチメニューが押せるようになります。',
+                'why' => 'お店のメニューはそのままに、「'.$ga['label'].'」ボタンの行き先だけを LIFF の URL（https://liff.line.me/{LIFF ID}）にします。ここまで終わると、お客さんのスマホのリッチメニューが押せるようになります。',
             ],
             [
                 'key' => 'test', 'title' => '動作確認：お客さんのスマホから贈って、オーナーに届くか', 'who' => 'phone', 'chapter' => '10-purchase',
                 'done' => Order::where(['store_id' => $s->id, 'route' => 'original'])->exists(),
                 'actions' => [
                     ['open', '疑似スマホで、お客さんの「'.$s->name.'」のトークを開く', $oa ? route('mock.phone', ['chat' => $oa->id]) : route('mock.phone')],
-                    ['click', 'リッチメニューの「ギフトを贈る」→ 商品の「この商品を送る」'],
+                    ['click', 'リッチメニューの「'.$ga['label'].'」→ 商品の「この商品を送る」'],
                     ['paste', 'はじめてならカード番号にこれを入力（有効期限 12/40・CVC 123）', '4242424242424242'],
                     ['click', 'いちばん下の決済ボタン'],
                     ['check', '右のオーナーのスマホに「贈られました」が届いたら完成'],
