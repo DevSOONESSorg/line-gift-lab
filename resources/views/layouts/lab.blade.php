@@ -19,6 +19,7 @@
   </div>
   <footer class="text-center text-muted small py-4">株式会社SOONESS SE仕事体験コース 教材 ／ 「おくりギフト」「疑似LINE」は体験用の架空のサービスです</footer>
   <script src="/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+  @include('partials.build-nav')
   @stack('scripts')
 </body>
 </html>

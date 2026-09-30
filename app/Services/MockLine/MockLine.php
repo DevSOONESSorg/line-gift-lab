@@ -180,7 +180,7 @@ class MockLine
         $ch = $oa->messagingChannel;
         if (! $ch) return [null, 'Messaging API が有効になっていない'];
         if ($oa->response_mode !== 'bot') return [$ch, '応答モードが「チャット」になっている'];
-        if (! $ch->use_webhook) return [$ch, 'Webhook（Use webhook）がOFF'];
+        if (! $ch->use_webhook) return [$ch, 'Webhook（Webhookの利用）がOFF'];
         if (! $ch->webhook_url) return [$ch, 'Webhook URL が空'];
         return [$ch, null];
     }

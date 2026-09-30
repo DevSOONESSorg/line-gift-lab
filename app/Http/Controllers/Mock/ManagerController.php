@@ -39,6 +39,8 @@ class ManagerController extends Controller
     {
         $data = $r->validate(['name' => 'required|max:50', 'country' => 'required', 'agree' => 'accepted'], [], ['name' => 'アカウント名', 'country' => '所在国', 'agree' => '利用規約への同意']);
         $oa = MockLine::createOfficialAccount($data['name'], $this->me($r), (string) $r->input('industry'));
+        // 構築ナビ中なら「このお店の公式アカウント」として覚える
+        if ($sid = $r->session()->get('build.store')) $r->session()->put("build.oa.{$sid}", $oa->id);
         return redirect()->route('mock.manager.oa.home', $oa)->with('msg', "「{$oa->name}」を作成しました。あなたが管理者です。");
     }
 
@@ -127,7 +129,7 @@ class ManagerController extends Controller
             'auto_reply_on' => $r->input('auto_reply_on') === '1', 'auto_reply_text' => (string) $r->input('auto_reply_text'),
             'greeting_on' => $r->input('greeting_on') === '1', 'greeting_text' => (string) $r->input('greeting_text'),
         ]);
-        // Manager の「Webhook」と Developers の「Use webhook」は同じ1つのスイッチ
+        // Manager の「Webhook」と Developers の「Webhookの利用」は同じ1つのスイッチ
         if ($oa->messagingChannel && $r->has('webhook')) $oa->messagingChannel->update(['use_webhook' => $r->input('webhook') === '1']);
         Inside::info('line', "「{$oa->name}」の応答設定を変更しました",
             '応答モード: '.($oa->response_mode === 'bot' ? 'Bot' : 'チャット')."\n応答メッセージ: ".($oa->auto_reply_on ? 'ON' : 'OFF')

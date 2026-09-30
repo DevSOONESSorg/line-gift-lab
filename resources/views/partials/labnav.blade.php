@@ -6,4 +6,5 @@
   <a class="g g-manager {{ request()->is('mock/manager*') ? 'on' : '' }}" href="{{ route('mock.manager') }}">Manager<small>疑似LINE</small></a>
   <a class="g g-dev {{ request()->is('mock/developers*') ? 'on' : '' }}" href="{{ route('mock.developers') }}">Dev Console<small>疑似LINE</small></a>
   <a class="g g-inside {{ request()->is('inside*') ? 'on' : '' }}" href="{{ route('inside') }}">裏側ビュー</a>
+  <a class="g g-build {{ request()->is('build*') ? 'on' : '' }}" href="{{ route('build') }}"><i class="bi bi-signpost-split"></i> 構築ナビ</a>
 </nav>

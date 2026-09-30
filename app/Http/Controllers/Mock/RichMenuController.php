@@ -68,6 +68,33 @@ class RichMenuController extends Controller
         return redirect()->route('mock.manager.oa.richmenus', $oa)->with('msg', '保存しました');
     }
 
+    // 既存のリッチメニューのボタン（アクション）だけを変える。画像・分割はそのまま
+    public function edit(Request $r, OfficialAccount $oa, RichMenu $richMenu)
+    {
+        $this->guard($r, $oa);
+        abort_unless($richMenu->official_account_id == $oa->id, 404);
+        return view('mock.manager.richmenu-edit', ['menu' => $richMenu]);
+    }
+
+    public function update(Request $r, OfficialAccount $oa, RichMenu $richMenu)
+    {
+        $this->guard($r, $oa);
+        abort_unless($richMenu->official_account_id == $oa->id, 404);
+        $actions = [];
+        foreach ($richMenu->areas() as $i => $_) {
+            $old = $richMenu->actions[$i] ?? [];
+            $type = $r->input("action_type_$i", 'none');
+            $value = trim((string) $r->input("action_value_$i"));
+            if ($type !== 'none' && $value === '') return back()->withInput()->withErrors(['richmenu' => 'ボタン '.chr(65 + $i).' のURL／テキストが空です。']);
+            if ($type === 'link' && ! preg_match('#^(https?|line)://#', $value)) return back()->withInput()->withErrors(['richmenu' => 'ボタン '.chr(65 + $i).' のリンクは https:// から始まるURLを入れてください。']);
+            $actions[] = ['type' => $type, 'value' => $type === 'none' ? '' : $value] + (isset($old['label']) ? ['label' => $old['label']] : []);
+        }
+        $richMenu->update(['actions' => $actions, 'title' => $r->input('title') ?: $richMenu->title, 'bar_text' => $r->input('bar_text') ?: $richMenu->bar_text]);
+        Inside::ok('line', "「{$oa->name}」のリッチメニュー「{$richMenu->title}」のアクションを変更しました",
+            collect($actions)->map(fn ($a, $i) => 'ボタン'.chr(65 + $i).(isset($a['label']) ? "（{$a['label']}）" : '').': '.match ($a['type']) { 'link' => 'リンク → '.$a['value'], 'text' => "テキスト「{$a['value']}」を送る", default => '設定なし' })->join("\n"));
+        return redirect()->route('mock.manager.oa.richmenus', $oa)->with('msg', '保存しました');
+    }
+
     public function makeDefault(Request $r, OfficialAccount $oa, RichMenu $richMenu)
     {
         $this->guard($r, $oa);

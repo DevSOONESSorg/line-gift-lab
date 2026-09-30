@@ -41,6 +41,7 @@ class DevelopersController extends Controller
             return redirect()->route('mock.developers.provider', [$provider, 'create' => 'login'])->with('msg', 'チャネル名を入れ、アプリタイプで「ウェブアプリ」を選んでください。');
         }
         $ch = MockLine::createLoginChannel($provider->id, $r->input('name'), $this->me($r), (string) $r->input('description'));
+        if ($sid = $r->session()->get('build.store')) $r->session()->put("build.login.{$sid}", $ch->id);   // 構築ナビ用
         return redirect()->route('mock.developers.channel.show', $ch)->with('msg', 'チャネルを作成しました');
     }
 
@@ -72,7 +73,8 @@ class DevelopersController extends Controller
     public function saveWebhook(Request $r, Channel $channel)
     {
         $this->guard($r, $channel);
-        $channel->update(['webhook_url' => trim((string) $r->input('webhook_url'))]);
+        $url = trim((string) $r->input('webhook_url'));
+        $channel->update(['webhook_url' => $url] + ($url !== $channel->webhook_url ? ['webhook_verified_at' => null] : []));
         Inside::info('line', "Webhook URLを登録しました（{$channel->channel_id}）", $channel->webhook_url ?: '(空)');
         return $this->back($channel, 'messaging', 'Webhook URLを更新しました');
     }
@@ -81,6 +83,7 @@ class DevelopersController extends Controller
     {
         $this->guard($r, $channel);
         $result = MockLine::sendWebhook($channel, [], true);
+        $channel->update(['webhook_verified_at' => ($result['ok'] ?? false) ? now() : null]);
         return $this->back($channel, 'messaging')->with('verify', $result);
     }
 
@@ -88,7 +91,7 @@ class DevelopersController extends Controller
     {
         $this->guard($r, $channel);
         $channel->update(['use_webhook' => ! $channel->use_webhook]);
-        Inside::info('line', 'Use webhook を '.($channel->use_webhook ? 'ON' : 'OFF')." にしました（{$channel->channel_id}）");
+        Inside::info('line', 'Webhookの利用 を '.($channel->use_webhook ? 'ON' : 'OFF')." にしました（{$channel->channel_id}）");
         return $this->back($channel, 'messaging');
     }
 
@@ -106,10 +109,10 @@ class DevelopersController extends Controller
         $this->guard($r, $channel);
         if ($channel->type !== 'login') return $this->back($channel, 'basic', 'LIFFはLINEログインチャネルに追加します');
         $endpoint = trim((string) $r->input('endpoint_url'));
-        if (! preg_match('#^https?://#', $endpoint)) return $this->back($channel, 'liff', 'エンドポイントURLは http:// か https:// で始まるURLを入れてください');
+        if (! preg_match('#^https?://#', $endpoint)) return redirect()->route('mock.developers.channel.show', [$channel, 'tab' => 'liff', 'add' => 1])->with('msg', 'エンドポイントURLは http:// か https:// で始まるURLを入れてください');
         $liff = MockLine::addLiff($channel, $r->input('name') ?: $channel->name, $endpoint, $r->input('size', 'Full'),
-            implode(' ', (array) $r->input('scopes', ['profile'])), $r->boolean('bot_prompt'));
-        return $this->back($channel, 'liff', "LIFFアプリを追加しました。LIFF ID: {$liff->liff_id}");
+            implode(' ', (array) $r->input('scopes', ['profile'])), in_array($r->input('bot_prompt'), ['normal', 'aggressive', '1'], true));
+        return $this->back($channel, 'liff', "LIFFアプリを追加しました。LIFF ID: {$liff->liff_id} ／ LIFF URL: https://liff.line.me/{$liff->liff_id}");
     }
 
     public function updateLiff(Request $r, Channel $channel, string $liffId)

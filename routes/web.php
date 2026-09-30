@@ -14,6 +14,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 
+// 構築ナビ（オリジナルのお店の公式LINEを、本番と同じ順番でつなぐ道案内）
+Route::get('build', [\App\Http\Controllers\BuildController::class, 'index'])->name('build');
+Route::post('build/select', [\App\Http\Controllers\BuildController::class, 'select'])->name('build.select');
+Route::post('build/stop', [\App\Http\Controllers\BuildController::class, 'stop'])->name('build.stop');
+
 // ---------------------------------------------------------------
 // 管理画面（運営スタッフ）… ログインが必要
 // ---------------------------------------------------------------
@@ -118,6 +123,8 @@ Route::prefix('mock')->name('mock.')->group(function () {
         Route::get('richmenus/create', [Mock\RichMenuController::class, 'create'])->name('richmenus.create');
         Route::post('richmenus', [Mock\RichMenuController::class, 'store'])->name('richmenus.store');
         Route::post('richmenus/{richMenu}/default', [Mock\RichMenuController::class, 'makeDefault'])->name('richmenus.default');
+        Route::get('richmenus/{richMenu}/edit', [Mock\RichMenuController::class, 'edit'])->name('richmenus.edit');
+        Route::post('richmenus/{richMenu}', [Mock\RichMenuController::class, 'update'])->name('richmenus.update');
         Route::delete('richmenus/{richMenu}', [Mock\RichMenuController::class, 'destroy'])->name('richmenus.destroy');
     });
 

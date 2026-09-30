@@ -156,3 +156,57 @@ body.phone-screen .phone { box-shadow: 0 4px 12px rgba(0,0,0,.2); }
 .line-tabbar i { font-size: 20px; }
 .line-tabbar a { color: #333; } .line-tabbar a.on { color: #111; font-weight: 700; }
 .av.xs { width: 34px; height: 34px; font-size: 13px; align-self: flex-start; } .av-platform.xs { font-size: 15px; border-width: 1.5px; }
+
+/* 構築ナビ */
+.labnav .g-build.on, .labnav .g-build:hover { border-color: #f59f00; }
+.bstep { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; }
+.bstep-head { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; }
+.bstep .bno { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 13px; font-weight: 700; background: #e5e7eb; color: #555; flex-shrink: 0; }
+.bstep-done .bno { background: #06c755; color: #fff; }
+.bstep-done { opacity: .7; }
+.bstep-current { border-color: #f59f00; box-shadow: 0 0 0 3px rgba(245,159,0,.18); }
+.bstep-current .bno { background: #f59f00; color: #fff; }
+.bstep .bwho { display: block; font-size: 12px; color: #6b7280; }
+.bstep-body { padding: 0 12px 12px 48px; }
+.bstep-body ol { padding-left: 18px; }
+.bwhy { background: #fffbeb; border-radius: 6px; padding: 6px 8px; color: #78350f; }
+.build-nav { position: fixed; right: 16px; bottom: 16px; width: 380px; max-height: 75vh; z-index: 1050; background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.25); display: flex; flex-direction: column; overflow: hidden; }
+.build-nav-toggle { border: 0; background: #1f2937; color: #fff; padding: 9px 14px; text-align: left; font-weight: 600; font-size: 14px; }
+.build-nav-body { padding: 10px; overflow-y: auto; }
+.build-nav-body .bstep { margin-bottom: 8px; }
+.build-nav.min { width: auto; } .build-nav.min .build-nav-body { display: none; }
+
+/* 疑似 LINE Official Account Manager / LINE Developers の見た目 */
+.oam-top, .ldc-top { display: flex; align-items: center; gap: 16px; padding: 0 16px; min-height: 52px; }
+.oam-top { background: #06c755; color: #fff; }
+.ldc-top { background: #fff; border-bottom: 1px solid #e5e7eb; }
+.oam-logo, .ldc-logo { color: inherit; text-decoration: none; font-size: 16px; white-space: nowrap; }
+.oam-logo b { background: #fff; color: #06c755; border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
+.ldc-logo { color: #111; } .ldc-logo b { background: #06c755; color: #fff; border-radius: 6px; padding: 1px 6px; margin-right: 4px; }
+.oam-logo small, .ldc-logo small { opacity: .7; font-size: 11px; margin-left: 4px; }
+.oam-cur { display: flex; align-items: center; gap: 8px; font-weight: 600; } .oam-cur small { opacity: .8; font-weight: 400; }
+.oam-top .account-bar, .ldc-top .account-bar { background: transparent; border: 0; padding: 4px 0; }
+.oam-top .account-bar, .oam-top .account-bar .text-muted { color: #fff !important; }
+.mock-side > a.on { background: #effaf3; color: var(--manager); font-weight: 600; border-right: 3px solid var(--manager); }
+.ldc-side > a.on { background: #eef4ff; color: var(--dev); border-right-color: var(--dev); }
+.mock-side > .off { display: block; padding: 7px 18px; color: #adb5bd; }
+.oam-main, .ldc-main { max-width: 1100px; background: #f7f8fa; }
+.btn-line.px-4 { font-weight: 600; }
+.oam-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid #f1f3f5; }
+.oam-row .form-switch .form-check-input { width: 3em; height: 1.5em; }
+.oam-form .form-check-input:checked { background-color: #06c755; border-color: #06c755; }
+.ldc-fields .f { display: grid; grid-template-columns: 220px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f3f5; }
+.ldc-fields .f:last-child { border-bottom: 0; }
+.ldc-fields .f > label { font-weight: 600; font-size: 14px; color: #374151; }
+.ch-card.ch-new { align-items: center; justify-content: center; color: var(--dev); border-style: dashed; min-height: 96px; }
+.ch-type { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #e5e7eb; }
+.ch-type.ch-messaging { background: #dcfce7; color: #15803d; } .ch-type.ch-login { background: #dbeafe; color: #1d4ed8; }
+.ch-icon { width: 48px; height: 48px; border-radius: 10px; display: grid; place-items: center; font-size: 22px; color: #fff; }
+.ch-icon.ch-messaging { background: #06c755; } .ch-icon.ch-login { background: #2563eb; }
+.ch-kind { border: 2px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; text-align: center; min-width: 150px; }
+.ch-kind.on { border-color: var(--dev); color: var(--dev); font-weight: 600; } .ch-kind.off { color: #adb5bd; }
+.rm-edit-preview { position: relative; width: 100%; border: 1px solid #ddd; }
+.rm-edit-preview img { width: 100%; height: 100%; display: block; }
+.rm-box { position: absolute; border: 2px dashed rgba(255,255,255,.9); outline: 1px dashed rgba(0,0,0,.5); }
+.rm-box span { position: absolute; left: 6px; top: 4px; background: #111; color: #fff; font-weight: 700; font-size: 12px; border-radius: 4px; padding: 0 6px; }
+.oam-cur { white-space: nowrap; }

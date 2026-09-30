@@ -8,20 +8,20 @@
 
 ### Dev Console で値を控える
 
-1. [Dev Console](http://localhost:3000/mock/developers) → 運営のプロバイダー → **第3章で作ったお店の Messaging API チャネル**（お店の名前のもの）を開く
-2. **Basic settings** タブで **Channel ID** と **Channel secret** を控える
-3. **Messaging API** タブの「チャネルアクセストークン（長期）」で **発行** を押し、トークンを控える
+1. [Dev Console](http://localhost:3000/mock/developers) → 運営のプロバイダー → **第3章で有効にした Messaging API チャネル**（クラブ アズール）を開く
+2. **チャネル基本設定** タブで **チャネルID** と **チャネルシークレット** を控える（Manager の Messaging API 画面にも出ています）
+3. **Messaging API設定** タブの一番下「チャネルアクセストークン（長期）」で **発行** を押し、トークンを控える
 
 ### 管理画面に入れる
 
-4. 管理画面 → 自分のお店の **編集** →「LINE 連携設定（店舗専用チャネル）」に入力
+4. 管理画面 → クラブ アズールの **編集** →「LINE 連携設定（店舗専用チャネル）」に入力
 
    | 入力欄 | 入れる値 | どこで取った？ |
    |---|---|---|
    | LIFF ID | `2322485069-Gzqp84r0` の形 | 第4章（LINEログインチャネルの LIFF タブ） |
-   | Messaging API チャネルID | 10桁の数字 | Messaging APIチャネルの Basic settings |
-   | チャネルシークレット | 32文字 | Messaging APIチャネルの Basic settings |
-   | アクセストークン（長期） | 長い文字列 | Messaging APIチャネルの Messaging API タブ |
+   | Messaging API チャネルID | 10桁の数字 | Messaging APIチャネルの「チャネル基本設定」 |
+   | チャネルシークレット | 32文字 | Messaging APIチャネルの「チャネル基本設定」 |
+   | アクセストークン（長期） | 長い文字列 | Messaging APIチャネルの Messaging API設定タブ |
    | LINE公式アカウントID（@xxx） | `@123abcde` の形 | 第3章（Manager のアカウント設定） |
 
 5. 最下部の **更新** で保存

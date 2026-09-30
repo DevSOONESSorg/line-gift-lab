@@ -125,9 +125,9 @@ class StoreController extends Controller
         if (! $store->line_messaging_channel_id && ! $store->line_messaging_channel_access_token) {
             $add('Messaging API', true, '未設定 — お知らせは共通チャネルから送信されます（フォールバック）');
         } else {
-            $add('チャネルID の形', (bool) preg_match('/^\d{10}$/', (string) $store->line_messaging_channel_id), '10桁の数字（Messaging APIチャネルの Basic settings）');
+            $add('チャネルID の形', (bool) preg_match('/^\d{10}$/', (string) $store->line_messaging_channel_id), '10桁の数字（Messaging APIチャネルの「チャネル基本設定」）');
             $add('チャネルシークレット', (bool) preg_match('/^[0-9a-f]{32}$/', (string) $store->line_messaging_channel_secret), '32文字の英数字');
-            $add('アクセストークン', filled($store->line_messaging_channel_access_token), 'Messaging API タブで「発行」');
+            $add('アクセストークン', filled($store->line_messaging_channel_access_token), 'Messaging API設定タブで「発行」');
             $add('公式アカウントID の形', (bool) preg_match('/^@[0-9a-z]{3,}/i', (string) $store->line_official_account_id), '@ から始まるベーシックID');
             if ($store->line_messaging_channel_access_token) {
                 $line = LineClient::forStore($store);

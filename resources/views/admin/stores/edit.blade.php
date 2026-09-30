@@ -63,6 +63,7 @@
 
       <div class="card mb-3" id="line"><div class="card-header">LINE 連携設定 (店舗専用チャネル)</div><div class="card-body">
         <p class="form-text">オリジナル（お店の公式LINE）で贈れるようにするお店だけ設定します。空欄のお店は、共通のLIFF・共通チャネルが使われます。</p>
+        <a class="btn btn-sm btn-warning mb-3" href="{{ route('build', ['store' => $store->id]) }}"><i class="bi bi-signpost-split"></i> このお店を構築ナビで進める</a>
         <label class="form-label">LIFF ID (LINEログインチャネル)</label><input name="liff_id" class="form-control mb-2" value="{{ old('liff_id', $store->liff_id) }}" placeholder="2009896760-NLWo39Yw">
         <label class="form-label">Messaging API チャネルID</label><input name="line_messaging_channel_id" class="form-control mb-2" value="{{ old('line_messaging_channel_id', $store->line_messaging_channel_id) }}">
         <label class="form-label">Messaging API チャネルシークレット <span class="badge text-bg-{{ $store->line_messaging_channel_secret ? 'success' : 'secondary' }}">{{ $store->line_messaging_channel_secret ? '設定済み' : '未設定' }}</span></label>

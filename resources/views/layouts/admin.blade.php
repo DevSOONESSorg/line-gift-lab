@@ -54,6 +54,7 @@
     // data-confirm が付いたフォームは、送信前に確認する（取消・削除などの取り返しのつかない操作）
     document.querySelectorAll('form[data-confirm]').forEach((f) => f.addEventListener('submit', (e) => { if (!confirm(f.dataset.confirm)) e.preventDefault(); }));
   </script>
+  @include('partials.build-nav')
   @stack('scripts')
 </body>
 </html>
