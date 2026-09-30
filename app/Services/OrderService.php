@@ -18,7 +18,7 @@ use RuntimeException;
 // =====================================================
 class OrderService
 {
-    public static function create(Store $store, Menu $menu, Customer $customer, PaymentMethod $method, string $route, ?string $message, ?string $cardLast4): Order
+    public static function create(Store $store, Menu $menu, Customer $customer, PaymentMethod $method, string $route, ?string $message, ?string $cardLast4, ?string $senderName = null, ?string $recipientName = null): Order
     {
         $rate = CommissionService::rateFor($store);
         $status = $method === PaymentMethod::Card ? OrderStatus::Requested : OrderStatus::AwaitingPayment;
@@ -26,13 +26,14 @@ class OrderService
             ? now()->addDays(config('lab.card_authorization_days'))
             : now()->addDays(config('lab.bank_transfer_days'));
 
-        $order = DB::transaction(function () use ($store, $menu, $customer, $method, $route, $message, $cardLast4, $rate, $status, $expires) {
+        $order = DB::transaction(function () use ($store, $menu, $customer, $method, $route, $message, $cardLast4, $rate, $status, $expires, $senderName, $recipientName) {
             $order = Order::create([
                 'store_id' => $store->id, 'menu_id' => $menu->id, 'customer_id' => $customer->id,
                 'menu_name' => $menu->name, 'amount' => $menu->price,
                 'commission_rate' => $rate, 'commission' => CommissionService::commission($menu->price, $rate),
                 'payment_method' => $method, 'status' => $status, 'route' => $route,
                 'message' => $message, 'card_last4' => $cardLast4, 'expires_at' => $expires,
+                'sender_name' => $senderName, 'recipient_name' => $recipientName,
             ]);
             $order->statusLogs()->create(['from' => null, 'to' => $status->value, 'by' => 'customer', 'note' => '注文']);
             return $order;

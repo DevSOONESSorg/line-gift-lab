@@ -116,12 +116,22 @@ class OwnerController extends Controller
         return view('liff.owner.gifts', ['store' => $store, 'orders' => $store->orders()->with('customer')->latest('id')->get()]);
     }
 
+    // 贈り物を受け取る画面（受け取ったあとは「受け取りました！」を表示）
+    public function gift(Request $r, Store $store, Order $order)
+    {
+        $this->own($r, $store);
+        abort_unless($order->store_id === $store->id, 404);
+        return view('liff.owner.gift', ['store' => $store, 'order' => $order->load('customer')]);
+    }
+
     public function receive(Request $r, Store $store, Order $order)
     {
         $this->own($r, $store);
         abort_unless($order->store_id === $store->id, 404);
         try { OrderService::receive($order); } catch (\RuntimeException $e) { return back()->with('msg', $e->getMessage()); }
-        return redirect()->route('liff.manage.thank', [$store, $order])->with('msg', '受け取りました（決済が確定しました）。お礼を送りましょう。');
+        // 受け取ったら、送り主に通知（本番環境と同じ）
+        Notifier::toCustomer($order, "[{$store->name}]\n贈り物「{$order->menu_name}」を受け取りました🍾\nお礼をお届けするまでしばらくお待ちください。");
+        return redirect()->route('liff.manage.gift', [$store, $order]);
     }
 
     public function thankForm(Request $r, Store $store, Order $order)
@@ -143,7 +153,7 @@ class OwnerController extends Controller
         try { OrderService::thank($order, $path, $r->input('thank_message')); } catch (\RuntimeException $e) { return back()->with('msg', $e->getMessage()); }
 
         $thanksLiff = Setting::get('platform_liff_thanks');
-        Notifier::toCustomer($order, "{$store->name}からお礼が届きました🎬\n".($r->input('thank_message') ? '「'.$r->input('thank_message')."」\n" : '')
+        Notifier::toCustomer($order, "[{$store->name}]からお礼が届きました🎬\n".($r->input('thank_message') ? '「'.$r->input('thank_message')."」\n" : '')
             .'お礼一覧から見られます'.($thanksLiff ? "\nhttps://liff.line.me/{$thanksLiff}" : ''));
         return redirect()->route('liff.manage.gifts', $store)->with('msg', 'お礼を送りました');
     }

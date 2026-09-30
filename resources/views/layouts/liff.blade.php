@@ -9,9 +9,9 @@
   <link href="/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
   <link href="/css/liff.css" rel="stylesheet">
 </head>
-<body>
+<body class="theme-@yield('theme', 'dark')">
   <div class="liff">
-    @include('partials.flash')
+    @include('liff._flash')
     @yield('content')
   </div>
   @if (! empty($mockUid))

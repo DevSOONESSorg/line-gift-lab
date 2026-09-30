@@ -58,6 +58,7 @@ Route::prefix('liff')->name('liff.')->middleware('line.user')->group(function ()
     // お客さん
     Route::get('shops', [Liff\ShopController::class, 'index'])->name('shops');
     Route::get('s/{slug}', [Liff\ShopController::class, 'show'])->name('store');
+    Route::get('s/{slug}/m/{menu}', [Liff\OrderController::class, 'create'])->name('order.form');   // 「この商品を送る」→ 注文画面
     Route::post('s/{slug}/order', [Liff\OrderController::class, 'store'])->name('order');
     Route::get('orders/{order}/done', [Liff\OrderController::class, 'done'])->name('order.done');
     Route::get('history', [Liff\HistoryController::class, 'index'])->name('history');
@@ -72,6 +73,7 @@ Route::prefix('liff')->name('liff.')->middleware('line.user')->group(function ()
     Route::post('manage/{store}/menus', [Liff\OwnerController::class, 'addMenu'])->name('manage.menus.add');
     Route::post('manage/{store}/menus/{menu}/toggle', [Liff\OwnerController::class, 'toggleMenu'])->name('manage.menus.toggle');
     Route::get('manage/{store}/gifts', [Liff\OwnerController::class, 'gifts'])->name('manage.gifts');
+    Route::get('manage/{store}/gifts/{order}', [Liff\OwnerController::class, 'gift'])->name('manage.gift');   // 贈り物を受け取る画面
     Route::post('manage/{store}/gifts/{order}/receive', [Liff\OwnerController::class, 'receive'])->name('manage.receive');
     Route::get('manage/{store}/gifts/{order}/thank', [Liff\OwnerController::class, 'thankForm'])->name('manage.thank');
     Route::post('manage/{store}/gifts/{order}/thank', [Liff\OwnerController::class, 'thank'])->name('manage.thank.post');

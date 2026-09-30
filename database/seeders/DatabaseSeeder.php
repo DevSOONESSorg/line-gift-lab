@@ -84,12 +84,13 @@ class DatabaseSeeder extends Seeder
         $pch->update(['webhook_url' => "{$local}/api/webhook/line/platform", 'use_webhook' => true]);
         $plogin = MockLine::createLoginChannel($providerId, 'おくりギフト(dev) 共通アプリ', 'company');
         $plogin->update(['is_published' => true]);
-        $liff = fn ($name, $path) => MockLine::addLiff($plogin, $name, "{$local}/liff/{$path}", 'Full', 'profile openid chat_message.write', true);
+        // サイズ：お客さん向けは Tall（トークの上に下から出る）、オーナー向けは Full（全画面）
+        $liff = fn ($name, $path, $size = 'Tall') => MockLine::addLiff($plogin, $name, "{$local}/liff/{$path}", $size, 'profile openid chat_message.write', true);
         $lShops = $liff('お店をさがす', 'shops');
         $lHistory = $liff('送信履歴', 'history');
         $lThanks = $liff('お礼一覧', 'thanks');
-        $lRegister = $liff('出店登録', 'register');
-        $lManage = $liff('店舗管理', 'manage');
+        $lRegister = $liff('出店登録', 'register', 'Full');
+        $lManage = $liff('店舗管理', 'manage', 'Full');
         $this->richMenu($poa, '共通メニュー', 'large-6', 'platform-menu.png', [
             ['type' => 'link', 'value' => "https://liff.line.me/{$lShops->liff_id}"],
             ['type' => 'link', 'value' => "https://liff.line.me/{$lHistory->liff_id}"],
@@ -100,7 +101,7 @@ class DatabaseSeeder extends Seeder
         ]);
         foreach ([
             'platform_channel_id' => $pch->channel_id, 'platform_secret' => $pch->secret, 'platform_token' => $ptoken,
-            'platform_basic_id' => $poa->basic_id, 'platform_liff_thanks' => $lThanks->liff_id,
+            'platform_basic_id' => $poa->basic_id, 'platform_liff_thanks' => $lThanks->liff_id, 'platform_liff_manage' => $lManage->liff_id,
         ] as $k => $v) Setting::put($k, $v);
 
         // ---------- 見本バー（共通掲載。店舗専用LINEはなし） ----------
@@ -129,8 +130,13 @@ class DatabaseSeeder extends Seeder
         $sch->update(['webhook_url' => "{$local}/api/webhook/line/store/sample-cafe", 'use_webhook' => true]);
         $slogin = MockLine::createLoginChannel($providerId, '見本カフェ LIFF', 'company');
         $slogin->update(['is_published' => true]);
-        $sliff = MockLine::addLiff($slogin, '見本カフェでギフトを贈る', "{$local}/liff/s/sample-cafe", 'Full', 'profile openid chat_message.write', true);
-        $this->richMenu($soa, '贈るボタン', 'small-1', 'cafe-menu.png', [['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}"]]);
+        $sliff = MockLine::addLiff($slogin, '見本カフェでギフトを贈る', "{$local}/liff/s/sample-cafe", 'Tall', 'profile openid chat_message.write', true);
+        // お店の公式LINEのメニュー：店舗ページ（このお店の LIFF）／送信履歴・お礼一覧（運営の LIFF）
+        $this->richMenu($soa, '店舗メニュー', 'small-3', 'cafe-menu.png', [
+            ['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}"],
+            ['type' => 'link', 'value' => "https://liff.line.me/{$lHistory->liff_id}"],
+            ['type' => 'link', 'value' => "https://liff.line.me/{$lThanks->liff_id}"],
+        ]);
         $cafe = Store::create([
             'name' => '見本カフェ', 'slug' => 'sample-cafe', 'description' => '店舗専用の公式LINEから贈れる見本のお店です。', 'image_color' => '#e8590c',
             'prefecture' => '沖縄県', 'city' => '浦添市', 'tel' => '098-000-0002',
@@ -197,7 +203,8 @@ class DatabaseSeeder extends Seeder
             $o = Order::create([
                 'store_id' => $store->id, 'menu_id' => $menu->id, 'customer_id' => $customers[$i % 5]->id, 'menu_name' => $menu->name, 'amount' => $menu->price,
                 'commission_rate' => $rate, 'commission' => CommissionService::commission($menu->price, $rate), 'payment_method' => $method,
-                'status' => $status, 'route' => $route, 'message' => $i % 2 ? 'いつもありがとう！' : null, 'card_last4' => $method === PaymentMethod::Card ? '4242' : null,
+                'status' => $status, 'route' => $route, 'message' => $i % 2 ? "いつもありがとう！\nみんなで飲んでね" : null,
+                'sender_name' => $customers[$i % 5]->line_display_name, 'recipient_name' => $i % 3 === 0 ? 'スタッフ あや' : null, 'card_last4' => $method === PaymentMethod::Card ? '4242' : null,
                 'expires_at' => in_array($status, [OrderStatus::Requested, OrderStatus::AwaitingPayment]) ? $at->copy()->addDays(3) : null,
                 'paid_at' => in_array($status, [OrderStatus::Received, OrderStatus::Thanked, OrderStatus::Refunded]) ? $at : null,
                 'received_at' => in_array($status, [OrderStatus::Received, OrderStatus::Thanked, OrderStatus::Refunded]) ? $at->copy()->addHours(2) : null,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Liff;
 
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use App\Models\Menu;
 use App\Models\Order;
 use App\Models\Store;
 use App\Services\Notifier;
@@ -13,6 +14,17 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    // 注文画面（商品を1つ選んだあと）：送信者名・贈る人・メッセージ・支払い方法
+    public function create(Request $r, string $slug, Menu $menu)
+    {
+        $store = Store::where(['slug' => $slug, 'is_approved' => true])->firstOrFail();
+        abort_unless($menu->store_id === $store->id && $menu->is_active, 404);
+        return view('liff.order', [
+            'store' => $store, 'menu' => $menu,
+            'needsId' => $store->require_id_verification && ! $r->attributes->get('customer')?->id_verified_at,
+        ]);
+    }
+
     public function store(Request $r, string $slug)
     {
         $store = Store::where(['slug' => $slug, 'is_approved' => true])->firstOrFail();
@@ -21,7 +33,8 @@ class OrderController extends Controller
 
         $data = $r->validate([
             'menu_id' => 'required|integer', 'message' => 'nullable|max:300', 'payment_method' => 'required|in:card,bank_transfer',
-        ], [], ['menu_id' => '商品', 'payment_method' => '支払い方法']);
+            'sender_name' => 'required|max:50', 'recipient_name' => 'nullable|max:50',
+        ], [], ['menu_id' => '商品', 'payment_method' => '支払い方法', 'sender_name' => '送信者名', 'recipient_name' => '贈る人']);
         $menu = $store->menus()->where('is_active', true)->find($data['menu_id']);
         if (! $menu) return back()->withInput()->withErrors(['menu_id' => '商品を選んでください。']);
 
@@ -58,13 +71,13 @@ class OrderController extends Controller
         }
 
         $route = $r->session()->get("route.{$store->id}", 'original');
-        $order = OrderService::create($store, $menu, $customer, $method, $route, $data['message'] ?? null, $last4);
+        $order = OrderService::create($store, $menu, $customer, $method, $route, $data['message'] ?? null, $last4, $data['sender_name'], $data['recipient_name'] ?? null);
 
         if ($method === PaymentMethod::Card) {
-            Notifier::toCustomer($order, "{$store->name}「{$menu->name}」のギフトを贈りました（注文番号 #{$order->id}）。\nお店が受け取るとお礼が届きます。");
-            Notifier::toOwner($store, "【{$store->name}】ギフトが届きました（#{$order->id} {$menu->name}）。\nメニューの「店舗管理」→ ギフト一覧 から受け取ってください。");
+            Notifier::toCustomer($order, "ご注文ありがとうございます🎁\n[{$store->name}]へ「{$menu->name}」をお贈りしました。\n\nお店が受け取り次第、お礼動画・メッセージをお届けします。\nしばらくお待ちください。");
+            Notifier::giftToOwner($order);
         } else {
-            Notifier::toCustomer($order, "{$store->name}「{$menu->name}」の注文を受け付けました（#{$order->id}）。\n{$order->expires_at->format('m/d H:i')} までに ".number_format($order->amount).'円 をお振込みください。');
+            Notifier::toCustomer($order, "ご注文ありがとうございます🎁\n[{$store->name}]へ「{$menu->name}」のご注文を受け付けました（注文番号 {$order->order_code}）。\n\n{$order->expires_at->format('m/d H:i')} までに ".number_format($order->amount)."円 をお振込みください。\n入金を確認したら、お店にお届けします。");
         }
         return redirect()->route('liff.order.done', $order);
     }

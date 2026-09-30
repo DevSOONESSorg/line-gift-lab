@@ -38,7 +38,7 @@ class OrderController extends Controller
         return $this->run($order, function () use ($order) {
             OrderService::confirmPayment($order);
             Notifier::toCustomer($order, "{$order->store->name}「{$order->menu_name}」のご入金を確認しました。お店で受け取られると完了です。");
-            Notifier::toOwner($order->store, "【{$order->store->name}】ギフトが届きました（#{$order->id} {$order->menu_name}）。店舗管理から受け取ってください。");
+            Notifier::giftToOwner($order);
         }, '入金を確認しました');
     }
 

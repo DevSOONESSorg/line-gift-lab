@@ -7,6 +7,9 @@
   <div class="col-lg-7">
     <div class="card mb-3"><div class="card-header">注文情報</div><div class="card-body"><dl class="row mb-0">
       <dt class="col-4">注文ID</dt><dd class="col-8">{{ $order->id }}</dd>
+      <dt class="col-4">注文番号</dt><dd class="col-8"><code>{{ $order->order_code }}</code> <small class="text-muted">（お客さんに見せる番号。連番の注文IDは見せない）</small></dd>
+      <dt class="col-4">送信者名</dt><dd class="col-8">{{ $order->senderLabel() }}</dd>
+      <dt class="col-4">受取人</dt><dd class="col-8">{{ $order->recipientLabel() }}</dd>
       <dt class="col-4">店舗</dt><dd class="col-8"><a href="{{ route('admin.stores.show', $order->store) }}">{{ $order->store->name }}</a></dd>
       <dt class="col-4">どこから</dt><dd class="col-8">{{ $order->route === 'common' ? '共通アプリ（運営の公式LINE）' : 'お店の公式LINE・QR' }}</dd>
       <dt class="col-4">メニュー</dt><dd class="col-8">{{ $order->menu_name }}</dd>
@@ -14,7 +17,7 @@
       <dt class="col-4">決済方法</dt><dd class="col-8">{{ $order->payment_method->label() }}{{ $order->card_last4 ? " **** {$order->card_last4}" : '' }}</dd>
       <dt class="col-4">ステータス</dt><dd class="col-8"><span class="badge text-bg-{{ $order->status->color() }}">{{ $order->status->label() }}</span></dd>
       <dt class="col-4">期限</dt><dd class="col-8">{{ $order->expires_at?->format('Y/m/d H:i') ?? '—' }}</dd>
-      <dt class="col-4">メッセージ</dt><dd class="col-8">{{ $order->message ?: '—' }}</dd>
+      <dt class="col-4">メッセージ</dt><dd class="col-8" style="white-space:pre-wrap">{{ $order->message ?: '—' }}</dd>
       <dt class="col-4">注文日時</dt><dd class="col-8">{{ $order->created_at->format('Y/m/d H:i') }}</dd>
       <dt class="col-4">受取日時</dt><dd class="col-8">{{ $order->received_at?->format('Y/m/d H:i') ?? '—' }}</dd>
     </dl></div></div>

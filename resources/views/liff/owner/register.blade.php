@@ -1,7 +1,8 @@
 @extends('layouts.liff')
+@section('theme', 'light')
 @section('title', '出店登録')
 @section('content')
-  <h1 class="h5 mt-3">出店登録</h1>
+  <div class="l-h">出店登録</div>
   <p class="small">おくりギフトに、あなたのお店を登録します。登録したLINEアカウントが、そのお店の「オーナー」になります（ギフトの受け取り・商品登録ができる人）。</p>
   <form method="post" action="{{ route('liff.register.post') }}">
     @csrf
@@ -30,6 +31,6 @@
     <h2 class="h6 mt-3">4. 掲載方法</h2>
     <label class="menu"><input type="radio" name="publish" value="common" @checked(old('publish', 'common') === 'common')><span><strong>共通掲載</strong><br><span class="small text-muted">おくりギフトの「お店をさがす」に、お店が並びます</span></span></label>
     <label class="menu"><input type="radio" name="publish" value="original" @checked(old('publish') === 'original')><span><strong>オリジナル</strong><br><span class="small text-muted">お店の公式LINEを用意し、そのリッチメニューから贈れるようにします（運営が設定をお手伝いします）</span></span></label>
-    <button class="btn btn-success w-100 mt-3">送信</button>
+    <button class="btn btn-warning fw-bold w-100 mt-3">送信</button>
   </form>
 @endsection

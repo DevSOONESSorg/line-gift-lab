@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\Store;
 use App\Services\Line\LineClient;
 use App\Support\Inside;
@@ -34,6 +35,15 @@ class Notifier
     public static function toCustomer(Order $order, string $text): array
     {
         return self::channelForOrder($order)->push($order->customer->line_user_id, $text);
+    }
+
+    // 「贈り物が届きました」をオーナーへ。店舗管理（贈り物一覧）を開くリンクを付ける
+    public static function giftToOwner(Order $order): ?array
+    {
+        $store = $order->store;
+        $manage = Setting::get('platform_liff_manage');
+        return self::toOwner($store, "[{$store->name}]\n{$order->senderLabel()}様から\n「{$order->menu_name}」が贈られました🍾\n\n店舗管理画面でご確認ください。"
+            .($manage ? "\nhttps://liff.line.me/{$manage}/{$store->id}/gifts" : ''));
     }
 
     // 店舗オーナーへのお知らせは、いつも運営の共通チャネルから

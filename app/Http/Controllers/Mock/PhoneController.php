@@ -53,7 +53,10 @@ class PhoneController extends Controller
         parse_str($u['query'] ?? '', $q);
         if ($liff) { $q['mock_uid'] = $me->user_id; $q['mock_liff'] = $liff->liff_id; }
         $src = ($u['path'] ?? '/').($q ? '?'.http_build_query($q) : '');
-        return ['iframe' => $local ? $src : $target, 'liffId' => $liff?->liff_id];
+        // スマホの中のブラウザの上部に出す「アプリ名」と「ドメイン」、LIFF のサイズ（Full / Tall / Compact）
+        $ep = $liff ? parse_url($liff->endpoint_url) : $u;
+        return ['iframe' => $local ? $src : $target, 'liffId' => $liff?->liff_id, 'liffName' => $liff?->name, 'size' => $liff?->size ?? 'Full',
+            'host' => ($ep['host'] ?? 'localhost').(isset($ep['port']) ? ':'.$ep['port'] : '')];
     }
 
     // 2台を左右に並べる画面。?add= や ?open= が付いていたら、?to= のスマホ（省略時はお客さん）で開く

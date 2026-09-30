@@ -31,4 +31,19 @@ class Order extends Model
 
     // お店に振り込む額 ＝ 売上 − 手数料
     public function payout(): int { return $this->amount - $this->commission; }
+
+    // 送り主の表示名（入力がなければ LINE の表示名）／受取人（空欄ならお店宛）
+    public function senderLabel(): string { return $this->sender_name ?: ($this->customer?->line_display_name ?? ''); }
+    public function recipientLabel(): string { return $this->recipient_name ?: 'お店宛'; }
+
+    // 注文番号：連番の id はそのまま見せず、推測されにくい10文字をお客さんに見せる
+    protected static function booted(): void
+    {
+        static::creating(function (self $o) {
+            if ($o->order_code) return;
+            do { $code = strtoupper(\Illuminate\Support\Str::random(10)); $code = strtr($code, ['0' => 'X', 'O' => 'Y', 'I' => 'Z', '1' => 'K', 'L' => 'M']); }
+            while (self::where('order_code', $code)->exists());
+            $o->order_code = $code;
+        });
+    }
 }
