@@ -5,16 +5,30 @@
 <p class="text-muted">お店の公式LINEと自社サービス（おくりギフト）を、<strong>本番と同じ順番</strong>でつなぐ道案内です。
   それぞれの手順が終わったかは、あなたの入力ではなく <strong>実際の設定を見て自動で判定</strong> します。<strong>前の手順が終わるまで、次の手順は開きません。</strong></p>
 
-<form method="post" action="{{ route('build.select') }}" class="card card-body mb-4" onsubmit="return confirm('このお店を最初の状態に戻して、新しく構築を始めます。これまでの構築（公式LINEの設定・LIFF・注文など）はすべて消えます。よろしいですか？')">@csrf
+<form method="post" action="{{ route('build.select') }}" class="card card-body mb-4" id="scenario-form">@csrf
   <div class="d-flex flex-wrap gap-2 align-items-center">
-    <label class="fw-bold text-nowrap">構築するお店</label>
-    <select name="scenario" class="form-select w-auto">
+    <label class="fw-bold text-nowrap" for="scenario-select">構築するお店</label>
+    <select name="scenario" id="scenario-select" class="form-select w-auto" data-current="{{ $guide?->scenario }}">
       @foreach ($scenarios as $k => $sc)<option value="{{ $k }}" @selected($guide?->scenario === $k)>{{ $sc['label'] }}</option>@endforeach
     </select>
-    <button class="btn btn-primary"><i class="bi bi-arrow-counterclockwise"></i> 最初から構築を始める</button>
+    @if ($guide?->scenario)
+      <button class="btn btn-outline-danger btn-sm"><i class="bi bi-arrow-counterclockwise"></i> このお店を最初からやり直す</button>
+    @endif
   </div>
-  <div class="form-text">選ぶと、そのお店は「オーナーが出店登録した直後・公式LINEとリッチメニューはあるが、まだつながっていない」状態に戻ります。お客さんのスマホにお店の公式LINEが出ますが、手順10が終わるまでリッチメニューは押せません。</div>
+  <div class="form-text">プルダウンでお店を選ぶと、すぐにそのお店の構築が始まります。そのお店は「オーナーが出店登録した直後・公式LINEとリッチメニューはあるが、まだつながっていない」状態に戻ります。お客さんのスマホにお店の公式LINEが出ますが、リッチメニューの設定が終わるまでボタンは押せません。</div>
 </form>
+<script>
+  (() => {
+    const form = document.getElementById('scenario-form'), sel = document.getElementById('scenario-select');
+    const warn = (name) => `「${name}」を最初の状態に戻して、新しく構築を始めます。\nこのお店のこれまでの構築（公式LINEの設定・LIFF・注文など）はすべて消えます。よろしいですか？`;
+    // プルダウンを選んだ時点で、そのお店の新規構築を始める（キャンセルしたら元のお店に戻す）
+    sel.addEventListener('change', () => {
+      if (confirm(warn(sel.selectedOptions[0].text))) form.submit();
+      else sel.value = sel.dataset.current;
+    });
+    form.addEventListener('submit', (e) => { if (!confirm(warn(sel.selectedOptions[0].text))) e.preventDefault(); });
+  })();
+</script>
 
 @if ($guide)
   @php $done = collect($steps)->where('state', 'done')->count(); @endphp
