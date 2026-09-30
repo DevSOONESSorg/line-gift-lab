@@ -96,7 +96,12 @@
 
 <aside class="phone-help">
   <h2 class="h5">疑似スマホ</h2>
-  <p>スマホのLINEの代わりです。このスマホ1台で、<strong>お客さん</strong>にも<strong>お店のオーナー</strong>にもなります。</p>
+  <p>スマホのLINEの代わりです。LINEでこのサービスを使うのは、次の<strong>2つの役</strong>です。このスマホ1台で、両方になれます。</p>
+  <ul class="small">
+    <li><strong>お客さん</strong>：お店にギフトを贈る人</li>
+    <li><strong>オーナー</strong>：このサービスを導入したお店の人（ギフトを受け取る・お礼を送る）</li>
+  </ul>
+  <p class="small">構築エンジニア（私たち）も、動作確認では自分のスマホで触ります。そのときは <strong>お客さん役</strong>（贈れるか）や <strong>オーナー役</strong>（受け取れるか）になって確かめます。だれが触っても、サービスから見れば「お客さん」か「オーナー」のどちらかです。</p>
   <ul class="small">
     <li>緑の吹き出し＝あなたが送ったもの、白＝公式アカウントから届いたもの</li>
     <li>吹き出しの下の小さな文字で「誰が返したか」がわかります（<strong>bot</strong>＝自社サーバー／<strong>応答メッセージ</strong>＝LINE社の定型文）</li>
