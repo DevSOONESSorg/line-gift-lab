@@ -39,7 +39,7 @@ class Drill extends Command
     public function handle(): int
     {
         $store = $this->option('store') ? Store::where('slug', $this->option('store'))->first()
-            : Store::whereNotIn('slug', ['sample-bar', 'sample-cafe', 'store-pending'])->latest('id')->first();
+            : Store::whereNotIn('slug', ['sample-bar', 'lumiere', 'store-pending'])->latest('id')->first();
         $no = $this->argument('no');
 
         if (! $no) {

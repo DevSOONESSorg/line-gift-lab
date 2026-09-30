@@ -34,7 +34,7 @@
   <h2 class="h5 mt-4">まずやること（コースA 第0章）</h2>
   <ol>
     <li><a href="{{ route('mock.phone') }}">疑似スマホ</a>で「おくりギフト(dev)」→ メニュー「お店をさがす」→「見本バー」にギフトを贈る</li>
-    <li>「見本カフェ」の公式LINE → メニュー「ギフトを贈る」で贈る（オリジナルの入口）</li>
+    <li>「シャンパンバー ルミエール」の公式LINE → メニュー「ギフトを贈る」で贈る（オリジナルの入口）</li>
     <li><a href="{{ route('inside') }}">裏側ビュー</a>で何が起きたかを見る</li>
     <li>管理画面（<code>admin@example.com</code> ／ <code>Taiken-2026</code>）で注文を見る</li>
   </ol>

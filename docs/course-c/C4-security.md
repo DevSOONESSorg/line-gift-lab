@@ -32,8 +32,8 @@ docker compose exec app php artisan tinker
 ```
 
 ```php
-DB::table('stores')->where('slug', 'sample-cafe')->value('line_messaging_channel_secret');   // 暗号化された文字列
-App\Models\Store::where('slug', 'sample-cafe')->first()->line_messaging_channel_secret;      // モデル経由だと復号される
+DB::table('stores')->where('slug', 'lumiere')->value('line_messaging_channel_secret');   // 暗号化された文字列
+App\Models\Store::where('slug', 'lumiere')->first()->line_messaging_channel_secret;      // モデル経由だと復号される
 ```
 
 ## 課題

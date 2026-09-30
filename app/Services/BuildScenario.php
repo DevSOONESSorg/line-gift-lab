@@ -31,60 +31,156 @@ class BuildScenario
 {
     public const SCENARIOS = [
         'club-azure' => [
-            'label' => 'クラブ アズール（ラウンジ・那覇市）',
-            'slug' => 'club-azure',   // 課題で決める slug（構築ナビに「これを入れる」と出る）
+            'label' => 'クラブ アズール（ラウンジ・沖縄 那覇）',
+            'slug' => 'club-azure',   // 課題で決める slug
             'store' => [
-                'name' => 'クラブ アズール', 'description' => '那覇のラウンジ。スタッフへのギフトはこちらから。', 'image_color' => '#1d4ed8',
+                'name' => 'クラブ アズール', 'description' => '那覇・松山のラウンジ。スタッフへのシャンパンはこちらから。', 'image_color' => '#1d4ed8',
                 'prefecture' => '沖縄県', 'city' => '那覇市', 'address' => '松山1-2-3 アズールビル2F', 'tel' => '098-000-0004', 'business_license_number' => '那保第000号（架空）',
                 'representative_name' => '東 あおい', 'representative_tel' => '090-0000-0004',
                 'bank_name' => 'みなと銀行', 'bank_branch' => '松山支店', 'bank_account_type' => '普通', 'bank_account_number' => '7654321', 'bank_account_name' => 'アズマ アオイ',
             ],
-            'menus' => [7, 6, 4],   // 商品テンプレートの番号
+            'menus' => [4, 7, 9],   // 商品テンプレートの番号
             'industry' => 'ナイトワーク',
+            // large-4。「贈る」は A（ギフトを贈る）
             'richmenu' => ['title' => 'お店のメニュー', 'template' => 'large-4', 'image' => 'azure-menu.png', 'actions' => [
-                ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],   // ← ここに贈る画面（LIFF）の URL を入れるのが課題
+                ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],
                 ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
                 ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
                 ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
             ]],
         ],
-        'bar-tsukiakari' => [
-            'label' => 'バー 月あかり（バー・沖縄市）',
-            'slug' => 'bar-tsukiakari',
+        'lounge-coral' => [
+            'label' => 'ラウンジ コーラル（ラウンジ・沖縄 北谷）',
+            'slug' => 'lounge-coral',   // 課題で決める slug
             'store' => [
-                'name' => 'バー 月あかり', 'description' => '沖縄市のオーセンティックバー。バーテンダーへの一杯はこちらから。', 'image_color' => '#7c2d12',
-                'prefecture' => '沖縄県', 'city' => '沖縄市', 'address' => '中央2-3-4 月見ビル1F', 'tel' => '098-000-0005', 'business_license_number' => '中保第000号（架空）',
-                'representative_name' => '月城 ひかる', 'representative_tel' => '090-0000-0005',
-                'bank_name' => 'みなと銀行', 'bank_branch' => 'コザ支店', 'bank_account_type' => '普通', 'bank_account_number' => '1112223', 'bank_account_name' => 'ツキシロ ヒカル',
+                'name' => 'ラウンジ コーラル', 'description' => '北谷の海辺のラウンジ。サンセットに乾杯を。', 'image_color' => '#0d9488',
+                'prefecture' => '沖縄県', 'city' => '中頭郡北谷町', 'address' => '美浜9-8-7 コーラルテラス3F', 'tel' => '098-000-0007', 'business_license_number' => '中保第000号（架空）',
+                'representative_name' => '珊瑚 みお', 'representative_tel' => '090-0000-0007',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '北谷支店', 'bank_account_type' => '普通', 'bank_account_number' => '2223334', 'bank_account_name' => 'サンゴ ミオ',
             ],
-            'menus' => [4, 6, 7],
+            'menus' => [4, 5, 7],   // 商品テンプレートの番号
+            'industry' => 'ナイトワーク',
+            // large-3。「贈る」は C（ギフトを贈る）
+            'richmenu' => ['title' => 'コーラルメニュー', 'template' => 'large-3', 'image' => 'coral-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'text', 'value' => '予約したい', 'label' => 'ご予約'],
+                ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],
+            ]],
+        ],
+        'club-etoile' => [
+            'label' => 'クラブ エトワール（キャバクラ・新宿 歌舞伎町）',
+            'slug' => 'club-etoile',   // 課題で決める slug
+            'store' => [
+                'name' => 'クラブ エトワール', 'description' => '歌舞伎町のキャバクラ。推しのキャストにシャンパンを。', 'image_color' => '#db2777',
+                'prefecture' => '東京都', 'city' => '新宿区', 'address' => '歌舞伎町1-0-1 エトワールビル5F', 'tel' => '03-0000-0011', 'business_license_number' => '新保第000号（架空）',
+                'representative_name' => '星野 るな', 'representative_tel' => '090-0000-0011',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '新宿支店', 'bank_account_type' => '普通', 'bank_account_number' => '4445556', 'bank_account_name' => 'ホシノ ルナ',
+            ],
+            'menus' => [1, 2, 5, 7],   // 商品テンプレートの番号
+            'industry' => 'ナイトワーク',
+            // large-6。「贈る」は B（シャンパンを贈る）
+            'richmenu' => ['title' => 'エトワールメニュー', 'template' => 'large-6', 'image' => 'etoile-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'キャスト紹介', 'label' => 'キャスト紹介'],
+                ['type' => 'none', 'value' => '', 'label' => 'シャンパンを贈る'],
+                ['type' => 'text', 'value' => '出勤情報', 'label' => '出勤情報'],
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'text', 'value' => '料金システム', 'label' => '料金システム'],
+                ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
+            ]],
+        ],
+        'club-luna-noir' => [
+            'label' => 'クラブ ルナノワール（キャバクラ・新宿 歌舞伎町）',
+            'slug' => 'club-luna-noir',   // 課題で決める slug
+            'store' => [
+                'name' => 'クラブ ルナノワール', 'description' => '歌舞伎町の夜に浮かぶ月。キャストへのギフトはこちら。', 'image_color' => '#7c3aed',
+                'prefecture' => '東京都', 'city' => '新宿区', 'address' => '歌舞伎町2-0-2 ノワールタワー7F', 'tel' => '03-0000-0012', 'business_license_number' => '新保第001号（架空）',
+                'representative_name' => '黒崎 ゆあ', 'representative_tel' => '090-0000-0012',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '歌舞伎町支店', 'bank_account_type' => '普通', 'bank_account_number' => '5556667', 'bank_account_name' => 'クロサキ ユア',
+            ],
+            'menus' => [1, 3, 4, 7],   // 商品テンプレートの番号
+            'industry' => 'ナイトワーク',
+            // small-3。「贈る」は B（ギフトを贈る）
+            'richmenu' => ['title' => 'ルナノワールメニュー', 'template' => 'small-3', 'image' => 'lunanoir-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'キャスト', 'label' => 'キャスト'],
+                ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],
+                ['type' => 'text', 'value' => '予約したい', 'label' => 'ご予約'],
+            ]],
+        ],
+        'club-arcadia' => [
+            'label' => 'クラブ アルカディア（ホストクラブ・大阪 ミナミ）',
+            'slug' => 'club-arcadia',   // 課題で決める slug
+            'store' => [
+                'name' => 'クラブ アルカディア', 'description' => 'ミナミのホストクラブ。推しへのシャンパンはここから。', 'image_color' => '#ca8a04',
+                'prefecture' => '大阪府', 'city' => '大阪市中央区', 'address' => '宗右衛門町0-1 アルカディア会館4F', 'tel' => '06-0000-0021', 'business_license_number' => '大保第000号（架空）',
+                'representative_name' => '神崎 れお', 'representative_tel' => '090-0000-0021',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '心斎橋支店', 'bank_account_type' => '普通', 'bank_account_number' => '6667778', 'bank_account_name' => 'カンザキ レオ',
+            ],
+            'menus' => [3, 1, 8, 7],   // 商品テンプレートの番号
+            'industry' => 'ナイトワーク',
+            // large-4。「贈る」は D（推しに贈る）
+            'richmenu' => ['title' => 'アルカディアメニュー', 'template' => 'large-4', 'image' => 'arcadia-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'ホスト紹介', 'label' => 'ホスト紹介'],
+                ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'none', 'value' => '', 'label' => '推しに贈る'],
+            ]],
+        ],
+        'club-soten' => [
+            'label' => 'クラブ 蒼天（ホストクラブ・大阪 ミナミ）',
+            'slug' => 'club-soten',   // 課題で決める slug
+            'store' => [
+                'name' => 'クラブ 蒼天', 'description' => 'ミナミのホストクラブ「蒼天」。記念日のシャンパンに。', 'image_color' => '#2563eb',
+                'prefecture' => '大阪府', 'city' => '大阪市中央区', 'address' => '東心斎橋0-2 蒼天ビル6F', 'tel' => '06-0000-0022', 'business_license_number' => '大保第001号（架空）',
+                'representative_name' => '天野 そら', 'representative_tel' => '090-0000-0022',
+                'bank_name' => 'みなと銀行', 'bank_branch' => 'なんば支店', 'bank_account_type' => '普通', 'bank_account_number' => '7778889', 'bank_account_name' => 'アマノ ソラ',
+            ],
+            'menus' => [2, 1, 8, 7],   // 商品テンプレートの番号
+            'industry' => 'ナイトワーク',
+            // large-6。「贈る」は F（シャンパンを贈る）
+            'richmenu' => ['title' => '蒼天メニュー', 'template' => 'large-6', 'image' => 'soten-menu.png', 'actions' => [
+                ['type' => 'text', 'value' => 'ホスト紹介', 'label' => 'ホスト紹介'],
+                ['type' => 'text', 'value' => '料金システム', 'label' => '料金システム'],
+                ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
+                ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
+                ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'none', 'value' => '', 'label' => 'シャンパンを贈る'],
+            ]],
+        ],
+        'bar-tsukikage' => [
+            'label' => 'BAR 月影（バー・京都 祇園）',
+            'slug' => 'bar-tsukikage',   // 課題で決める slug
+            'store' => [
+                'name' => 'BAR 月影', 'description' => '祇園の路地裏のバー。バーテンダーに一杯を。', 'image_color' => '#9f1239',
+                'prefecture' => '京都府', 'city' => '京都市東山区', 'address' => '祇園町南側0-3', 'tel' => '075-000-0031', 'business_license_number' => '京保第000号（架空）',
+                'representative_name' => '月岡 しずく', 'representative_tel' => '090-0000-0031',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '祇園支店', 'bank_account_type' => '普通', 'bank_account_number' => '8889990', 'bank_account_name' => 'ツキオカ シズク',
+            ],
+            'menus' => [4, 6, 7],   // 商品テンプレートの番号
             'industry' => '飲食店',
-            // 大・3分割（上1＋下2）。「贈る」は左下の B
-            'richmenu' => ['title' => '月あかりメニュー', 'template' => 'large-3', 'image' => 'tsukiakari-menu.png', 'actions' => [
+            // large-3。「贈る」は B（ギフトを贈る）
+            'richmenu' => ['title' => '月影メニュー', 'template' => 'large-3', 'image' => 'tsukikage-menu.png', 'actions' => [
                 ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
                 ['type' => 'none', 'value' => '', 'label' => 'ギフトを贈る'],
                 ['type' => 'text', 'value' => '予約したい', 'label' => 'ご予約'],
             ]],
         ],
-        'yakiniku-harusaki' => [
-            'label' => '焼肉 はるさき（焼肉店・浦添市）',
-            'slug' => 'yakiniku-harusaki',
+        'bar-akari' => [
+            'label' => 'BAR 灯（バー・京都 先斗町）',
+            'slug' => 'bar-akari',   // 課題で決める slug
             'store' => [
-                'name' => '焼肉 はるさき', 'description' => '浦添の焼肉店。がんばるスタッフへの差し入れはこちらから。', 'image_color' => '#b91c1c',
-                'prefecture' => '沖縄県', 'city' => '浦添市', 'address' => '港川5-6-7', 'tel' => '098-000-0006', 'business_license_number' => '浦保第000号（架空）',
-                'representative_name' => '春崎 たける', 'representative_tel' => '090-0000-0006',
-                'bank_name' => 'みなと銀行', 'bank_branch' => '浦添支店', 'bank_account_type' => '普通', 'bank_account_number' => '3334445', 'bank_account_name' => 'ハルサキ タケル',
+                'name' => 'BAR 灯', 'description' => '先斗町、鴨川沿いの小さなバー。灯りの下で乾杯を。', 'image_color' => '#15803d',
+                'prefecture' => '京都府', 'city' => '京都市中京区', 'address' => '先斗町通0-4', 'tel' => '075-000-0032', 'business_license_number' => '京保第001号（架空）',
+                'representative_name' => '灯 はるか', 'representative_tel' => '090-0000-0032',
+                'bank_name' => 'みなと銀行', 'bank_branch' => '四条支店', 'bank_account_type' => '普通', 'bank_account_number' => '9990001', 'bank_account_name' => 'アカリ ハルカ',
             ],
-            'menus' => [7, 9, 6],
+            'menus' => [4, 5, 7],   // 商品テンプレートの番号
             'industry' => '飲食店',
-            // 大・6分割（3×2）。「贈る」は右下の F
-            'richmenu' => ['title' => 'はるさきメニュー', 'template' => 'large-6', 'image' => 'harusaki-menu.png', 'actions' => [
-                ['type' => 'text', 'value' => 'メニュー', 'label' => 'メニュー'],
+            // large-4。「贈る」は B（一杯を贈る）
+            'richmenu' => ['title' => '灯メニュー', 'template' => 'large-4', 'image' => 'akari-menu.png', 'actions' => [
                 ['type' => 'text', 'value' => 'お店の情報', 'label' => 'お店の情報'],
+                ['type' => 'none', 'value' => '', 'label' => '一杯を贈る'],
                 ['type' => 'text', 'value' => '営業時間', 'label' => '営業時間'],
-                ['type' => 'text', 'value' => 'クーポン', 'label' => 'クーポン'],
                 ['type' => 'link', 'value' => 'https://www.instagram.com/', 'label' => 'Instagram'],
-                ['type' => 'none', 'value' => '', 'label' => 'スタッフに贈る'],
             ]],
         ],
     ];

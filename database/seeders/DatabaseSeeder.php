@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Storage;
 //   ・管理画面のログインユーザー
 //   ・商品テンプレート、代理店
 //   ・運営の公式LINE「おくりギフト(dev)」（共通チャネル・LIFF・リッチメニュー）
-//   ・見本のお店：見本バー（共通掲載）、見本カフェ（オリジナル：店舗専用LINE・全部つながった完成形）、承認待ちの店
+//   ・見本のお店：見本バー（共通掲載）、シャンパンバー ルミエール（オリジナル：店舗専用LINE・全部つながった完成形）、承認待ちの店
 //   ・いろいろな状態の注文（管理画面の練習用）
 // =====================================================
 class DatabaseSeeder extends Seeder
@@ -120,25 +120,25 @@ class DatabaseSeeder extends Seeder
         // 来月だけ手数料率を変える例
         $bar->monthlyRates()->create(['year' => now()->addMonth()->year, 'month' => now()->addMonth()->month, 'rate' => 10]);
 
-        // ---------- 見本カフェ（オリジナル：店舗専用の公式LINE。手順書どおりに全部つながった完成形） ----------
+        // ---------- シャンパンバー ルミエール（オリジナル：店舗専用の公式LINE。手順書どおりに全部つながった完成形） ----------
         // 本番と同じ流れ：個人アカウントで作成 → 会社アカウントを運用担当者に → 会社アカウントで Messaging API 有効化
-        $soa = MockLine::createOfficialAccount('見本カフェ', 'personal', '飲食');
+        $soa = MockLine::createOfficialAccount('シャンパンバー ルミエール', 'personal', '飲食');
         $ml->table('oa_members')->insert(['official_account_id' => $soa->id, 'account_id' => 'company', 'role' => 'operator']);
         $soa->update(['auto_reply_on' => false]);
         $sch = MockLine::enableMessagingApi($soa, $providerId, 'company');
         $stoken = MockLine::issueToken($sch);
-        $sch->update(['webhook_url' => "{$local}/api/webhook/line/store/sample-cafe", 'use_webhook' => true]);
-        $slogin = MockLine::createLoginChannel($providerId, '見本カフェ LIFF', 'company');
+        $sch->update(['webhook_url' => "{$local}/api/webhook/line/store/lumiere", 'use_webhook' => true]);
+        $slogin = MockLine::createLoginChannel($providerId, 'シャンパンバー ルミエール LIFF', 'company');
         $slogin->update(['is_published' => true]);
-        $sliff = MockLine::addLiff($slogin, '見本カフェでギフトを贈る', "{$local}/liff/s/sample-cafe", 'Tall', 'profile openid chat_message.write', true);
+        $sliff = MockLine::addLiff($slogin, 'ルミエールでギフトを贈る', "{$local}/liff/s/lumiere", 'Tall', 'profile openid chat_message.write', true);
         // お店の公式LINEのメニュー：店舗ページ（このお店の LIFF）／送信履歴・お礼一覧（運営の LIFF）
-        $this->richMenu($soa, '店舗メニュー', 'small-3', 'cafe-menu.png', [
+        $this->richMenu($soa, '店舗メニュー', 'small-3', 'lumiere-menu.png', [
             ['type' => 'link', 'value' => "https://liff.line.me/{$sliff->liff_id}"],
             ['type' => 'link', 'value' => "https://liff.line.me/{$lHistory->liff_id}"],
             ['type' => 'link', 'value' => "https://liff.line.me/{$lThanks->liff_id}"],
         ]);
         $cafe = Store::create([
-            'name' => '見本カフェ', 'slug' => 'sample-cafe', 'description' => '店舗専用の公式LINEから贈れる見本のお店です。', 'image_color' => '#e8590c',
+            'name' => 'シャンパンバー ルミエール', 'slug' => 'lumiere', 'description' => '店舗専用の公式LINEから贈れる見本のお店です。今夜の一杯をスタッフに。', 'image_color' => '#b45309',
             'prefecture' => '沖縄県', 'city' => '浦添市', 'tel' => '098-000-0002',
             'representative_name' => '見本 太郎', 'representative_tel' => '090-0000-0002',
             'bank_name' => 'ゆうちょ銀行', 'bank_account_type' => '普通', 'bank_account_name' => 'ミホン タロウ', 'yucho_symbol' => '17010', 'yucho_number' => '12345671',
@@ -147,7 +147,7 @@ class DatabaseSeeder extends Seeder
             'liff_id' => $sliff->liff_id, 'line_messaging_channel_id' => $sch->channel_id, 'line_messaging_channel_secret' => $sch->secret,
             'line_messaging_channel_access_token' => $stoken, 'line_official_account_id' => $soa->basic_id,
         ]);
-        foreach ([['スタッフ乾杯用', 1000], ['ケーキセット', 1500], ['スタンダード・ブリュット', 14490]] as [$n, $p]) $cafe->menus()->create(['name' => $n, 'price' => $p]);
+        foreach ([['スタッフ乾杯用', 1000], ['フルーツ盛り合わせ', 8000], ['スタンダード・ブリュット', 14490]] as [$n, $p]) $cafe->menus()->create(['name' => $n, 'price' => $p]);
 
         // ---------- 承認待ちのお店（承認の練習用） ----------
         Store::create(['name' => '承認待ちスナック', 'slug' => 'store-pending', 'prefecture' => '沖縄県', 'city' => '沖縄市', 'tel' => '098-000-0003',
@@ -157,7 +157,7 @@ class DatabaseSeeder extends Seeder
         // 最初は作らない。構築ナビのプルダウンで選んだときに、スタート地点のお店が作られ、お客さんのスマホに公式LINEが追加される
         // 中身は app/Services/BuildScenario.php
 
-        // お客さんのスマホは、最初から見本カフェの友だち
+        // お客さんのスマホは、最初からシャンパンバー ルミエールの友だち
         //   本物ではお客さんが運営LINEを入れていることもあるが、教材では左右の役割がまざらないように入れない
         // オーナーのスマホは、運営LINEの友だち（出店登録・店舗管理・ギフトのお知らせは運営LINEから）
         foreach ([[$guest, $soa], [$owner, $poa]] as [$user, $oa]) {
@@ -168,7 +168,7 @@ class DatabaseSeeder extends Seeder
         $this->sampleOrders($bar, $cafe);
 
         DB::connection('inside')->table('logs')->delete();   // 初期データづくりの記録は消しておく
-        \App\Support\Inside::info('app', '初期データを作りました（運営LINE・見本バー・見本カフェ・承認待ちの店・練習用の注文）');
+        \App\Support\Inside::info('app', '初期データを作りました（運営LINE・見本バー・シャンパンバー ルミエール・承認待ちの店・練習用の注文）');
     }
 
     private function richMenu(OfficialAccount $oa, string $title, string $template, string $image, array $actions): void
