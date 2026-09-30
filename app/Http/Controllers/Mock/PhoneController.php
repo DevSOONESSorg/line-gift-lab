@@ -77,6 +77,11 @@ class PhoneController extends Controller
         $me = LineUser::me($phone);
         $friends = OfficialAccount::join('friends', 'friends.official_account_id', '=', 'official_accounts.id')
             ->where('friends.user_id', $me->user_id)->orderBy('official_accounts.id')->get(['official_accounts.*', 'friends.blocked']);
+        // トーク一覧：それぞれの最後のメッセージ（新しい順）
+        foreach ($friends as $f) {
+            $f->last = Message::where(['official_account_id' => $f->id, 'user_id' => $me->user_id])->latest('id')->first();
+        }
+        $talks = $friends->sortByDesc(fn ($f) => $f->last?->id ?? 0)->values();
         $chat = $request->query('chat') ? OfficialAccount::find($request->query('chat')) : null;
         $messages = collect();
         $richMenu = null;
@@ -94,7 +99,7 @@ class PhoneController extends Controller
         }
         $addOa = $addTarget ? (OfficialAccount::byBasicId($addTarget) ?? (object) ['notFound' => $addTarget]) : null;
 
-        return view('mock.phone', compact('phone', 'me', 'friends', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa') + [
+        return view('mock.phone', compact('phone', 'me', 'friends', 'talks', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa') + [
             'lastId' => $messages->last()?->id ?? 0,
         ]);
     }

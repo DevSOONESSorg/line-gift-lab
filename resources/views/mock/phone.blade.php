@@ -45,7 +45,7 @@
           <div class="msg in"><div class="side"><span class="read">既読</span>{{ substr($m->created_at, 11, 5) }}</div><div class="bubble">{!! $linkify($m->text) !!}</div></div>
         @else
           <div class="msg out">
-            <span class="avatar">{{ mb_substr($chat->name, 0, 1) }}</span>
+            @include('mock._avatar', ['oa' => $chat, 'size' => 'xs'])
             <div class="bubble">{!! $linkify($m->text) !!}</div>
             <div class="side">{{ substr($m->created_at, 11, 5) }}<span class="via">{{ ['bot' => 'bot', 'auto' => '応答メッセージ', 'greeting' => 'あいさつ', 'liff' => 'LIFF'][$m->via] ?? '' }}</span></div>
           </div>
@@ -86,21 +86,47 @@
       </form>
     @endif
 
-  @else
-    <div class="chat-head"><span></span><span class="title">ホーム</span><span></span></div>
-    <div class="phone-body p-3">
-      <form method="post" action="{{ route('mock.phone.name', $phone) }}" class="d-flex gap-2 align-items-center">@csrf
-        <span class="oa-icon">私</span><input name="display_name" class="form-control form-control-sm" value="{{ $me->display_name }}" maxlength="20"><button class="btn btn-sm btn-link text-nowrap">名前を変更</button></form>
-      <p class="small text-muted mt-2">あなたのユーザーID：<code class="user-select-all">{{ $me->user_id }}</code></p>
-      <h4 class="h6 mt-3">友だち（公式アカウント）</h4>
-      @forelse ($friends as $f)
-        <a class="friend" href="{{ route('mock.phone.screen', ['phone' => $phone, 'chat' => $f->id]) }}"><span class="oa-icon">{{ mb_substr($f->name, 0, 1) }}</span><span>{{ $f->name }}{{ $f->blocked ? '（ブロック中）' : '' }}</span></a>
-      @empty
-        <p class="text-muted">まだいません</p>
-      @endforelse
-      <h4 class="h6 mt-3">ID検索で友だち追加</h4>
-      <form class="d-flex gap-2" action="{{ route('mock.phone.screen', $phone) }}"><input name="add" class="form-control form-control-sm" placeholder="@123abcde"><button class="btn btn-sm btn-secondary text-nowrap">検索</button></form>
+  @elseif (request('tab') === 'friends')
+    {{-- 友だちタブ：自分のプロフィール（表示名・ユーザーID）と、友だちの公式アカウント --}}
+    <div class="line-top"><div class="tabs"><a href="{{ route('mock.phone.screen', $phone) }}">トーク</a><b>友だち</b></div></div>
+    <div class="phone-body px-3">
+      <div class="me-card">
+        <span class="av av-me">{{ mb_substr($me->display_name, 0, 1) }}</span>
+        <form method="post" action="{{ route('mock.phone.name', $phone) }}" class="flex-grow-1">@csrf
+          <div class="d-flex gap-1"><input name="display_name" class="form-control form-control-sm fw-bold" value="{{ $me->display_name }}" maxlength="20"><button class="btn btn-sm btn-light text-nowrap">変更</button></div>
+          <div class="uid">ユーザーID <code class="user-select-all">{{ $me->user_id }}</code></div>
+        </form>
+      </div>
+      <p class="small text-muted mb-1">↑ LINEの表示名（あいさつメッセージの {Nickname} に入る）と、公式アカウントごとに決まるユーザーID</p>
+      <h4 class="list-h">公式アカウント {{ $friends->count() }}</h4>
+      @foreach ($friends as $f)
+        <a class="talk" href="{{ route('mock.phone.screen', ['phone' => $phone, 'chat' => $f->id]) }}">@include('mock._avatar', ['oa' => $f, 'size' => 'sm'])<span class="t"><b>{{ $f->name }}</b>@if ($f->blocked)<span class="p">ブロック中</span>@endif</span></a>
+      @endforeach
     </div>
+    @include('mock._tabbar', ['active' => 'home'])
+
+  @else
+    {{-- トーク一覧（LINEアプリを開いたときの画面） --}}
+    <div class="line-top">
+      <div class="tabs"><b>トーク <i class="bi bi-caret-down-fill"></i></b><a href="{{ route('mock.phone.screen', ['phone' => $phone, 'tab' => 'friends']) }}">友だち</a></div>
+      <div class="icons"><i class="bi bi-emoji-smile"></i><i class="bi bi-calendar3"></i><i class="bi bi-plus-lg"></i></div>
+    </div>
+    <form class="line-search" action="{{ route('mock.phone.screen', $phone) }}"><i class="bi bi-search"></i><input name="add" placeholder="検索（@ID で公式アカウントを友だち追加）" autocomplete="off"><i class="bi bi-qr-code-scan"></i></form>
+    <div class="phone-body">
+      @forelse ($talks as $f)
+        <a class="talk" href="{{ route('mock.phone.screen', ['phone' => $phone, 'chat' => $f->id]) }}">
+          @include('mock._avatar', ['oa' => $f])
+          <span class="t">
+            <b class="{{ $f->is_platform ? 'official' : '' }}">{{ $f->name }}</b>
+            <span class="p">{{ $f->blocked ? 'ブロック中' : \Illuminate\Support\Str::limit(preg_replace('/\s+/u', ' ', $f->last?->text ?? ''), 60) }}</span>
+          </span>
+          <span class="d">{{ $f->last ? (substr($f->last->created_at, 0, 10) === now()->toDateString() ? substr($f->last->created_at, 11, 5) : \Illuminate\Support\Carbon::parse($f->last->created_at)->format('n/j')) : '' }}</span>
+        </a>
+      @empty
+        <p class="text-muted text-center mt-5 small">トークはまだありません。<br>上の検索に @ID を入れて、公式アカウントを友だち追加しましょう。</p>
+      @endforelse
+    </div>
+    @include('mock._tabbar', ['active' => 'talk'])
   @endif
 
   @if ($open)

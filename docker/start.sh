@@ -13,7 +13,7 @@ cd /app
 
 [ -f .env ] || cp .env.example .env
 # Laravel が一時ファイルを置くフォルダ（空のフォルダは git に残らないので、ここで必ず作る）
-mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs bootstrap/cache
+mkdir -p "${VIEW_COMPILED_PATH:-storage/framework/views}" storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs bootstrap/cache
 [ -f vendor/autoload.php ] || composer install --no-interaction --prefer-dist
 grep -q '^APP_KEY=base64' .env || php artisan key:generate --force
 
