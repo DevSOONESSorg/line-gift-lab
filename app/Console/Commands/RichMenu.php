@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Mock\Channel;
 use App\Models\Store;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -33,6 +34,12 @@ class RichMenu extends Command
             return self::FAILURE;
         }
         $this->token = $store->line_messaging_channel_access_token;
+        // 疑似LINE のお店のトークンでは使えない（このコマンドは本物の api.line.me に送るため）
+        if (Channel::byToken($this->token)) {
+            $this->error("「{$store->name}」は疑似LINEのお店です。このコマンドは本物のLINE（コースB）で、自分で作ったお店に使います。");
+            $this->line('  → 疑似LINEのお店のリッチメニューは、疑似 Manager の「リッチメニュー」から作ります（コースA 第8章）。');
+            return self::FAILURE;
+        }
         $this->liffId = (string) $store->liff_id;
         $a = $this->argument('args');
 

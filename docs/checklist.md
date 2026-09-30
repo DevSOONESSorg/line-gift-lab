@@ -147,9 +147,12 @@ docker compose exec app php artisan lab:drill 1 --store={自分のslug}
 
 ## 12. コマンド（コースB・Cで使う）
 
+`lab:richmenu` は本物のLINEに送るコマンドなので、12-1〜12-3 は **コースB で本物のLINEとつないだお店** で確かめる（コースBを使わないなら飛ばしてよい）。
+
+- [ ] 12-0 疑似LINEのお店（`--store=sample-cafe`）で実行すると、「疑似LINEのお店です」と案内が出て止まる
 - [ ] 12-1 `php artisan lab:richmenu list --store={slug}` が一覧を出す
-- [ ] 12-2 `lab:richmenu setup-tabs --store={slug}` でタブ切り替えのリッチメニューができ、疑似スマホで切り替わる
-- [ ] 12-3 `lab:richmenu delete-all --store={slug}` で消え、疑似スマホから消える
+- [ ] 12-2 `lab:richmenu setup-tabs --store={slug}` でタブ切り替えのリッチメニューができ、本物のLINEで切り替わる
+- [ ] 12-3 `lab:richmenu delete-all --store={slug}` で消え、本物のLINEから消える
 - [ ] 12-4 アプリのコード（例：`resources/views/liff/shops.blade.php` の文言）を直すと、再起動せずに画面に反映される
 
 ## 13. コースB（本物のLINE）を使う場合だけ
