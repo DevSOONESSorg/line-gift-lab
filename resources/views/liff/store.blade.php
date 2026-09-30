@@ -51,7 +51,7 @@
   @endif
 
   @if ($store->line_official_account_id && $route === 'original')
-    <p class="small text-center"><a href="{{ ($lineUser['mock'] ?? false) ? route('mock.phone', ['add' => $store->line_official_account_id]) : 'https://line.me/R/ti/p/'.$store->line_official_account_id }}" target="_top">このお店の公式LINEを友だち追加</a></p>
+    <p class="small text-center"><a href="{{ ($lineUser['mock'] ?? false) ? route('mock.phone.screen', ['phone' => $lineUser['phone'] ?? 'customer', 'add' => $store->line_official_account_id]) : 'https://line.me/R/ti/p/'.$store->line_official_account_id }}" target="{{ ($lineUser['mock'] ?? false) ? '_parent' : '_top' }}">このお店の公式LINEを友だち追加</a></p>
   @endif
 @endsection
 @push('scripts')

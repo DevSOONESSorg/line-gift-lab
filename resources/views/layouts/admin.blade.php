@@ -37,7 +37,7 @@
         <div class="small text-white-50 mb-1">LINE友だち登録（出店の入口）</div>
         <div id="qr" class="bg-white p-2 d-inline-block rounded"></div>
         <div class="small mt-1"><code class="text-white-50">{{ $platformBasicId }}</code></div>
-        <a class="btn btn-sm btn-outline-light mt-2" href="{{ route('mock.phone', ['add' => $platformBasicId]) }}">疑似スマホで読み取る</a>
+        <a class="btn btn-sm btn-outline-light mt-2" href="{{ route('mock.phone', ['add' => $platformBasicId, 'to' => 'owner']) }}">オーナーのスマホで読み取る</a>
       </div>
     </aside>
     <main class="admin-main flex-grow-1 p-4">

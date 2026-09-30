@@ -72,7 +72,9 @@ class DatabaseSeeder extends Seeder
         ]);
         $providerId = $ml->table('providers')->insertGetId(['name' => MockLine::PLATFORM_PROVIDER]);
         $ml->table('provider_members')->insert(['provider_id' => $providerId, 'account_id' => 'company', 'role' => 'admin']);
-        $me = LineUser::create(['user_id' => 'U'.bin2hex(random_bytes(16)), 'display_name' => 'あなた']);
+        // 疑似スマホは2台：お客さん（ギフトを贈る人）と、お店のオーナー（受け取る人）
+        $guest = LineUser::create(['user_id' => 'U'.bin2hex(random_bytes(16)), 'display_name' => 'お客さん', 'phone' => 'customer']);
+        $owner = LineUser::create(['user_id' => 'U'.bin2hex(random_bytes(16)), 'display_name' => 'オーナー', 'phone' => 'owner']);
 
         // ---------- 運営の公式LINE（共通チャネル） ----------
         $poa = MockLine::createOfficialAccount('おくりギフト(dev)', 'company', 'サービス', true);
@@ -108,7 +110,7 @@ class DatabaseSeeder extends Seeder
             'representative_name' => '見本 花子', 'representative_tel' => '090-0000-0001',
             'bank_name' => 'さくら銀行', 'bank_branch' => '那覇支店', 'bank_account_type' => '普通', 'bank_account_number' => '1234567', 'bank_account_name' => 'ミホン ハナコ',
             'agent_id' => $agent2->id, 'commission_rate' => 13.6, 'is_approved' => true, 'is_listed_in_directory' => true,
-            'owner_line_user_id' => $me->user_id,
+            'owner_line_user_id' => $owner->user_id,
         ]);
         foreach ([6, 7, 4, 1] as $tid) {
             $t = MenuTemplate::find($tid);
@@ -135,7 +137,7 @@ class DatabaseSeeder extends Seeder
             'representative_name' => '見本 太郎', 'representative_tel' => '090-0000-0002',
             'bank_name' => 'ゆうちょ銀行', 'bank_account_type' => '普通', 'bank_account_name' => 'ミホン タロウ', 'yucho_symbol' => '17010', 'yucho_number' => '12345671',
             'agent_id' => $agent1->id, 'commission_rate' => 10, 'is_approved' => true, 'is_listed_in_directory' => false, 'wants_original' => true,
-            'owner_line_user_id' => $me->user_id,
+            'owner_line_user_id' => $owner->user_id,
             'liff_id' => $sliff->liff_id, 'line_messaging_channel_id' => $sch->channel_id, 'line_messaging_channel_secret' => $sch->secret,
             'line_messaging_channel_access_token' => $stoken, 'line_official_account_id' => $soa->basic_id,
         ]);
@@ -145,10 +147,11 @@ class DatabaseSeeder extends Seeder
         Store::create(['name' => '承認待ちスナック', 'slug' => 'store-pending', 'prefecture' => '沖縄県', 'city' => '沖縄市', 'tel' => '098-000-0003',
             'representative_name' => '申込 次郎', 'representative_tel' => '090-0000-0003', 'commission_rate' => 10, 'is_approved' => false]);
 
-        // あなたのスマホは、最初から運営LINEと見本カフェの友だち
-        foreach ([$poa, $soa] as $oa) {
-            $ml->table('friends')->insert(['official_account_id' => $oa->id, 'user_id' => $me->user_id, 'blocked' => false]);
-            MockLine::addMessage($oa->id, $me->user_id, 'out', 'greeting', $oa->greeting_text);
+        // お客さんのスマホは、最初から運営LINEと見本カフェの友だち
+        // オーナーのスマホは、運営LINEの友だち（出店登録・店舗管理・ギフトのお知らせは運営LINEから）
+        foreach ([[$guest, $poa], [$guest, $soa], [$owner, $poa]] as [$user, $oa]) {
+            $ml->table('friends')->insert(['official_account_id' => $oa->id, 'user_id' => $user->user_id, 'blocked' => false]);
+            MockLine::addMessage($oa->id, $user->user_id, 'out', 'greeting', $oa->greeting_text);
         }
 
         $this->sampleOrders($bar, $cafe);

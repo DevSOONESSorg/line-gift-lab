@@ -8,5 +8,5 @@
     <div class="card"><div class="card-body py-2 px-3"><div class="small text-muted">{{ $k }}</div><strong>{{ $v }}</strong></div></div>
   @endforeach
 </div>
-<p>ベーシックID：<code>{{ $oa->basic_id }}</code> <a class="btn btn-sm btn-outline-success" href="{{ route('mock.phone', ['add' => $oa->basic_id]) }}">疑似スマホで友だち追加</a></p>
+<p>ベーシックID：<code>{{ $oa->basic_id }}</code> <a class="btn btn-sm btn-outline-success" href="{{ route('mock.phone', ['add' => $oa->basic_id]) }}">お客さんのスマホで友だち追加</a></p>
 @endsection

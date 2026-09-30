@@ -86,12 +86,16 @@ Route::get('media/thank-videos/{order}', [Liff\HistoryController::class, 'video'
 Route::prefix('mock')->name('mock.')->group(function () {
     Route::post('switch-account', [Mock\AccountController::class, 'switch'])->name('switch-account');
 
-    Route::get('phone', [Mock\PhoneController::class, 'index'])->name('phone');
-    Route::post('phone/name', [Mock\PhoneController::class, 'rename'])->name('phone.name');
-    Route::post('phone/add', [Mock\PhoneController::class, 'add'])->name('phone.add');
-    Route::post('phone/chat/{oa}/send', [Mock\PhoneController::class, 'send'])->name('phone.send');
-    Route::post('phone/chat/{oa}/block', [Mock\PhoneController::class, 'block'])->name('phone.block');
-    Route::get('phone/chat/{oa}/last', [Mock\PhoneController::class, 'last'])->name('phone.last');
+    // 疑似スマホは2台（お客さん・オーナー）。/mock/phone で左右に並べて表示し、1台ずつの画面は /mock/phone/{customer|owner}
+    Route::get('phone', [Mock\PhoneController::class, 'both'])->name('phone');
+    Route::prefix('phone/{phone}')->where(['phone' => 'customer|owner'])->group(function () {
+        Route::get('/', [Mock\PhoneController::class, 'index'])->name('phone.screen');
+        Route::post('name', [Mock\PhoneController::class, 'rename'])->name('phone.name');
+        Route::post('add', [Mock\PhoneController::class, 'add'])->name('phone.add');
+        Route::post('chat/{oa}/send', [Mock\PhoneController::class, 'send'])->name('phone.send');
+        Route::post('chat/{oa}/block', [Mock\PhoneController::class, 'block'])->name('phone.block');
+        Route::get('chat/{oa}/last', [Mock\PhoneController::class, 'last'])->name('phone.last');
+    });
     Route::post('phone/liff-send', [Mock\PhoneController::class, 'liffSend'])->name('phone.liff-send');
 
     Route::get('manager', [Mock\ManagerController::class, 'index'])->name('manager');

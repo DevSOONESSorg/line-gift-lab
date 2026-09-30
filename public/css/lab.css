@@ -77,6 +77,18 @@ pre.sql { white-space: pre-wrap; background: #111827; color: #e5e7eb; padding: 1
 .friend { display: flex; align-items: center; gap: 10px; padding: 8px 4px; text-decoration: none; color: #212529; border-bottom: 1px solid #f1f3f5; }
 .phone-help { max-width: 360px; }
 
+/* 疑似スマホ2台（左：お客さん／右：オーナー） */
+.phones-page { padding: 16px; }
+.phones { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+.phone-col { display: flex; flex-direction: column; align-items: center; }
+.phone-title { font-size: 1.05rem; font-weight: bold; margin: 0 0 6px; text-align: center; }
+.phone-title small { display: block; font-weight: normal; font-size: .75rem; color: #6c757d; }
+.phone-title-customer i { color: var(--phone); } .phone-title-owner i { color: var(--admin); }
+.phone-shell { width: 404px; height: 790px; border: 0; background: transparent; }
+.phones-page .phone-help { max-width: 860px; margin-top: 16px; }
+body.phone-screen { background: transparent; margin: 0; padding: 6px 12px 12px; display: flex; justify-content: center; }
+body.phone-screen .phone { box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+
 /* 裏側ビュー */
 .log { background: #fff; border-left: 6px solid #adb5bd; margin: 3px 0; border-radius: 4px; }
 .log summary { display: flex; gap: 10px; padding: 7px 10px; cursor: pointer; align-items: baseline; list-style: none; font-size: 14px; }

@@ -24,6 +24,8 @@ else
   php artisan migrate:fresh --seed --force   # 初回 → 表を作って初期データを入れる
 fi
 [ -e public/storage ] || php artisan storage:link
+# 画面（Blade）を先にまとめて変換しておく（疑似スマホ2台を同時に開いたとき、変換が重なってエラーになるのを防ぐ）
+php artisan view:cache > /dev/null
 
 php artisan schedule:work > storage/logs/schedule.log 2>&1 &
 

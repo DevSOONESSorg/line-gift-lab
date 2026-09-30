@@ -12,7 +12,8 @@ use App\Support\Inside;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-// 疑似スマホ（お客さん・オーナーのLINEアプリの役）
+// 疑似スマホ（LINEアプリの役）。お客さんのスマホと、オーナーのスマホの2台がある
+//   {phone} には customer（お客さん）か owner（オーナー）が入る
 class PhoneController extends Controller
 {
     // URL を「スマホの中のブラウザ」で開くときの行き先を決める
@@ -55,9 +56,22 @@ class PhoneController extends Controller
         return ['iframe' => $local ? $src : $target, 'liffId' => $liff?->liff_id];
     }
 
-    public function index(Request $request)
+    // 2台を左右に並べる画面。?add= や ?open= が付いていたら、?to= のスマホ（省略時はお客さん）で開く
+    public function both(Request $request)
     {
-        $me = LineUser::me();
+        $to = in_array($request->query('to'), ['customer', 'owner'], true) ? $request->query('to') : 'customer';
+        $pass = array_filter($request->only(['add', 'open', 'chat']));
+        $src = [];
+        foreach (array_keys(LineUser::PHONES) as $phone) {
+            $src[$phone] = route('mock.phone.screen', ['phone' => $phone] + ($phone === $to ? $pass : []));
+        }
+        return view('mock.phones', ['src' => $src, 'users' => collect(LineUser::PHONES)->map(fn ($l, $p) => LineUser::me($p))]);
+    }
+
+    // スマホ1台の画面（左右の枠の中に表示される）
+    public function index(Request $request, string $phone)
+    {
+        $me = LineUser::me($phone);
         $friends = OfficialAccount::join('friends', 'friends.official_account_id', '=', 'official_accounts.id')
             ->where('friends.user_id', $me->user_id)->orderBy('official_accounts.id')->get(['official_accounts.*', 'friends.blocked']);
         $chat = $request->query('chat') ? OfficialAccount::find($request->query('chat')) : null;
@@ -77,42 +91,42 @@ class PhoneController extends Controller
         }
         $addOa = $addTarget ? (OfficialAccount::byBasicId($addTarget) ?? (object) ['notFound' => $addTarget]) : null;
 
-        return view('mock.phone', compact('me', 'friends', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa') + [
+        return view('mock.phone', compact('phone', 'me', 'friends', 'chat', 'messages', 'richMenu', 'friendRow', 'open', 'addOa') + [
             'lastId' => $messages->last()?->id ?? 0,
         ]);
     }
 
-    public function rename(Request $request)
+    public function rename(Request $request, string $phone)
     {
-        LineUser::query()->update(['display_name' => mb_substr(trim((string) $request->input('display_name')) ?: 'あなた', 0, 20)]);
-        return redirect()->route('mock.phone');
+        LineUser::me($phone)->update(['display_name' => mb_substr(trim((string) $request->input('display_name')) ?: LineUser::PHONES[$phone], 0, 20)]);
+        return redirect()->route('mock.phone.screen', $phone);
     }
 
-    public function add(Request $request)
+    public function add(Request $request, string $phone)
     {
         $oa = OfficialAccount::byBasicId($request->input('basic_id'));
-        if (! $oa) return redirect()->route('mock.phone', ['add' => $request->input('basic_id')]);
-        MockLine::follow($oa, LineUser::me());
-        return redirect()->route('mock.phone', ['chat' => $oa->id]);
+        if (! $oa) return redirect()->route('mock.phone.screen', ['phone' => $phone, 'add' => $request->input('basic_id')]);
+        MockLine::follow($oa, LineUser::me($phone));
+        return redirect()->route('mock.phone.screen', ['phone' => $phone, 'chat' => $oa->id]);
     }
 
-    public function send(Request $request, OfficialAccount $oa)
+    public function send(Request $request, string $phone, OfficialAccount $oa)
     {
-        $me = LineUser::me();
+        $me = LineUser::me($phone);
         $text = trim((string) $request->input('text'));
         if ($text !== '' && $oa->isFriend($me->user_id)) MockLine::userSendsText($oa, $me, $text);
-        return redirect()->route('mock.phone', ['chat' => $oa->id]);
+        return redirect()->route('mock.phone.screen', ['phone' => $phone, 'chat' => $oa->id]);
     }
 
-    public function block(Request $request, OfficialAccount $oa)
+    public function block(Request $request, string $phone, OfficialAccount $oa)
     {
-        MockLine::block($oa, LineUser::me(), $request->boolean('blocked'));
-        return redirect()->route('mock.phone', ['chat' => $oa->id]);
+        MockLine::block($oa, LineUser::me($phone), $request->boolean('blocked'));
+        return redirect()->route('mock.phone.screen', ['phone' => $phone, 'chat' => $oa->id]);
     }
 
-    public function last(OfficialAccount $oa)
+    public function last(string $phone, OfficialAccount $oa)
     {
-        return ['lastId' => (int) Message::where(['official_account_id' => $oa->id, 'user_id' => LineUser::me()->user_id])->max('id')];
+        return ['lastId' => (int) Message::where(['official_account_id' => $oa->id, 'user_id' => LineUser::me($phone)->user_id])->max('id')];
     }
 
     // LIFF の liff.sendMessages() の代わり：LIFF から「お客さんとして」トークにメッセージを送る
@@ -126,7 +140,9 @@ class PhoneController extends Controller
             Inside::ng('line', "LIFF {$liff->liff_id} からの送信を断りました（scope に chat_message.write がない）");
             return response()->json(['ok' => false, 'message' => 'scope に chat_message.write がありません'], 403);
         }
-        MockLine::userSendsText($oa, LineUser::me(), mb_substr((string) $request->input('text'), 0, 200), 'liff');
+        // どちらのスマホの LIFF から送ったかは、画面から一緒に送られてくる mock_uid で決める
+        $me = LineUser::find((string) $request->input('mock_uid')) ?? LineUser::me();
+        MockLine::userSendsText($oa, $me, mb_substr((string) $request->input('text'), 0, 200), 'liff');
         return ['ok' => true];
     }
 }

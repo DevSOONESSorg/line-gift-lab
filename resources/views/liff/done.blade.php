@@ -18,7 +18,7 @@
   // 本物では liff.sendMessages([...]) で、お客さん本人の発言としてトークに送れる（scope に chat_message.write が必要）
   async function sendToChat(btn) {
     const r = await fetch(@json(route('mock.phone.liff-send')), { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': @json(csrf_token()) },
-      body: JSON.stringify({ liff_id: @json($openedLiff), basic_id: @json($order->store->line_official_account_id), text: @json("「{$order->menu_name}」を贈りました🎁") }) }).then((x) => x.json());
+      body: JSON.stringify({ mock_uid: @json($mockUid ?? null), liff_id: @json($openedLiff), basic_id: @json($order->store->line_official_account_id), text: @json("「{$order->menu_name}」を贈りました🎁") }) }).then((x) => x.json());
     btn.textContent = r.ok ? '送りました' : '送れませんでした：' + r.message;
     btn.disabled = true;
   }

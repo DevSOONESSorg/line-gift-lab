@@ -49,7 +49,7 @@
       <div id="storeqr" class="d-inline-block"></div>
       <div class="small mt-2"><code>{{ $qrUrl }}</code> <button class="btn btn-sm btn-outline-secondary" onclick="navigator.clipboard.writeText('{{ $qrUrl }}'); this.textContent='コピーしました'">コピー</button></div>
       <p class="small text-muted mt-2 mb-1">{{ $store->liff_id ? 'お店専用の LIFF で開きます' : 'LIFF ID が未設定なので、共通のページで開きます' }}</p>
-      <a class="btn btn-sm btn-outline-primary" href="{{ route('mock.phone', ['open' => $qrUrl]) }}">疑似スマホで読み取る</a>
+      <a class="btn btn-sm btn-outline-primary" href="{{ route('mock.phone', ['open' => $qrUrl]) }}">お客さんのスマホで読み取る</a>
     </div></div>
   </div>
 </div>

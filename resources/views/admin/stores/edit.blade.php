@@ -105,7 +105,7 @@
   <form method="post" action="{{ route('admin.stores.test-line', $store) }}" id="test-line-form" class="mt-3">@csrf
     <label class="form-label fw-bold">テスト送信</label>
     <p class="form-text mb-1">設定した Messaging API トークンで送信できるか確認します。送信先は LINE userId（Uから始まる文字列）。受信者はその店舗の公式アカウントを友だち追加している必要があります。</p>
-    <div class="input-group"><input name="line_id" class="form-control font-monospace" placeholder="U0123...（疑似スマホのホームに出ている、あなたのユーザーID）" value="{{ old('line_id') }}"><button class="btn btn-outline-success">テスト送信</button></div>
+    <div class="input-group"><input name="line_id" class="form-control font-monospace" placeholder="U0123...（疑似スマホのホームに出ている、ユーザーID）" value="{{ old('line_id') }}"><button class="btn btn-outline-success">テスト送信</button></div>
   </form>
 </div></div>
 
