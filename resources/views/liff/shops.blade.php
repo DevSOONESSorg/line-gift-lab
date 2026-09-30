@@ -2,7 +2,7 @@
 @section('title', 'お店をさがす')
 @section('content')
   @include('liff._appnav')
-  <form class="d-flex gap-2 my-3"><input name="q" class="form-control" placeholder="お店の名前" value="{{ request('q') }}"><button class="btn btn-success">検索</button></form>
+  <form class="d-flex gap-2 my-3"><input name="q" class="form-control" placeholder="お店の名前" value="{{ request('q') }}"><button class="btn btn-success text-nowrap">検索</button></form>
   @forelse ($stores as $s)
     <a class="shop" href="{{ route('liff.store', [$s->slug, 'via' => 'app']) }}">
       <span class="shop-icon" style="background:{{ $s->image_color }}">{{ mb_substr($s->name, 0, 1) }}</span>

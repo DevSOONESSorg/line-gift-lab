@@ -89,7 +89,7 @@
         <p class="text-muted">まだいません</p>
       @endforelse
       <h4 class="h6 mt-3">ID検索で友だち追加</h4>
-      <form class="d-flex gap-2"><input name="add" class="form-control form-control-sm" placeholder="@123abcde"><button class="btn btn-sm btn-secondary">検索</button></form>
+      <form class="d-flex gap-2"><input name="add" class="form-control form-control-sm" placeholder="@123abcde"><button class="btn btn-sm btn-secondary text-nowrap">検索</button></form>
     </div>
   @endif
 </div>
