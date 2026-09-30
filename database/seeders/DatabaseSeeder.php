@@ -153,9 +153,9 @@ class DatabaseSeeder extends Seeder
         Store::create(['name' => '承認待ちスナック', 'slug' => 'store-pending', 'prefecture' => '沖縄県', 'city' => '沖縄市', 'tel' => '098-000-0003',
             'representative_name' => '申込 次郎', 'representative_tel' => '090-0000-0003', 'commission_rate' => 10, 'is_approved' => false]);
 
-        // ---------- 課題のお店：クラブ アズール（コースAで、あなたがつなぐお店） ----------
-        // 中身は app/Services/BuildScenario.php。構築ナビでお店を選ぶたびに、同じスタート地点に作り直されます
-        \App\Services\BuildScenario::reset('club-azure');
+        // ---------- 課題のお店（クラブ アズール など） ----------
+        // 最初は作らない。構築ナビのプルダウンで選んだときに、スタート地点のお店が作られ、お客さんのスマホに公式LINEが追加される
+        // 中身は app/Services/BuildScenario.php
 
         // お客さんのスマホは、最初から見本カフェの友だち
         //   本物ではお客さんが運営LINEを入れていることもあるが、教材では左右の役割がまざらないように入れない

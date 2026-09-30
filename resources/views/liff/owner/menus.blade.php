@@ -1,6 +1,6 @@
 @extends('layouts.liff')
 @section('theme', 'light')
-@section('title', '商品登録')
+@section('title', '商品管理')
 @section('content')
   @include('liff.owner._nav')
   @forelse ($menus as $m)

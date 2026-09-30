@@ -91,9 +91,10 @@ class PhoneController extends Controller
             $friendRow = DB::connection('mockline')->table('friends')->where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->first();
             $messages = Message::where(['official_account_id' => $chat->id, 'user_id' => $me->user_id])->orderBy('id')->get();
             $richMenu = $chat->richMenus()->where('is_default', true)->latest('id')->first();
-            // 構築中のお店は、構築ナビのリッチメニューの手順が終わるまで、リッチメニューを押せないようにする
-            $guide = \App\Services\BuildGuide::current();
-            $rmLocked = $guide && $guide->oa && $guide->oa->id == $chat->id && ! $guide->isDone('richmenu');
+            // 課題のお店は、構築ナビのリッチメニューの手順（手順10）まで終わるまで、リッチメニューを押せないようにする
+            //   （完成したお店は、ほかのお店を構築中でも押せる）
+            $scStore = \App\Services\BuildScenario::storeOfOa($chat->id);
+            $rmLocked = $scStore && ! (new \App\Services\BuildGuide($scStore))->isDone('richmenu');
         }
         $open = null;
         $addTarget = $request->query('add');

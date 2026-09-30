@@ -36,8 +36,8 @@ class OwnerController extends Controller
 
     public function register(Request $r)
     {
-        $this->customer($r);
-        return view('liff.owner.register');
+        $c = $this->customer($r);
+        return view('liff.owner.register', ['myStores' => Store::where('owner_line_user_id', $c->line_user_id)->get()]);
     }
 
     public function storeRegistration(Request $r)

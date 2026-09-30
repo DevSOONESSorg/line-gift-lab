@@ -6,6 +6,7 @@ use App\Models\Mock\Channel;
 use App\Models\Mock\LiffApp;
 use App\Models\Mock\OfficialAccount;
 use App\Models\Mock\Provider;
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Store;
@@ -69,6 +70,7 @@ class BuildGuide
         $s = $this->store; $oa = $this->oa; $ch = $this->messaging; $login = $this->login; $liff = $this->liff;
         $platform = Provider::where('name', MockLine::PLATFORM_PROVIDER)->first();
         $slug = $this->targetSlug();
+        $platformOa = OfficialAccount::where('is_platform', true)->first();
         $ga = $this->scenario ? BuildScenario::giftArea($this->scenario) : ['letter' => 'A', 'label' => 'ギフトを贈る', 'others' => []];
         $inviteOpen = $oa && DB::connection('mockline')->table('invites')->where('official_account_id', $oa->id)->whereNull('used_by')->exists();
 
@@ -219,9 +221,23 @@ class BuildGuide
                     ['click', 'リッチメニューの「'.$ga['label'].'」→ 商品の「この商品を送る」'],
                     ['paste', 'はじめてならカード番号にこれを入力（有効期限 12/40・CVC 123）', '4242424242424242'],
                     ['click', 'いちばん下の決済ボタン'],
-                    ['check', '右のオーナーのスマホに「贈られました」が届いたら完成'],
+                    ['check', '「DELIVERED」の画面が出たら、お客さん側はOK（次の手順でオーナー側を確かめる）'],
                 ],
-                'why' => '運営スタッフがスマホを触るのは、この動作確認のときだけ。お客さん役・オーナー役の両方で確かめます。',
+                'why' => '運営スタッフがスマホを触るのは、この動作確認のときだけ。まずお客さん役で「贈れるか」を確かめます。',
+            ],
+            [
+                'key' => 'owner', 'title' => 'オーナーのスマホで、届いたギフトを確認して「受け取る」', 'who' => 'phone', 'chapter' => '10-purchase',
+                'done' => Order::where(['store_id' => $s->id, 'route' => 'original'])->whereIn('status', [OrderStatus::Received, OrderStatus::Thanked])->exists(),
+                'actions' => [
+                    ['open', '疑似スマホで、右のオーナーの「おくりギフト(dev)」のトークを開く', $platformOa ? route('mock.phone', ['to' => 'owner', 'chat' => $platformOa->id]) : route('mock.phone')],
+                    ['check', 'トークに「['.$s->name.']」の「贈られました」のお知らせが届いている'],
+                    ['click', 'リッチメニューの「店舗管理」（下の段のまん中）'],
+                    ['select', 'お店の一覧から「'.$s->name.'」のカードを探す（オーナーのお店が全部ならんでいます）'],
+                    ['click', 'そのカードの黄色い「贈り物一覧」（受取待ちの数が出ています）'],
+                    ['click', 'いま贈ったギフトを開いて「受け取る」'],
+                    ['check', '左のお客さんのスマホに「受け取りました🍾」が届いたら完成'],
+                ],
+                'why' => 'オーナーは、運営の公式LINE（おくりギフト）の「店舗管理」で自分のお店を選び、「贈り物一覧」で届いたギフトを確かめます。本番でテスト購入したときも、ここを見れば届いたかがすぐにわかります。',
             ],
         ];
 

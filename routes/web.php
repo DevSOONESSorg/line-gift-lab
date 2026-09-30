@@ -19,6 +19,7 @@ Route::get('build', [\App\Http\Controllers\BuildController::class, 'index'])->na
 Route::post('build/select', [\App\Http\Controllers\BuildController::class, 'select'])->name('build.select');
 Route::post('build/stop', [\App\Http\Controllers\BuildController::class, 'stop'])->name('build.stop');
 Route::get('build/nav', [\App\Http\Controllers\BuildController::class, 'nav'])->name('build.nav');
+Route::post('build/reset', [\App\Http\Controllers\BuildController::class, 'resetAll'])->name('build.reset');
 
 // ---------------------------------------------------------------
 // 管理画面（運営スタッフ）… ログインが必要

@@ -17,7 +17,10 @@ use Illuminate\Support\Facades\Storage;
 // =====================================================
 // 構築の課題（シナリオ）
 //
-// 本番と同じ「スタート地点」のお店を作る。構築ナビでお店を選ぶたびに、ここで作り直す（＝新規構築）。
+// 本番と同じ「スタート地点」のお店を作る。
+// 構築ナビのプルダウンで「はじめて」選んだときに作る（お客さんのスマホにお店の公式LINEが追加される）。
+// 2回目以降は作り直さず、続きから。完成したお店は残り、贈る機能も使える。
+// 「構築履歴をリセット」で、課題のお店をすべて消して最初に戻す（resetAll）。
 //   ・オーナーが運営LINEのQRから出店登録済み（未承認・slug は仮の store-番号）
 //   ・お店は自分の公式LINEを持っていて、お客さんも友だち追加している
 //   ・リッチメニューもある。「ギフトを贈る」ボタンだけ、まだどこにもつながっていない
@@ -95,6 +98,32 @@ class BuildScenario
             else $others[] = $letters[$i].'（'.$a['label'].'）';
         }
         return ($gift ?? ['letter' => 'A', 'label' => 'ギフトを贈る']) + ['others' => $others];
+    }
+
+    // プルダウンで選んだとき：まだ作っていなければスタート地点を作る。作ってあれば、そのまま続きから
+    public static function start(string $key): Store
+    {
+        $store = Store::find(self::storeId($key));
+        return $store ?: self::reset($key);
+    }
+
+    // 構築履歴をリセット：課題のお店を、構築したものもふくめてすべて消す（お客さんのスマホからも消える）
+    public static function resetAll(): void
+    {
+        foreach (array_keys(self::SCENARIOS) as $key) {
+            self::destroy($key);
+            Setting::whereIn('key', ["scenario.{$key}.store", "scenario.{$key}.oa"])->delete();
+        }
+        Inside::info('app', '構築履歴をリセットしました', '課題のお店（公式LINE・チャネル・LIFF・注文）をすべて消しました');
+    }
+
+    // この公式アカウントが課題のお店のものなら、そのお店
+    public static function storeOfOa(int $oaId): ?Store
+    {
+        foreach (array_keys(self::SCENARIOS) as $k) {
+            if ((int) Setting::get("scenario.{$k}.oa") === $oaId) return Store::find(self::storeId($k));
+        }
+        return null;
     }
 
     public static function storeId(string $key): ?int { return Setting::get("scenario.{$key}.store") ? (int) Setting::get("scenario.{$key}.store") : null; }

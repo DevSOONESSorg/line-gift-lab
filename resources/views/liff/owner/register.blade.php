@@ -3,6 +3,13 @@
 @section('title', '出店登録')
 @section('content')
   <div class="l-h">出店登録</div>
+  @if ($myStores->isNotEmpty())
+    <div class="own-card">
+      <div class="small mb-2">登録済みのお店があります（{{ $myStores->count() }}件）。ギフトの確認や商品の変更は「店舗管理」から。</div>
+      <a class="own-main" href="{{ route('liff.manage') }}">店舗管理でお店を選ぶ</a>
+    </div>
+    <p class="small text-muted">新しくお店を登録するときは、下に入力してください。</p>
+  @endif
   <p class="small">おくりギフトに、あなたのお店を登録します。登録したLINEアカウントが、そのお店の「オーナー」になります（ギフトの受け取り・商品登録ができる人）。</p>
   <form method="post" action="{{ route('liff.register.post') }}">
     @csrf

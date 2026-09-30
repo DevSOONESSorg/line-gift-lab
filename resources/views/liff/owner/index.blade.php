@@ -2,17 +2,31 @@
 @section('theme', 'light')
 @section('title', '店舗管理')
 @section('content')
+  {{-- 本番の「店舗管理」と同じ並び：お店ごとのカード → 贈り物一覧／商品管理／スタッフ管理 --}}
   <div class="l-h">店舗管理</div>
   @forelse ($stores as $s)
-    <div class="l-card">
-      <div class="d-flex justify-content-between align-items-start">
-        <div class="name">{{ $s->name }}</div>
-        <span>@if (! $s->is_approved)<span class="pill pill-wait">承認待ち</span>@endif <span class="pill pill-gray">{{ $s->is_listed_in_directory ? '共通掲載' : 'オリジナル' }}</span></span>
+    <div class="own-card">
+      <div class="own-head">
+        <div>
+          <div class="own-name">{{ $s->name }}</div>
+          @if ($s->is_approved)<span class="own-badge ok">承認済み</span>@else<span class="own-badge wait">承認待ち</span>@endif
+        </div>
+        <div class="own-icons">
+          <button type="button" class="own-icon" onclick="ownNote(this)" aria-label="編集">✏️</button>
+          <button type="button" class="own-icon" onclick="ownNote(this)" aria-label="削除">🗑️</button>
+        </div>
       </div>
-      <div class="meta mt-1">商品 {{ $s->menus_count }} 件 ／ 受取待ち {{ $s->waiting_count }} 件</div>
-      <div class="d-flex gap-2 mt-3"><a class="btn-gold" href="{{ route('liff.manage.gifts', $s) }}">贈り物一覧</a><a class="btn-ghost mt-0" href="{{ route('liff.manage.menus', $s) }}">商品登録</a></div>
+      <a class="own-main" href="{{ route('liff.manage.gifts', $s) }}">贈り物一覧@if ($s->waiting_count)<span class="own-count">{{ $s->waiting_count }}</span>@endif</a>
+      <div class="own-sub">
+        <a href="{{ route('liff.manage.menus', $s) }}">商品管理</a>
+        <button type="button" onclick="ownNote(this)">スタッフ管理</button>
+      </div>
+      <div class="own-note" hidden>この教材では使えません（本番にはあります）</div>
     </div>
   @empty
-    <p>あなたがオーナーのお店はまだありません。<a href="{{ route('liff.register') }}">出店登録</a>から登録してください。</p>
+    <p>あなたがオーナーのお店はまだありません。<a href="{{ route('liff.register') }}">店舗登録</a>から登録してください。</p>
   @endforelse
+  <script>
+    function ownNote(el) { const n = el.closest('.own-card').querySelector('.own-note'); n.hidden = false; setTimeout(() => { n.hidden = true; }, 2500); }
+  </script>
 @endsection
