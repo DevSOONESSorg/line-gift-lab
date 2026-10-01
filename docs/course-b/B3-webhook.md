@@ -4,12 +4,7 @@
 
 ここからは、本物のLINEから **あなたのPCで動いている教材アプリ** に Webhook を届けます。PCはインターネットから直接は見えないので、**トンネル**（Cloudflare Quick Tunnel）で一時的な入口を作ります。
 
-```mermaid
-flowchart LR
-    phone["スマホ"] --> line["LINE社（本物）"]
-    line -- Webhook --> tunnel["https://xxxx.trycloudflare.com<br>（トンネル）"]
-    tunnel --> pc["あなたのPC<br>（教材アプリ）"]
-```
+![スマホ → LINE社（本物）→ Webhook → トンネル（https://xxxx.trycloudflare.com）→ あなたのPC（教材アプリ）](../images/tunnel.svg)
 
 ## 1. トンネルつきで起動する
 

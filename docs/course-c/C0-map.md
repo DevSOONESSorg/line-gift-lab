@@ -4,16 +4,7 @@
 
 ブラウザで <http://localhost:3000/admin/stores> を開いたとき：
 
-```mermaid
-flowchart LR
-    A["ブラウザ<br>GET /admin/stores"] --> B["routes/web.php<br>Route::resource('stores', …)"]
-    B --> M["ミドルウェア<br>auth（ログインしてる？）"]
-    M --> C["Admin/StoreController<br>index()"]
-    C --> D["Store モデル<br>Store::withCount('orders')…"]
-    D --> E[("database.sqlite<br>stores テーブル")]
-    C --> V["resources/views/admin/stores/index.blade.php"]
-    V --> A
-```
+![GET /admin/stores の流れ：ブラウザ → routes/web.php → ミドルウェア auth → Admin/StoreController の index() → Store モデル → database.sqlite。コントローラーがビュー（index.blade.php）を返し、ブラウザに表示](../images/laravel-request.svg)
 
 | 役割 | 場所 | ひとことで |
 |---|---|---|
