@@ -55,16 +55,7 @@
 
 裏側では、3つのシステムがやりとりしています。
 
-```mermaid
-flowchart LR
-    phone["スマホ（LINEアプリ）<br>お客さん・お店のオーナー"]
-    line["LINE社<br>公式アカウント・チャネル<br>LIFF・リッチメニュー"]
-    app["自社サーバー（おくりギフト / Laravel）<br>店舗・商品・注文・お客さん"]
-    phone <--> line
-    line <-- "Webhook / Messaging API" --> app
-    mgr["Manager / Developers Console<br>（運営スタッフが構築で使う）"] -.-> line
-    adm["管理画面<br>（運営スタッフが使う）"] -.-> app
-```
+![この教材のしくみ：スマホ（お客さん・オーナー）↔ LINE社（公式アカウント・チャネル・LIFF・リッチメニュー）↔ 自社サーバー（おくりギフト）。運営スタッフは Manager / Developers Console と管理画面を使う](docs/images/architecture.svg)
 
 本物の世界では、真ん中の「LINE社」の中は見えません。そこでこの教材では、**LINE社の役をする「疑似LINE」** を自分たちで作り、アプリの中に入れています。インターネットにつながなくても、手順書の全ステップを体験できます。
 
