@@ -46,3 +46,9 @@ updates:
     schedule:
       interval: monthly
       timezone: Asia/Tokyo
+    ignore:
+      # PHP の 8.4 → 8.5 のような版上げは提案させない（実物のアプリに合わせて、人が決める）。
+      # 8.4 の中のセキュリティ修正は、同じ 8.4-cli-bookworm の名前のまま配布されるので、
+      # docker compose build --pull で取り込まれる
+      - dependency-name: php
+        update-types: [version-update:semver-major, version-update:semver-minor]
