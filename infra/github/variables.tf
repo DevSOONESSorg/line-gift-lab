@@ -34,5 +34,6 @@ variable "required_checks" {
     "ブラウザ自動操作",
     "Docker で起動",
     "手順書のリンク",
+    "Terraform のチェック",
   ]
 }

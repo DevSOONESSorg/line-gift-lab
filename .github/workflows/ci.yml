@@ -4,13 +4,14 @@
 #   「教材が壊れていないか」をいろいろな角度から自動で確かめます。
 #   結果は GitHub の「Actions」タブと、PR の画面に ✅ / ❌ で出ます。
 #
-#   ジョブ（＝確認の種類）は次の6つ。お互いを待たずに同時に走ります。
+#   ジョブ（＝確認の種類）は次の7つ。お互いを待たずに同時に走ります。
 #     test        起動とテスト        … DB作成・画面の変換・PHPUnit のテスト
 #     quality     コードの品質        … 部品の脆弱性・書き方（Pint）・静的解析（Larastan）
 #     smoke       全画面の巡回        … 全ページを開いて 500 エラーが出ないか
 #     e2e         ブラウザ自動操作    … 疑似スマホでギフトを贈る〜受け取るまで（Playwright）
 #     docker      Docker で起動       … 受講者と同じ docker compose up で本当に起動するか
 #     docs        手順書のリンク      … docs/ と README のリンク切れ・画像切れ
+#     terraform   Terraform のチェック … infra/ の書き方・文法・よくあるミス（GitHub の設定は変えない）
 #   さらに定期実行のときだけ:
 #     docs-external  外部リンク       … LINE の公式ドキュメントなど、外のリンクが生きているか
 # =====================================================
@@ -208,6 +209,49 @@ jobs:
       - name: 片付け
         if: always()
         run: docker compose down -v
+
+  # ---------------------------------------------------
+  # Terraform のチェック（infra/github）
+  #   ここでは「コードとして正しいか」だけを見る。GitHub の設定を実際に変える
+  #   terraform apply は、PR をマージしたあとに、人が手元で実行する
+  # ---------------------------------------------------
+  terraform:
+    name: Terraform のチェック
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: infra/github
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Terraform を準備
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: '~1.16'
+
+      # 字下げや = の位置がそろっているか。直すときは手元で  terraform fmt -recursive
+      - name: 書き方（terraform fmt）
+        run: terraform fmt -check -recursive -diff
+
+      # GitHub にはつながず（-backend=false）、部品だけ用意して文法を確かめる
+      - name: 文法（terraform validate）
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+      # よくある書き方のミス（使っていない変数、型の付け忘れなど）。ルールは .tflint.hcl
+      - name: TFLint を準備
+        uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: v0.64.0
+
+      - name: よくあるミス（TFLint）
+        run: |
+          tflint --init
+          tflint --format compact
+        env:
+          GITHUB_TOKEN: ${{ github.token }}   # TFLint が部品を取りに行くときの回数制限よけ
 
   # ---------------------------------------------------
   # 手順書のリンク（中のリンクだけ。ネットにはつながない）

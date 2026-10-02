@@ -6,7 +6,7 @@
 #
 #   このルールでできること:
 #     - main には直接 push できない（必ず PR を通す）
-#     - PR は、CI の6つのチェックが全部 ✅ になるまでマージボタンが押せない
+#     - PR は、CI の必須チェック（variables.tf の required_checks）が全部 ✅ になるまでマージボタンが押せない
 #     - 管理者（自分）も例外にしない
 # =====================================================
 resource "github_branch_protection" "main" {
@@ -19,7 +19,7 @@ resource "github_branch_protection" "main" {
   # CI のチェックをマージの条件にする
   required_status_checks {
     strict   = false               # true にすると「main の最新を取り込んでから」でないとマージできない（1人開発では手間なだけなので false）
-    contexts = var.required_checks # variables.tf の6つ
+    contexts = var.required_checks # variables.tf の required_checks
   }
 
   # main への変更は PR 経由に限る。
