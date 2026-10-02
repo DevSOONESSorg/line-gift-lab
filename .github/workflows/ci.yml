@@ -44,7 +44,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: コードを取得
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # PHP・部品・.env・DB の準備（.github/actions/setup-app/action.yml）
       - name: 教材の準備
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-app
 
       # 使っている部品（composer.lock）に、既知の脆弱性がないか
@@ -100,7 +100,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-app
 
       # 教材のサーバーを裏で起動して、応答するまで待つ（start.sh の最後と同じ起動方法）
@@ -128,7 +128,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-app
 
       - name: 教材を起動
@@ -177,7 +177,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # 受講者がやるのと同じ  docker compose up  （-d で裏で動かす）
       - name: docker compose up
@@ -217,7 +217,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # lychee：Markdown の中のリンク・画像・ページ内リンク（#見出し）が切れていないか
       - name: リンクと画像をチェック
@@ -238,7 +238,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: 外部リンクをチェック
         uses: lycheeverse/lychee-action@v2
         with:
