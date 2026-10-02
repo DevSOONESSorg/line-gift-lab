@@ -1,0 +1,11 @@
+{
+  "name": "line-gift-lab-e2e",
+  "private": true,
+  "description": "教材の画面をブラウザで自動操作するテスト（Playwright）",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

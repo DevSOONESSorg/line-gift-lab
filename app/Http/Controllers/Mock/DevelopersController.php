@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Mock\Account;
 use App\Models\Mock\Channel;
 use App\Models\Mock\LiffApp;
+use App\Models\Mock\OfficialAccount;
 use App\Models\Mock\Provider;
 use App\Services\MockLine\MockLine;
 use App\Support\Inside;
@@ -68,7 +69,7 @@ class DevelopersController extends Controller
         $this->guard($r, $channel);
         $roles = DB::connection('mockline')->table('channel_roles')->join('accounts', 'accounts.id', '=', 'channel_roles.account_id')->where('channel_id', $channel->id)->get();
         // リンクできる公式アカウント：同じプロバイダーに Messaging API チャネルがあるもの（本物と同じ）
-        $linkable = \App\Models\Mock\OfficialAccount::whereIn('id', Channel::where(['type' => 'messaging', 'provider_id' => $channel->provider_id])->pluck('official_account_id'))->orderBy('basic_id')->get();
+        $linkable = OfficialAccount::whereIn('id', Channel::where(['type' => 'messaging', 'provider_id' => $channel->provider_id])->pluck('official_account_id'))->orderBy('basic_id')->get();
         return view('mock.developers.channel', ['tab' => $r->query('tab', 'basic'), 'liffs' => $channel->liffApps, 'roles' => $roles,
             'accounts' => Account::all(), 'verify' => session('verify'), 'linkable' => $linkable, 'editLiff' => $r->query('liff') ? $channel->liffApps->firstWhere('liff_id', $r->query('liff')) : null]);
     }
@@ -110,7 +111,7 @@ class DevelopersController extends Controller
     {
         $this->guard($r, $channel);
         $channel->update(['is_published' => ! $channel->is_published]);
-        Inside::info('line', "LINEログインチャネル {$channel->channel_id} を「".($channel->is_published ? '公開' : '開発中')."」にしました",
+        Inside::info('line', "LINEログインチャネル {$channel->channel_id} を「".($channel->is_published ? '公開' : '開発中').'」にしました',
             '本物では「開発中」のあいだ、チャネルの管理者・テスター以外は LIFF を開けません（本番の店舗オンボーディングで忘れやすいポイント）');
         return $this->back($channel, 'basic');
     }
@@ -140,7 +141,7 @@ class DevelopersController extends Controller
         abort_if($oaId && ! Channel::where(['type' => 'messaging', 'provider_id' => $channel->provider_id, 'official_account_id' => $oaId])->exists(), 422, 'そのアカウントは選べません');
         $channel->update(['linked_oa_id' => $oaId]);
         $oa = $channel->fresh()->linkedOa;
-        Inside::info('line', "LINEログインチャネル {$channel->channel_id} のリンクされたLINE公式アカウントを「".($oa ? "{$oa->basic_id} {$oa->name}" : '–')."」にしました",
+        Inside::info('line', "LINEログインチャネル {$channel->channel_id} のリンクされたLINE公式アカウントを「".($oa ? "{$oa->basic_id} {$oa->name}" : '–').'」にしました',
             'LIFF の友だち追加オプションは、ここでリンクした公式アカウントの友だち追加をすすめます。未設定だと友だち追加オプションが効きません');
         return $this->back($channel, 'basic', 'リンクされたLINE公式アカウントを更新しました');
     }

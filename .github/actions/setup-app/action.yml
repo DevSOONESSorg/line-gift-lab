@@ -1,0 +1,43 @@
+# =====================================================
+# 共通の準備（複合アクション）
+#   いくつかのジョブで「PHP を入れて、教材をインストールして、DB を作る」まで同じことをするので、
+#   ここに1回だけ書いて、ci.yml から  uses: ./.github/actions/setup-app  で呼び出します。
+#   中身は docker/start.sh とほぼ同じです。
+# =====================================================
+name: 教材の準備
+description: PHP・部品・.env・DB を用意して、初期データを入れる
+
+runs:
+  using: composite
+  steps:
+    # PHP を入れる（Dockerfile と同じ 8.4。SQLite と zip も使えるようにする）
+    - name: PHP 8.4 を準備
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        extensions: pdo_sqlite, zip
+        coverage: none
+        tools: composer:v2
+
+    # composer のダウンロード結果を覚えておく（2回目以降が速くなる）
+    - name: composer のキャッシュ
+      uses: actions/cache@v4
+      with:
+        path: ~/.composer/cache/files
+        key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+        restore-keys: composer-${{ runner.os }}-
+
+    - name: 部品を入れる（composer install）
+      shell: bash
+      run: composer install --no-interaction --prefer-dist --no-progress
+
+    # .env を作る → 暗号化の鍵を作る → 一時フォルダ・DBファイル3つを作る → 表と初期データ
+    - name: 起動前の準備とDB作成
+      shell: bash
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs bootstrap/cache
+        touch database/database.sqlite database/mockline.sqlite database/inside.sqlite
+        php artisan migrate:fresh --seed --force
+        php artisan storage:link

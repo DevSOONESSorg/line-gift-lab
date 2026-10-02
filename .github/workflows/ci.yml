@@ -1,0 +1,249 @@
+# =====================================================
+# CI（継続的インテグレーション）
+#   push・PR のたびに、GitHub が用意したまっさらなパソコン（Ubuntu）で
+#   「教材が壊れていないか」をいろいろな角度から自動で確かめます。
+#   結果は GitHub の「Actions」タブと、PR の画面に ✅ / ❌ で出ます。
+#
+#   ジョブ（＝確認の種類）は次の6つ。お互いを待たずに同時に走ります。
+#     test        起動とテスト        … DB作成・画面の変換・PHPUnit のテスト
+#     quality     コードの品質        … 部品の脆弱性・書き方（Pint）・静的解析（Larastan）
+#     smoke       全画面の巡回        … 全ページを開いて 500 エラーが出ないか
+#     e2e         ブラウザ自動操作    … 疑似スマホでギフトを贈る〜受け取るまで（Playwright）
+#     docker      Docker で起動       … 受講者と同じ docker compose up で本当に起動するか
+#     docs        手順書のリンク      … docs/ と README のリンク切れ・画像切れ
+#   さらに定期実行のときだけ:
+#     docs-external  外部リンク       … LINE の公式ドキュメントなど、外のリンクが生きているか
+# =====================================================
+name: CI
+
+# いつ動かすか
+on:
+  push:
+    branches: [main]        # main に push されたとき
+  pull_request:             # PR を作った・更新したとき
+  workflow_dispatch:        # Actions タブの「Run workflow」ボタンから手動で
+  schedule:
+    - cron: '0 0 * * 1'     # 毎週月曜 9:00（日本時間）。コードを変えていなくても、外の変化で壊れていないか見る
+
+# 同じブランチで続けて push したら、古い方の実行は止める
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# このワークフローがリポジトリに対してできること（読むだけ。必要最小限にしておく）
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------
+  # 起動とテスト
+  # ---------------------------------------------------
+  test:
+    name: 起動とテスト
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      # PHP・部品・.env・DB の準備（.github/actions/setup-app/action.yml）
+      - name: 教材の準備
+        uses: ./.github/actions/setup-app
+
+      # 画面（Blade）を全部まとめて変換してみる。書き間違いがあるとここで止まる
+      - name: 画面のファイルをチェック
+        run: php artisan view:cache
+
+      - name: テスト（PHPUnit）
+        run: php artisan test
+
+      - name: 失敗したときのログ
+        if: failure()
+        run: cat storage/logs/*.log 2>/dev/null || echo "ログはありません"
+
+  # ---------------------------------------------------
+  # コードの品質
+  #   3つの確認は、どれかが失敗しても残りも最後まで走らせる（if: !cancelled()）
+  # ---------------------------------------------------
+  quality:
+    name: コードの品質
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-app
+
+      # 使っている部品（composer.lock）に、既知の脆弱性がないか
+      # abandoned（開発が止まった部品）は表示だけにして、失敗にはしない
+      - name: 部品の脆弱性チェック（composer audit）
+        run: composer audit --abandoned=report
+
+      # 書き方がそろっているか（ルールは pint.json）。
+      # 直すときは手元で  vendor/bin/pint  を実行すると、自動で直してくれる
+      - name: 書き方チェック（Pint）
+        if: ${{ !cancelled() }}
+        run: vendor/bin/pint --test
+
+      # 実行しなくてもわかるバグを探す（設定は phpstan.neon）。
+      # Larastan は受講者の環境（composer.json）には入れず、CI の中だけで追加する
+      - name: 静的解析（Larastan）
+        if: ${{ !cancelled() }}
+        run: |
+          composer require --dev --no-interaction --no-progress "larastan/larastan:3.12.2" "phpstan/phpstan:2.2.16"
+          vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+  # ---------------------------------------------------
+  # 全画面の巡回
+  # ---------------------------------------------------
+  smoke:
+    name: 全画面の巡回
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-app
+
+      # 教材のサーバーを裏で起動して、応答するまで待つ（start.sh の最後と同じ起動方法）
+      - name: 教材を起動
+        run: |
+          cd public
+          PHP_CLI_SERVER_WORKERS=4 nohup php -S 127.0.0.1:3000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php > ../storage/logs/server.log 2>&1 &
+          cd ..
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/up > /dev/null && exit 0; sleep 1; done
+          echo "起動しませんでした"; cat storage/logs/server.log; exit 1
+
+      # 全ページを開く（中身は .github/scripts/smoke.sh）
+      - name: 全画面を開く
+        run: bash .github/scripts/smoke.sh
+
+      - name: 失敗したときのログ
+        if: failure()
+        run: cat storage/logs/*.log 2>/dev/null || echo "ログはありません"
+
+  # ---------------------------------------------------
+  # ブラウザ自動操作（E2E）
+  # ---------------------------------------------------
+  e2e:
+    name: ブラウザ自動操作
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-app
+
+      - name: 教材を起動
+        run: |
+          cd public
+          PHP_CLI_SERVER_WORKERS=4 nohup php -S 127.0.0.1:3000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php > ../storage/logs/server.log 2>&1 &
+          cd ..
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/up > /dev/null && exit 0; sleep 1; done
+          echo "起動しませんでした"; cat storage/logs/server.log; exit 1
+
+      # Node.js と Playwright（ブラウザを自動で動かす道具）を用意する
+      - name: Node.js を準備
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+
+      - name: Playwright を準備
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      # 操作の中身は tests/e2e/specs/ にある
+      - name: ブラウザで操作する
+        working-directory: tests/e2e
+        run: npx playwright test
+
+      # 失敗したら、画面のスクリーンショットと操作の記録を Actions の画面からダウンロードできるようにする
+      - name: 失敗したときの記録を保存
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            tests/e2e/playwright-report/
+            tests/e2e/test-results/
+          retention-days: 7
+
+  # ---------------------------------------------------
+  # Docker で起動（受講者と同じ方法）
+  # ---------------------------------------------------
+  docker:
+    name: Docker で起動
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      # 受講者がやるのと同じ  docker compose up  （-d で裏で動かす）
+      - name: docker compose up
+        run: docker compose up -d --build app
+
+      # 初回は composer install などで数分かかるので、最大10分待つ
+      - name: 起動するまで待つ
+        run: |
+          for i in $(seq 1 120); do
+            if curl -fsS http://localhost:3000/up > /dev/null 2>&1; then echo "起動しました（約$((i * 5))秒）"; exit 0; fi
+            sleep 5
+          done
+          echo "10分待っても起動しませんでした"; exit 1
+
+      # 主な画面が開けるか（中身まで細かく見るのは smoke と e2e の役目）
+      - name: 主な画面を開く
+        run: |
+          for path in / /admin/login /mock/phone /build /inside; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "http://localhost:3000$path")
+            echo "$code  $path"
+            [ "$code" -lt 500 ] || exit 1
+          done
+
+      - name: 失敗したときのログ
+        if: failure()
+        run: docker compose logs app
+
+      - name: 片付け
+        if: always()
+        run: docker compose down -v
+
+  # ---------------------------------------------------
+  # 手順書のリンク（中のリンクだけ。ネットにはつながない）
+  # ---------------------------------------------------
+  docs:
+    name: 手順書のリンク
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # lychee：Markdown の中のリンク・画像・ページ内リンク（#見出し）が切れていないか
+      - name: リンクと画像をチェック
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --offline --include-fragments --no-progress
+            --exclude-path vendor --exclude-path tests/e2e/node_modules
+            './**/*.md'
+
+  # ---------------------------------------------------
+  # 手順書の外部リンク（定期実行・手動のときだけ）
+  #   外のサイトは一時的に落ちていることもあるので、push のたびには見ない
+  # ---------------------------------------------------
+  docs-external:
+    name: 手順書の外部リンク
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: 外部リンクをチェック
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --max-retries 3 --accept 200,206,429
+            --exclude localhost --exclude 127.0.0.1
+            --exclude-path vendor --exclude-path tests/e2e/node_modules
+            './**/*.md'

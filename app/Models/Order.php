@@ -7,6 +7,7 @@ use App\Enums\PaymentMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
@@ -41,7 +42,7 @@ class Order extends Model
     {
         static::creating(function (self $o) {
             if ($o->order_code) return;
-            do { $code = strtoupper(\Illuminate\Support\Str::random(10)); $code = strtr($code, ['0' => 'X', 'O' => 'Y', 'I' => 'Z', '1' => 'K', 'L' => 'M']); }
+            do { $code = strtoupper(Str::random(10)); $code = strtr($code, ['0' => 'X', 'O' => 'Y', 'I' => 'Z', '1' => 'K', 'L' => 'M']); }
             while (self::where('order_code', $code)->exists());
             $o->order_code = $code;
         });

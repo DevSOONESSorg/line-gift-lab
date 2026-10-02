@@ -1,0 +1,41 @@
+# =====================================================
+# Dependabot：使っている部品の新しい版が出たら、更新の PR を自動で作る
+#   PR ができると CI が走るので、「更新しても教材が壊れないか」まで自動でわかります。
+#   ✅ ならマージ、❌ なら中身を見て判断します。
+# =====================================================
+version: 2
+updates:
+  # Laravel 本体などの PHP の部品（composer.json / composer.lock）
+  - package-ecosystem: composer
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '09:00'
+      timezone: Asia/Tokyo
+    open-pull-requests-limit: 5
+    groups:
+      # 小さな更新（バグ修正・機能追加）は1つの PR にまとめる
+      composer-minor:
+        update-types: [minor, patch]
+
+  # E2E テストの道具（tests/e2e/package.json）
+  - package-ecosystem: npm
+    directory: /tests/e2e
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo
+
+  # CI で使っているアクション（actions/checkout など）
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo
+
+  # Dockerfile の土台（php:8.4-cli-bookworm）
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo

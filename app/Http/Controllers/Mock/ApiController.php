@@ -39,7 +39,7 @@ class ApiController extends Controller
         $to = (string) $request->input('to');
         if (! $ch->officialAccount->isFriend($to)) {
             // 本物も、友だちでない／ブロック中の人への送信はエラーにならず「届かない」だけ
-            Inside::ng('line', "API 送信 → 200 でも届いていません（".Inside::mask($to, 6)." は「{$ch->officialAccount->name}」の友だちではない／ブロック中）");
+            Inside::ng('line', 'API 送信 → 200 でも届いていません（'.Inside::mask($to, 6)." は「{$ch->officialAccount->name}」の友だちではない／ブロック中）");
             return response()->json(['sentMessages' => []]);
         }
         $texts = $this->texts($request->input('messages', []));

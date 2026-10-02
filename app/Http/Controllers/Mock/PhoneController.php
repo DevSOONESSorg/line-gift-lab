@@ -7,6 +7,8 @@ use App\Models\Mock\LiffApp;
 use App\Models\Mock\LineUser;
 use App\Models\Mock\Message;
 use App\Models\Mock\OfficialAccount;
+use App\Services\BuildGuide;
+use App\Services\BuildScenario;
 use App\Services\MockLine\MockLine;
 use App\Support\Inside;
 use Illuminate\Http\Request;
@@ -47,7 +49,7 @@ class PhoneController extends Controller
             }
             if ($liff->bot_prompt && $ch) {
                 $linked = $ch->linkedOa;
-                if (! $linked) Inside::info('line', "友だち追加オプションは On ですが、チャネルに「リンクされたLINE公式アカウント」がないので、友だち追加をすすめられません");
+                if (! $linked) Inside::info('line', '友だち追加オプションは On ですが、チャネルに「リンクされたLINE公式アカウント」がないので、友だち追加をすすめられません');
                 elseif (! $linked->isFriend($me->user_id)) Inside::info('line', "友だち追加オプション：「{$linked->name}」（{$linked->basic_id}）の友だち追加をすすめました", '本物のLINEでは、LIFF を開く同意画面に「友だち追加」のチェックが出ます');
             }
             $ep = parse_url($liff->endpoint_url);
@@ -105,8 +107,8 @@ class PhoneController extends Controller
             $richMenu = $chat->richMenus()->where('is_default', true)->latest('id')->first();
             // 課題のお店は、構築ナビのリッチメニューの手順が終わるまで、リッチメニューを押せないようにする
             //   （完成したお店は、ほかのお店を構築中でも押せる）
-            $scStore = \App\Services\BuildScenario::storeOfOa($chat->id);
-            $rmLocked = $scStore && ! (new \App\Services\BuildGuide($scStore))->isDone('richmenu');
+            $scStore = BuildScenario::storeOfOa($chat->id);
+            $rmLocked = $scStore && ! (new BuildGuide($scStore))->isDone('richmenu');
         }
         $open = null;
         $addTarget = $request->query('add');
