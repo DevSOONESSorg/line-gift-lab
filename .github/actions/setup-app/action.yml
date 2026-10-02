@@ -10,7 +10,7 @@ description: PHP・部品・.env・DB を用意して、初期データを入れ
 runs:
   using: composite
   steps:
-    # PHP を入れる（Dockerfile と同じ 8.4。SQLite と zip も使えるようにする）
+    # PHP を入れる。版は Dockerfile の FROM php:〇〇 と必ずそろえる（受講者の環境と同じにするため）
     - name: PHP 8.4 を準備
       uses: shivammathur/setup-php@v2
       with:
