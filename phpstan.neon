@@ -1,0 +1,21 @@
+# =====================================================
+# 静的解析（Larastan / PHPStan）の設定
+#   コードを「実行せずに読んで」バグになりそうな所を探します。
+#   level は 0〜10。数字が大きいほど厳しい。
+#
+#   phpstan-baseline.neon … 導入した時点ですでにあった指摘の一覧（いったん許す）
+#   → 「これから書くコード」だけが新しい指摘として CI で止まります。
+#   指摘を直したら、baseline から消して減らしていくのが理想です。
+# =====================================================
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - routes
+        - database
+    # baseline にあるのに、もう起きない指摘（＝直った）はエラーにしない
+    reportUnmatchedIgnoredErrors: false

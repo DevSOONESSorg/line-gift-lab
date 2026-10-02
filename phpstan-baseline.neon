@@ -1,0 +1,817 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$officialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/Drill.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$webhook_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/Drill.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$channel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/Drill.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$stores\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AgentController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/OrderController.php
+
+		-
+			message: '#^Parameter \#3 \$parameters of static method Illuminate\\Support\\Facades\\URL\:\:temporarySignedRoute\(\) expects array, App\\Models\\Order given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Admin/OrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$month\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/StoreController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$year\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/StoreController.php
+
+		-
+			message: '#^Parameter \#1 \$boolean of function abort_unless expects bool, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/BuildController.php
+
+		-
+			message: '#^Call to function abort_unless\(\) with arguments bool, 404 and ''決済が確定した注文だけ領収書を出せます。'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: app/Http/Controllers/Liff/HistoryController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Liff/OrderController.php
+
+		-
+			message: '#^Parameter \#2 \$menu of static method App\\Services\\OrderService\:\:create\(\) expects App\\Models\\Menu, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\|Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Liff/OrderController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$menu_template_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Liff/OwnerController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Liff/OwnerController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$price\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Liff/OwnerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$channel_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/ApiController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LineUser\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ApiController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Account\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Account\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\Mock\\Account\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$channel_id\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$is_published\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$liffApps\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$linkedOa\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$privacy_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$provider\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$provider_id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$two_factor\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$type\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$use_webhook\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$webhook_url\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/DevelopersController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Account\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Account\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$enabled\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$official_account_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$auto_reply_on\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$greeting_on\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$messagingChannel\.$#'
+			identifier: property.notFound
+			count: 6
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 7
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$response_mode\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\Mock\\OfficialAccount\>\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Parameter \#1 \$boolean of function abort_unless expects bool, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Mock/ManagerController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$bot_prompt\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$channel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$endpoint_url\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\Mock\\LiffApp\>\:\:\$scopes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$last\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 2
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>size" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Http/Controllers/Mock/PhoneController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\RichMenu\:\:\$bar_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\RichMenu\:\:\$image_path\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\RichMenu\:\:\$official_account_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\RichMenu\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Parameter \#1 \$boolean of function abort_unless expects bool, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Mock/RichMenuController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LineUser\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\Mock\\LineUser\>\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/IdentifyLineUser.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LineUser\|Illuminate\\Database\\Eloquent\\Collection\<\(int\|string\), App\\Models\\Mock\\LineUser\>\:\:\$phone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Middleware/IdentifyLineUser.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$keywords\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Mock/AutoReply.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LineUser\:\:\$phone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Mock/LineUser.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\RichMenu\:\:\$template\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Mock/RichMenu.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$line_display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>line_display_name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Models/Order.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Models/Setting.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$access_token\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$channel_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$country\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$is_published\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$linked_oa_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$privacy_url\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$provider_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$secret\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$two_factor\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$use_webhook\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$webhook_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$webhook_verified_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$bot_prompt\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$channel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$scopes\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LiffApp\:\:\$size\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Message\:\:\$created_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Message\:\:\$direction\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Message\:\:\$text\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Message\:\:\$via\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$auto_reply_on\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$basic_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$greeting_on\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$messagingChannel\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$response_mode\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>channel" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/BuildGuide.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$auto_reply_on\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$basic_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$greeting_on\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$richMenus\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Offset \(''お店の情報''\|''キャスト''\|''キャスト紹介''\|''ホスト紹介''\|''予約したい''\|''出勤情報''\|''営業時間''\|''料金システム''\) on array\{お店の情報\: literal\-string&non\-falsy\-string, 営業時間\: ''営業時間 20\:00〜翌1\:00…'', キャスト紹介\: ''在籍キャストは Instagram…'', キャスト\: ''在籍キャストは Instagram…'', ホスト紹介\: ''在籍ホストは Instagram…'', 出勤情報\: ''本日の出勤は Instagram…'', 料金システム\: ''SET 60分 ¥5…'', 予約したい\: ''ご予約ありがとうございます。…''\} in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.offset
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Parameter \#2 \$value of static method App\\Models\\Setting\:\:put\(\) expects string, int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Parameter \#2 \$value of static method App\\Models\\Setting\:\:put\(\) expects string, int\<0, max\> given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/BuildScenario.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/Line/LineClient.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\AutoReply\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$channel_id\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$officialAccount\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$secret\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$webhook_url\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\LineUser\:\:\$display_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$auto_reply_on\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$greeting_on\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$greeting_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$messagingChannel\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$response_mode\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Provider\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>bot_user_id" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Services/MockLine/MockLine.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$line_user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasOwnMessagingChannel\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Parameter \#1 \$store of static method App\\Services\\Line\\LineClient\:\:forStore\(\) expects App\\Models\\Store, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Parameter \#1 \$store of static method App\\Services\\Notifier\:\:toOwner\(\) expects App\\Models\\Store, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/Notifier.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$channel_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\Channel\:\:\$secret\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Mock\\OfficialAccount\:\:\$basic_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$price\.$#'
+			identifier: property.notFound
+			count: 2
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Call to function in_array\(\) with \*NEVER\* and array\{App\\Enums\\OrderStatus\:\:Received, App\\Enums\\OrderStatus\:\:Thanked, App\\Enums\\OrderStatus\:\:Refunded\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Call to function in_array\(\) with \*NEVER\* and array\{App\\Enums\\OrderStatus\:\:Requested, App\\Enums\\OrderStatus\:\:AwaitingPayment\} will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between \*NEVER\* and App\\Enums\\OrderStatus\:\:Cancelled will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between \*NEVER\* and App\\Enums\\OrderStatus\:\:Refunded will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: database/seeders/DatabaseSeeder.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between \*NEVER\* and App\\Enums\\OrderStatus\:\:Thanked will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 3
+			path: database/seeders/DatabaseSeeder.php
