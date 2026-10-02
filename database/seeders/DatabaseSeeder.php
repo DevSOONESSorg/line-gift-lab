@@ -6,7 +6,6 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Models\Agent;
 use App\Models\Customer;
-use App\Models\Menu;
 use App\Models\MenuTemplate;
 use App\Models\Mock\LineUser;
 use App\Models\Mock\OfficialAccount;
@@ -16,6 +15,7 @@ use App\Models\Store;
 use App\Models\User;
 use App\Services\CommissionService;
 use App\Services\MockLine\MockLine;
+use App\Support\Inside;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -173,7 +173,7 @@ class DatabaseSeeder extends Seeder
         $this->sampleOrders($bar, $cafe);
 
         DB::connection('inside')->table('logs')->delete();   // 初期データづくりの記録は消しておく
-        \App\Support\Inside::info('app', '初期データを作りました（運営LINE・バー ノクターン・シャンパンバー ルミエール・承認待ちの店・練習用の注文）');
+        Inside::info('app', '初期データを作りました（運営LINE・バー ノクターン・シャンパンバー ルミエール・承認待ちの店・練習用の注文）');
     }
 
     private function richMenu(OfficialAccount $oa, string $title, string $template, string $image, array $actions): void

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\Store;
 use App\Services\BuildGuide;
 use App\Services\BuildScenario;
+use App\Support\Inside;
 use Illuminate\Http\Request;
 
 // 構築ナビ：どのお店を構築中かを覚え、手順の一覧を表示する
@@ -53,11 +55,11 @@ class BuildController extends Controller
         abort_unless($guide?->scenario, 404);
         $data = $r->validate(['auto_reply_on' => 'required|in:1,0', 'keywords' => 'required|integer|min:0|max:99', 'greeting_on' => 'required|in:1,0', 'case' => 'required|in:A,B'],
             [], ['auto_reply_on' => '応答メッセージ', 'keywords' => 'キーワード応答の件数', 'greeting_on' => 'あいさつメッセージ', 'case' => 'ケース']);
-        \App\Models\Setting::put("build.snapshot.{$guide->scenario}", json_encode([
+        Setting::put("build.snapshot.{$guide->scenario}", json_encode([
             'auto_reply_on' => $data['auto_reply_on'] === '1', 'keywords' => (int) $data['keywords'], 'greeting_on' => $data['greeting_on'] === '1',
             'case' => $data['case'], 'at' => now()->format('Y-m-d H:i'),
         ], JSON_UNESCAPED_UNICODE));
-        \App\Support\Inside::info('app', "「{$guide->store->name}」の変更前の状態を控えました",
+        Inside::info('app', "「{$guide->store->name}」の変更前の状態を控えました",
             '応答メッセージ: '.($data['auto_reply_on'] === '1' ? 'ON' : 'OFF')."\nキーワード応答: {$data['keywords']}件\nあいさつメッセージ: ".($data['greeting_on'] === '1' ? 'ON' : 'OFF')."\n判定: ケース{$data['case']}");
         return back();
     }

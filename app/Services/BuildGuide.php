@@ -2,15 +2,18 @@
 
 namespace App\Services;
 
+use App\Enums\OrderStatus;
 use App\Models\Mock\Channel;
 use App\Models\Mock\LiffApp;
+use App\Models\Mock\LineUser;
+use App\Models\Mock\Message;
 use App\Models\Mock\OfficialAccount;
 use App\Models\Mock\Provider;
-use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Setting;
 use App\Models\Store;
 use App\Services\MockLine\MockLine;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 // =====================================================
@@ -99,10 +102,10 @@ class BuildGuide
     public function finalCheck(): array
     {
         if (! $this->oa) return [false, null];
-        $guest = \App\Models\Mock\LineUser::me('customer');
-        $msgs = \App\Models\Mock\Message::where(['official_account_id' => $this->oa->id, 'user_id' => $guest->user_id])->orderBy('id')->get();
+        $guest = LineUser::me('customer');
+        $msgs = Message::where(['official_account_id' => $this->oa->id, 'user_id' => $guest->user_id])->orderBy('id')->get();
         $first = Order::where(['store_id' => $this->store->id, 'route' => 'original'])->min('created_at');
-        $since = $first ? \Carbon\Carbon::parse($first) : null;
+        $since = $first ? Carbon::parse($first) : null;
         $keywords = $this->initial()['keyword_list'] ?? [];
         $result = [false, null];
         foreach ($msgs as $i => $m) {

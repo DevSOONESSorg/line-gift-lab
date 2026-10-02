@@ -24,7 +24,7 @@ class ManagerController extends Controller
     private function guard(Request $r, OfficialAccount $oa): string
     {
         $role = $oa->roleOf($this->me($r));
-        abort_unless($role, 403, "「".Account::find($this->me($r))->name."」は「{$oa->name}」のメンバーではありません。権限管理で招待URLを発行してもらい、参加してください。");
+        abort_unless($role, 403, '「'.Account::find($this->me($r))->name."」は「{$oa->name}」のメンバーではありません。権限管理で招待URLを発行してもらい、参加してください。");
         view()->share(['oa' => $oa, 'role' => $role, 'roles' => self::ROLES]);
         return $role;
     }

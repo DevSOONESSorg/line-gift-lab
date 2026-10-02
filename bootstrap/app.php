@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\IdentifyLineUser;
+use App\Http\Middleware\MockLineToken;
+use App\Http\Middleware\ShareLabContext;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,15 +17,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // 名前で呼べるミドルウェア（routes/web.php で ->middleware('line.user') のように使う）
         $middleware->alias([
-            'line.user' => \App\Http\Middleware\IdentifyLineUser::class,
-            'mock.token' => \App\Http\Middleware\MockLineToken::class,
+            'line.user' => IdentifyLineUser::class,
+            'mock.token' => MockLineToken::class,
         ]);
         // 疑似LINEのAPIは「サーバー同士」の通信なので、画面用の CSRF チェックはしない
         $middleware->validateCsrfTokens(except: ['mock-line-api/*']);
         // 未ログインで管理画面を開いたらログイン画面へ
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
         // 全画面で使う共通の値（環境名など）
-        $middleware->web(append: [\App\Http\Middleware\ShareLabContext::class]);
+        $middleware->web(append: [ShareLabContext::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

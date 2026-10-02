@@ -6,6 +6,7 @@
 // =====================================================
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\BuildController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InsideController;
 use App\Http\Controllers\Liff;
@@ -15,12 +16,12 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 
 // 構築ナビ（オリジナルのお店の公式LINEを、本番と同じ順番でつなぐ道案内）
-Route::get('build', [\App\Http\Controllers\BuildController::class, 'index'])->name('build');
-Route::post('build/select', [\App\Http\Controllers\BuildController::class, 'select'])->name('build.select');
-Route::post('build/stop', [\App\Http\Controllers\BuildController::class, 'stop'])->name('build.stop');
-Route::get('build/nav', [\App\Http\Controllers\BuildController::class, 'nav'])->name('build.nav');
-Route::post('build/reset', [\App\Http\Controllers\BuildController::class, 'resetAll'])->name('build.reset');
-Route::post('build/snapshot', [\App\Http\Controllers\BuildController::class, 'snapshot'])->name('build.snapshot');
+Route::get('build', [BuildController::class, 'index'])->name('build');
+Route::post('build/select', [BuildController::class, 'select'])->name('build.select');
+Route::post('build/stop', [BuildController::class, 'stop'])->name('build.stop');
+Route::get('build/nav', [BuildController::class, 'nav'])->name('build.nav');
+Route::post('build/reset', [BuildController::class, 'resetAll'])->name('build.reset');
+Route::post('build/snapshot', [BuildController::class, 'snapshot'])->name('build.snapshot');
 
 // ---------------------------------------------------------------
 // 管理画面（運営スタッフ）… ログインが必要
