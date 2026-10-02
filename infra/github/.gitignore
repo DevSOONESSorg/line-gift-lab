@@ -1,0 +1,13 @@
+# Terraform がダウンロードした部品（terraform init で毎回作り直せる）
+.terraform/
+
+# 状態ファイル：「今 GitHub がどうなっているか」の記録。
+# 自分のPCにだけ置き、GitHub には上げない（設定の中身が丸見えになるため）
+*.tfstate
+*.tfstate.*
+
+# 自分だけの変数ファイル（トークンなどを書いてしまいやすい）
+*.tfvars
+crash.log
+
+# .terraform.lock.hcl は「部品の版を固定するメモ」なので、GitHub に上げる（無視しない）
