@@ -1,0 +1,10 @@
+# =====================================================
+# 手順書のリンクチェック（lychee）で、わざとチェックしないURL
+#   図の説明文（画像の alt）に書いた「見本の書き方」で、本物のリンクではないもの
+# =====================================================
+
+# LIFF URL の形の説明（https://liff.line.me/{LIFF ID}）。docs/course-a/04-liff.md の図
+^https://liff\.line\.me/LIFF/?$
+
+# トンネルのURLの見本（xxxx の部分は起動するたびに変わる）。docs/course-b/B3-webhook.md の図
+trycloudflare
