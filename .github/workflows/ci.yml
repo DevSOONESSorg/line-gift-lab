@@ -1,0 +1,83 @@
+# =====================================================
+# CI（継続的インテグレーション）
+#   push や PR のたびに、GitHub が用意したまっさらなパソコン（Ubuntu）で
+#   「教材が起動できて、テストが通るか」を自動で確かめます。
+#   結果は GitHub の「Actions」タブと、PR の画面に ✅ / ❌ で出ます。
+#
+#   中でやっていることは docker/start.sh とほぼ同じです。
+#   （start.sh は受講者のPCで、このファイルは GitHub のパソコンで動く）
+# =====================================================
+name: CI
+
+# いつ動かすか
+on:
+  push:
+    branches: [main]        # main に push されたとき
+  pull_request:             # PR を作った・更新したとき（どのブランチ宛てでも）
+  workflow_dispatch:        # Actions タブの「Run workflow」ボタンから手動でも動かせる
+
+# 同じブランチで続けて push したら、古い方の実行は止める（待ち時間とムダを減らす）
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: 起動とテスト
+    runs-on: ubuntu-latest   # GitHub が貸してくれるパソコンの種類
+    timeout-minutes: 15      # 何かで止まっても15分で打ち切る
+
+    steps:
+      # 1. リポジトリのコードを、GitHub のパソコンに取ってくる（git clone と同じ）
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      # 2. PHP を入れる（Dockerfile と同じ 8.4。SQLite と zip も使えるようにする）
+      - name: PHP 8.4 を準備
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, zip
+          coverage: none
+          tools: composer:v2
+
+      # 3. composer のダウンロード結果を覚えておく（2回目以降が速くなる）
+      #    composer.lock が変わったら、覚えていた分は使わずに取り直す
+      - name: composer のキャッシュ
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      # 4. Laravel 本体などの部品を入れる（start.sh の「vendor がなければ composer install」）
+      - name: 部品を入れる（composer install）
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      # 5. 起動前の準備（start.sh の 1〜4 と同じ）
+      #    .env を作る → 暗号化の鍵を作る → 一時フォルダを作る → DBファイル3つを作る
+      - name: 起動前の準備（.env・鍵・フォルダ・DBファイル）
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          mkdir -p storage/framework/views storage/framework/sessions storage/framework/cache/data storage/logs bootstrap/cache
+          touch database/database.sqlite database/mockline.sqlite database/inside.sqlite
+
+      # 6. 表を作って初期データ（クラブ アズールなど）を入れる
+      #    ここで失敗する ＝ 受講者が docker compose up した瞬間に失敗する
+      - name: DBを作って初期データを入れる
+        run: php artisan migrate:fresh --seed --force
+
+      # 7. 画面（Blade）を全部まとめて変換してみる
+      #    画面のファイルに書き間違いがあると、ここで見つかる
+      - name: 画面のファイルをチェック
+        run: php artisan view:cache
+
+      # 8. テストを実行（tests/ フォルダの中身）
+      - name: テスト
+        run: php artisan test
+
+      # 9. 失敗したときだけ、Laravel のログを表示する（原因を探す手がかり）
+      - name: 失敗したときのログ
+        if: failure()
+        run: cat storage/logs/*.log 2>/dev/null || echo "ログはありません"
