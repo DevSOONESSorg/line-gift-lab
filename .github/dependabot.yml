@@ -19,6 +19,13 @@ updates:
       composer-minor:
         update-types: [minor, patch]
 
+  # Terraform の GitHub 用の部品（infra/github/.terraform.lock.hcl）
+  - package-ecosystem: terraform
+    directory: /infra/github
+    schedule:
+      interval: monthly
+      timezone: Asia/Tokyo
+
   # E2E テストの道具（tests/e2e/package.json）
   - package-ecosystem: npm
     directory: /tests/e2e
