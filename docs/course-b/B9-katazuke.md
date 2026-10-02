@@ -35,4 +35,4 @@ docker compose up -d && docker compose exec app php artisan migrate:fresh --seed
 
 ## 6. 方法B（メールアドレスのビジネスID）の人
 
-ビジネスIDは残しておいても害はありませんが、不要なら <https://account.line.biz/> のアカウント設定から削除できます。
+ビジネスIDは残しておいても害はありませんが、不要なら <https://manager.line.biz/> からログインし、ビジネスIDのアカウント設定から削除できます。
