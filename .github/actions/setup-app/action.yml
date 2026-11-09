@@ -21,7 +21,7 @@ runs:
 
     # composer のダウンロード結果を覚えておく（2回目以降が速くなる）
     - name: composer のキャッシュ
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ~/.composer/cache/files
         key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
